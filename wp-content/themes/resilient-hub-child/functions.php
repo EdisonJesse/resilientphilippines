@@ -163,6 +163,11 @@ function rp_child_submit_resource_auth_gate() {
 			wp_safe_redirect( $redirect_url );
 			exit;
 		}
+	} else {
+		if ( is_page( 'submit-post' ) && ! current_user_can( 'publish_posts' ) && ! current_user_can( 'manage_options' ) ) {
+			wp_safe_redirect( home_url( '/' ) );
+			exit;
+		}
 	}
 }
 add_action( 'template_redirect', 'rp_child_submit_resource_auth_gate' );

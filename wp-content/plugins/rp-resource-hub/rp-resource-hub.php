@@ -2967,6 +2967,11 @@ function rp_resource_hub_submit_post_shortcode() {
 		return ob_get_clean();
 	}
 
+	if ( ! current_user_can( 'publish_posts' ) && ! current_user_can( 'manage_options' ) ) {
+		echo '<div class="rp-notice rp-notice-error">' . esc_html__( 'You do not have permission to submit posts or stories.', 'rp-resource-hub' ) . '</div>';
+		return ob_get_clean();
+	}
+
 	$notice = rp_resource_hub_get_upload_notice();
 	if ( $notice ) {
 		$notice_class = 'success' === $notice['type'] ? 'rp-notice-success' : 'rp-notice-error';
@@ -3038,6 +3043,10 @@ function rp_resource_hub_handle_post_upload() {
 	if ( ! is_user_logged_in() ) {
 		wp_safe_redirect( wp_login_url( home_url( '/submit-post/' ) ) );
 		exit;
+	}
+
+	if ( ! current_user_can( 'publish_posts' ) && ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'You do not have permission to submit posts or stories.', 'rp-resource-hub' ) );
 	}
 
 	$nonce = isset( $_POST['rp_post_upload_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_post_upload_nonce'] ) ) : '';

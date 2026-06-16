@@ -67,7 +67,9 @@
 							<li><a href="<?php echo esc_url( home_url( '/profile/' ) ); ?>"><?php esc_html_e( 'My Profile & Privacy', 'resilient-hub' ); ?></a></li>
 							<li><a href="<?php echo esc_url( home_url( '/my-contributions/' ) ); ?>"><?php esc_html_e( 'My Contributions', 'resilient-hub' ); ?></a></li>
 							<li><a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>"><?php esc_html_e( 'Submit a Resource', 'resilient-hub' ); ?></a></li>
-							<li><a href="<?php echo esc_url( home_url( '/submit-post/' ) ); ?>"><?php esc_html_e( 'Submit a Post/Story', 'resilient-hub' ); ?></a></li>
+							<?php if ( current_user_can( 'publish_posts' ) || current_user_can( 'manage_options' ) ) : ?>
+								<li><a href="<?php echo esc_url( home_url( '/submit-post/' ) ); ?>"><?php esc_html_e( 'Submit a Post/Story', 'resilient-hub' ); ?></a></li>
+							<?php endif; ?>
 							<li><a href="<?php echo esc_url( home_url( '/submit-sitrep/' ) ); ?>"><?php esc_html_e( 'Submit a SitRep', 'resilient-hub' ); ?></a></li>
 							<?php 
 							$can_moderate = current_user_can( 'manage_options' ) || current_user_can( 'publish_posts' ) || current_user_can( 'publish_partner_resources' ) || current_user_can( 'publish_rp_sitreps' );
