@@ -408,6 +408,11 @@ function rp_resource_hub_get_ip() {
 }
 
 function rp_resource_hub_track_page_view() {
+	// Check cookie opt-out choice
+	if ( isset( $_COOKIE['rp_cookie_consent'] ) && 'declined' === $_COOKIE['rp_cookie_consent'] ) {
+		return;
+	}
+
 	if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 		return;
 	}
@@ -454,6 +459,11 @@ function rp_resource_hub_track_page_view() {
 add_action( 'template_redirect', 'rp_resource_hub_track_page_view' );
 
 function rp_resource_hub_log_download( $post_id ) {
+	// Check cookie opt-out choice
+	if ( isset( $_COOKIE['rp_cookie_consent'] ) && 'declined' === $_COOKIE['rp_cookie_consent'] ) {
+		return;
+	}
+
 	global $wpdb;
 	$downloads_table = $wpdb->prefix . 'rp_analytics_downloads';
 	$ip_address = rp_resource_hub_get_ip();

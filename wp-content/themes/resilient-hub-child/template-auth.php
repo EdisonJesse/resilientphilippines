@@ -54,6 +54,10 @@ if ( $_SERVER['REQUEST_METHOD'] === 'POST' && isset( $_POST['rp_register_submit'
 		$password         = $_POST['user_password'];
 		$confirm_password = $_POST['confirm_password'];
 
+		if ( ! isset( $_POST['rp_privacy_consent'] ) ) {
+			$register_errors[] = __( 'You must agree to the Privacy Policy and Terms of Service to register.', 'resilient-hub' );
+		}
+
 		if ( empty( $username ) || empty( $email ) || empty( $first_name ) || empty( $last_name ) || empty( $password ) || empty( $confirm_password ) ) {
 			$register_errors[] = __( 'All fields are required.', 'resilient-hub' );
 		}
@@ -218,6 +222,19 @@ get_header();
 									<input type="password" name="confirm_password" id="confirm_password" class="input" required autocomplete="new-password">
 								</div>
 							</div>
+							
+							<div class="rp-auth-consent" style="margin-top: 16px; margin-bottom: 20px; font-size: 13px; color: #4b5563; display: flex; align-items: flex-start; gap: 8px;">
+								<input type="checkbox" name="rp_privacy_consent" id="rp_privacy_consent" style="margin-top: 3px;" required>
+								<label for="rp_privacy_consent">
+									<?php printf(
+										/* translators: 1: Privacy Policy URL, 2: Terms of Service URL */
+										__( 'I agree to the %1$s and %2$s. I consent to my registration details being processed in accordance with these policies.', 'resilient-hub' ),
+										'<a href="' . esc_url( home_url( '/privacy-policy/' ) ) . '" target="_blank">' . __( 'Privacy Policy', 'resilient-hub' ) . '</a>',
+										'<a href="' . esc_url( home_url( '/terms-of-service/' ) ) . '" target="_blank">' . __( 'Terms of Service', 'resilient-hub' ) . '</a>'
+									); ?>
+								</label>
+							</div>
+							
 							<button type="submit" name="rp_register_submit" class="rp-button rp-auth-submit"><?php esc_html_e( 'Create Account', 'resilient-hub' ); ?></button>
 						</form>
 					</div>

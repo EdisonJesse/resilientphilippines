@@ -118,11 +118,17 @@ get_header();
 								?>
 								<tr id="rp-user-row-<?php echo absint( $user->ID ); ?>">
 									<td>
+										<?php 
+										$deletion_requested = get_user_meta( $user->ID, '_rp_deletion_requested', true ); 
+										?>
 										<div class="rp-user-name-cell">
 											<?php echo get_avatar( $user->ID, 36, '', '', array( 'class' => 'rp-user-avatar' ) ); ?>
 											<div>
 												<span class="rp-user-display-name"><?php echo esc_html( $user->display_name ); ?></span>
 												<span class="rp-user-login-name">@<?php echo esc_html( $user->user_login ); ?></span>
+												<?php if ( $deletion_requested ) : ?>
+													<span class="rp-role-badge" style="background: #fee2e2; color: #b91c1c; font-size: 10px; margin-top: 4px; display: inline-block; font-weight: 700; border-radius: 4px; padding: 2px 6px;"><?php esc_html_e( 'DELETION REQUESTED', 'resilient-hub' ); ?></span>
+												<?php endif; ?>
 											</div>
 										</div>
 									</td>
@@ -143,6 +149,9 @@ get_header();
 												</select>
 												<button class="rp-btn-update-role" data-user-id="<?php echo absint( $user->ID ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'rp_update_role_' . $user->ID ) ); ?>">
 													<?php esc_html_e( 'Update', 'resilient-hub' ); ?>
+												</button>
+												<button class="rp-btn-delete-user" data-user-id="<?php echo absint( $user->ID ); ?>" data-nonce="<?php echo esc_attr( wp_create_nonce( 'rp_delete_user_' . $user->ID ) ); ?>" style="background: #dc2626; border-color: #dc2626; color: #fff; margin-left: 8px;">
+													<?php esc_html_e( 'Delete', 'resilient-hub' ); ?>
 												</button>
 											</div>
 										<?php endif; ?>
@@ -215,6 +224,55 @@ get_header();
 			.catch(function() {
 				button.disabled = false;
 				button.textContent = '<?php echo esc_js( __( 'Update', 'resilient-hub' ) ); ?>';
+			});
+		});
+	});
+
+	// Handle Admin Deleting User
+	document.querySelectorAll('.rp-btn-delete-user').forEach(function(btn) {
+		btn.addEventListener('click', function(e) {
+			e.preventDefault();
+			var button = this;
+			var userId = button.getAttribute('data-user-id');
+			var nonce = button.getAttribute('data-nonce');
+			var row = document.getElementById('rp-user-row-' + userId);
+
+			if (!confirm('<?php echo esc_js( __( 'Are you sure you want to permanently delete this user? All their submitted resources will be reassigned to you.', 'resilient-hub' ) ); ?>')) {
+				return;
+			}
+
+			button.disabled = true;
+			var originalText = button.textContent;
+			button.textContent = '<?php echo esc_js( __( 'Deleting...', 'resilient-hub' ) ); ?>';
+
+			var formData = new FormData();
+			formData.append('action', 'rp_delete_user');
+			formData.append('user_id', userId);
+			formData.append('nonce', nonce);
+
+			fetch('<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>', {
+				method: 'POST',
+				credentials: 'same-origin',
+				body: formData
+			})
+			.then(function(r) { return r.json(); })
+			.then(function(data) {
+				if (data.success) {
+					row.style.opacity = '0.5';
+					row.style.background = '#fee2e2';
+					row.style.transition = 'all 0.5s ease';
+					setTimeout(function() {
+						row.remove();
+					}, 800);
+				} else {
+					alert(data.data.message || 'Error occurred.');
+					button.disabled = false;
+					button.textContent = originalText;
+				}
+			})
+			.catch(function() {
+				button.disabled = false;
+				button.textContent = originalText;
 			});
 		});
 	});

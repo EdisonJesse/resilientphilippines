@@ -2689,3 +2689,125 @@ input[type="submit"].give-submit:focus {
   color: #991b1b;
   background: #fee2e2;
 }
+
+/* Footer Bottom & Legal Links */
+.rp-footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--rp-color-border, #d9e2de);
+  margin-top: 40px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--rp-color-muted, #53666f);
+}
+.rp-footer-legal-links {
+  display: flex;
+  gap: 24px;
+}
+.rp-footer-legal-links a {
+  color: var(--rp-color-muted, #53666f);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+.rp-footer-legal-links a:hover,
+.rp-footer-legal-links a:focus {
+  color: var(--rp-color-green, #176b52);
+}
+
+/* Cookie Consent Banner */
+.rp-cookie-banner {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--rp-color-border, #d9e2de);
+  box-shadow: 0 10px 25px -5px rgba(16, 32, 39, 0.1), 0 8px 10px -6px rgba(16, 32, 39, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+  z-index: 99999;
+  max-width: var(--rp-max-width, 1180px);
+  margin: 0 auto;
+}
+.rp-cookie-banner-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.rp-cookie-banner-text {
+  flex: 1 1 500px;
+}
+.rp-cookie-banner-text h4 {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--rp-color-navy, #12324a);
+}
+.rp-cookie-banner-text p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--rp-color-muted, #53666f);
+  line-height: 1.5;
+}
+.rp-cookie-banner-text a {
+  text-decoration: underline;
+  color: var(--rp-color-green, #176b52);
+  font-weight: 600;
+}
+.rp-cookie-banner-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.rp-cookie-banner-actions button {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  border: none;
+  transition: all 0.2s ease;
+}
+.rp-button-secondary {
+  background: #e5e7eb;
+  color: #374151;
+}
+.rp-button-secondary:hover {
+  background: #d1d5db;
+}
+
+@media (max-width: 768px) {
+  .rp-footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+  .rp-footer-legal-links {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .rp-cookie-banner {
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    padding: 16px;
+  }
+  .rp-cookie-banner-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .rp-cookie-banner-actions {
+    justify-content: flex-end;
+  }
+}

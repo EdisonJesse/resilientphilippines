@@ -378,6 +378,49 @@ function rp_child_create_analytics_page() {
 add_action( 'init', 'rp_child_create_analytics_page' );
 
 /**
+ * Auto-create the compliance policies pages if they don't exist.
+ */
+function rp_child_create_compliance_pages() {
+	$policies = array(
+		'privacy-policy' => array(
+			'title'   => __( 'Privacy Policy', 'resilient-hub' ),
+			'content' => '<h2>1. Data Minimisation & Scope</h2><p>We only collect the absolute minimum data required to facilitate secure portal collaboration. This includes names, email addresses, and encrypted passwords for user authentication. Furthermore, we log standard client IP addresses and user agents when users view portal content or download files for security auditing and lightweight service metrics.</p><h2>2. Consent & Opt-Out</h2><p>Consistent with GDPR guidelines, portal account registration requires affirmative consent. All Optional tracking/analytics are disabled if you toggle your tracking preferences off in the Cookie Consent Banner or the Privacy & Data Rights dashboard.</p><h2>3. Data Access & Rights</h2><p>You maintain full ownership of your data. You may download a copy of all information logged on your profile (Data Portability) or request account deletion (Right to Erasure) directly in our self-service portal.</p>',
+		),
+		'terms-of-service' => array(
+			'title'   => __( 'Terms of Service', 'resilient-hub' ),
+			'content' => '<h2>1. Agreement & Account Rules</h2><p>By creating a Collaborative Hub account, you agree to safeguard your credentials and refrain from uploading malicious files. All materials submitted must correspond to humanitarian learning, disaster risk reduction resources, and partner knowledge products.</p><h2>2. Acceptable Use Policy</h2><p>User submissions containing copyright infringement, promotional advertisements, or non-DRR information will be immediately deleted, and the offending account terminated without notice.</p><h2>3. Disclaimers</h2><p>ACCORD provides this platform as a collaborative resource. We do not warrant the accuracy of user-submitted materials and exclude all liability to the maximum extent permitted under law.</p>',
+		),
+		'cookie-policy' => array(
+			'title'   => __( 'Cookie Policy', 'resilient-hub' ),
+			'content' => '<h2>1. Strictly Necessary Cookies</h2><p>We deploy session and security cookies (`wordpress_logged_in_*`, `wp-settings-*`, and security tokens) to authenticate your profile and secure form submissions. These do not track cross-site behavior and are strictly necessary for platform operation.</p><h2>2. Optional Analytics Cookies</h2><p>If you consent to optional analytics, we use a custom self-hosted tracker cookie to monitor aggregate page views and file download events to identify popular materials. You can modify these choices at any time in the Privacy Portal.</p>',
+		),
+		'privacy-rights' => array(
+			'title'   => __( 'Privacy & Data Rights', 'resilient-hub' ),
+			'content' => '',
+		),
+	);
+
+	foreach ( $policies as $slug => $data ) {
+		if ( get_page_by_path( $slug ) ) {
+			continue;
+		}
+
+		$post_id = wp_insert_post( array(
+			'post_type'    => 'page',
+			'post_status'  => 'publish',
+			'post_name'    => $slug,
+			'post_title'   => $data['title'],
+			'post_content' => $data['content'],
+		) );
+
+		if ( $post_id && ! is_wp_error( $post_id ) && 'privacy-rights' === $slug ) {
+			update_post_meta( $post_id, '_wp_page_template', 'template-privacy-rights.php' );
+		}
+	}
+}
+add_action( 'init', 'rp_child_create_compliance_pages' );
+
+/**
  * One-time migration: Rebuild the primary navigation menu to consolidate
  * overlapping items (Posts, Stories, Library, Resource Hub) into a single
  * "Resources" parent with sub-items.
@@ -734,3 +777,119 @@ function rp_child_filter_primary_nav_menu( $items, $args ) {
 	return $items;
 }
 add_filter( 'wp_nav_menu_objects', 'rp_child_filter_primary_nav_menu', 10, 2 );
+
+/**
+ * Intercept Data Portability JSON Exports
+ */
+function rp_handle_user_data_export() {
+	if ( isset( $_GET['rp_download_user_data'] ) && is_user_logged_in() ) {
+		$user_id = get_current_user_id();
+		$user = get_userdata( $user_id );
+		
+		global $wpdb;
+		// Fetch views from DB
+		$views = $wpdb->get_results( $wpdb->prepare(
+			"SELECT id, post_id, ip_address, user_agent, created_at FROM {$wpdb->prefix}rp_analytics_views WHERE user_id = %d ORDER BY created_at DESC",
+			$user_id
+		) );
+		
+		// Fetch downloads from DB
+		$downloads = $wpdb->get_results( $wpdb->prepare(
+			"SELECT id, post_id, ip_address, user_agent, created_at FROM {$wpdb->prefix}rp_analytics_downloads WHERE user_id = %d ORDER BY created_at DESC",
+			$user_id
+		) );
+		
+		$export_data = array(
+			'profile'   => array(
+				'username'     => $user->user_login,
+				'email'        => $user->user_email,
+				'display_name' => $user->display_name,
+				'first_name'   => $user->first_name,
+				'last_name'    => $user->last_name,
+				'registered'   => $user->user_registered,
+				'roles'        => $user->roles,
+			),
+			'activity'  => array(
+				'page_views_logged' => $views,
+				'file_downloads'    => $downloads,
+			),
+			'meta'      => array(
+				'exported_at' => current_time( 'mysql' ),
+				'platform'    => get_bloginfo( 'name' ),
+			)
+		);
+		
+		header( 'Content-Type: application/json; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename="rp-user-data-export-' . sanitize_key( $user->user_login ) . '.json"' );
+		echo wp_json_encode( $export_data, JSON_PRETTY_PRINT );
+		exit;
+	}
+}
+add_action( 'init', 'rp_handle_user_data_export' );
+
+/**
+ * AJAX Handler: File Erasure/Deletion Request
+ */
+function rp_ajax_request_account_deletion_handler() {
+	if ( ! is_user_logged_in() ) {
+		wp_send_json_error( array( 'message' => __( 'You must be logged in.', 'resilient-hub' ) ) );
+	}
+	
+	$user_id = get_current_user_id();
+	$user = get_userdata( $user_id );
+	
+	$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+	if ( ! wp_verify_nonce( $nonce, 'rp_request_deletion_' . $user_id ) ) {
+		wp_send_json_error( array( 'message' => __( 'Security check failed. Please refresh the page and try again.', 'resilient-hub' ) ) );
+	}
+	
+	update_user_meta( $user_id, '_rp_deletion_requested', 1 );
+	
+	$admin_email = get_option( 'admin_email' );
+	$subject = sprintf( __( '[Resilient Hub] Account Deletion Request: @%s', 'resilient-hub' ), $user->user_login );
+	$message = sprintf(
+		__( "User @%s (%s) has submitted an account deletion request under GDPR Right to Erasure.\n\nPlease process this request inside the User Management dashboard:\n%s", 'resilient-hub' ),
+		$user->user_login,
+		$user->user_email,
+		home_url( '/user-management/' )
+	);
+	wp_mail( $admin_email, $subject, $message );
+	
+	wp_send_json_success( array( 'message' => __( 'Your deletion request has been submitted. The administrator will process it and delete your profile within 72 hours.', 'resilient-hub' ) ) );
+}
+add_action( 'wp_ajax_rp_request_account_deletion', 'rp_ajax_request_account_deletion_handler' );
+
+/**
+ * AJAX Handler: Admin Executing User Deletion
+ */
+function rp_ajax_delete_user_handler() {
+	if ( ! is_user_logged_in() || ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( array( 'message' => __( 'You do not have permission to manage users.', 'resilient-hub' ) ) );
+	}
+	
+	$user_id = isset( $_POST['user_id'] ) ? absint( $_POST['user_id'] ) : 0;
+	$nonce   = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+	
+	if ( ! $user_id || ! wp_verify_nonce( $nonce, 'rp_delete_user_' . $user_id ) ) {
+		wp_send_json_error( array( 'message' => __( 'Security check failed. Please refresh the page and try again.', 'resilient-hub' ) ) );
+	}
+	
+	if ( get_current_user_id() === $user_id ) {
+		wp_send_json_error( array( 'message' => __( 'You cannot delete yourself.', 'resilient-hub' ) ) );
+	}
+	
+	$user = get_userdata( $user_id );
+	if ( ! $user ) {
+		wp_send_json_error( array( 'message' => __( 'User not found.', 'resilient-hub' ) ) );
+	}
+	
+	require_once ABSPATH . 'wp-admin/includes/user.php';
+	$result = wp_delete_user( $user_id, get_current_user_id() );
+	
+	if ( $result ) {
+		wp_send_json_success( array( 'message' => sprintf( __( 'User %s was successfully deleted and their resources were reassigned.', 'resilient-hub' ), $user->display_name ) ) );
+	} else {
+		wp_send_json_error( array( 'message' => __( 'Failed to delete the user. Please try again.', 'resilient-hub' ) ) );
+	}
+}
+add_action( 'wp_ajax_rp_delete_user', 'rp_ajax_delete_user_handler' );
