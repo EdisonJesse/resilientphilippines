@@ -376,7 +376,7 @@ function rp_resource_hub_maybe_upgrade() {
 	flush_rewrite_rules();
 	update_option( 'rp_resource_hub_version', RP_RESOURCE_HUB_VERSION );
 }
-add_action( 'admin_init', 'rp_resource_hub_maybe_upgrade' );
+add_action( 'init', 'rp_resource_hub_maybe_upgrade' );
 
 function rp_resource_hub_activate() {
 	rp_resource_hub_register_post_types();
