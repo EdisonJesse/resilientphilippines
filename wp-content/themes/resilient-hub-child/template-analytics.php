@@ -354,7 +354,7 @@ get_header();
 							<input type="hidden" name="rp_search_log" value="<?php echo esc_attr( $search_log ); ?>">
 						<?php endif; ?>
 						<label for="rp_days" style="font-size: 14px; font-weight: 600; color: #4b5563;"><?php esc_html_e( 'Range:', 'resilient-hub' ); ?></label>
-						<select id="rp_days" name="rp_days" onchange="this.form.submit()" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 12px; font-size: 14px; background: #fff;">
+						<select id="rp_days" name="rp_days" onchange="this.form.submit()" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 12px; font-size: 14px; background: #fff; min-width: 180px;">
 							<option value="7" <?php selected( $days, 7 ); ?>><?php esc_html_e( 'Last 7 Days', 'resilient-hub' ); ?></option>
 							<option value="30" <?php selected( $days, 30 ); ?>><?php esc_html_e( 'Last 30 Days', 'resilient-hub' ); ?></option>
 							<option value="90" <?php selected( $days, 90 ); ?>><?php esc_html_e( 'Last 90 Days', 'resilient-hub' ); ?></option>
@@ -621,6 +621,8 @@ get_header();
 
 <!-- Load Chart.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<!-- Load html2canvas CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <!-- Load html2pdf.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -730,6 +732,7 @@ document.addEventListener('DOMContentLoaded', function() {
 						maxTicksLimit: 15
 					}
 				}
+			}
 		}
 	});
 

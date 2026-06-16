@@ -356,6 +356,8 @@ if ( $incidents_query->have_posts() ) {
     </section>
 </main>
 
+<!-- Load html2canvas CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <!-- Load html2pdf.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
