@@ -169,7 +169,7 @@ if ( $sitreps_query->have_posts() ) {
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px; align-items: start;">
+        <div class="rp-incident-row-split" style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px; align-items: start;">
             
             <!-- Left Side: Geographical Detail Table -->
             <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
@@ -352,6 +352,13 @@ if ( $sitreps_query->have_posts() ) {
 }
 
 /* Print/Export style modifiers to stack tab sections sequentially */
+.rp-exporting .rp-incident-row-split {
+	display: block !important;
+}
+.rp-exporting .rp-incident-row-split > div {
+	width: 100% !important;
+	margin-bottom: 30px !important;
+}
 .rp-exporting .rp-tab-content {
 	display: block !important;
 	border-top: 1px dashed #e2e8f0;
@@ -367,6 +374,13 @@ if ( $sitreps_query->have_posts() ) {
 	font-size: 13px;
 	margin-bottom: 8px;
 	letter-spacing: 0.5px;
+}
+.rp-exporting .rp-stat-card,
+.rp-exporting tr,
+.rp-exporting td,
+.rp-exporting th {
+	page-break-inside: avoid !important;
+	break-inside: avoid !important;
 }
 </style>
 
@@ -397,7 +411,8 @@ document.addEventListener('DOMContentLoaded', function() {
 				logging: false,
 				windowWidth: 1200
 			},
-			jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+			jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' },
+			pagebreak:    { mode: ['avoid-all', 'css'] }
 		};
 
 		html2pdf().set(opt).from(element).save().then(function() {

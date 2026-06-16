@@ -280,7 +280,7 @@ if ( $incidents_query->have_posts() ) {
             </div>
 
             <!-- Two-Column Breakdown -->
-            <div style="display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 40px; align-items: start;">
+            <div class="rp-dashboard-row-split" style="display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 40px; align-items: start;">
                 
                 <!-- Left Side: Province Breakdown -->
                 <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
@@ -370,6 +370,22 @@ if ( $incidents_query->have_posts() ) {
 	display: inline-block;
 	animation: spin 1s linear infinite;
 }
+
+/* Print/Export style modifiers */
+.rp-exporting .rp-dashboard-row-split {
+	display: block !important;
+}
+.rp-exporting .rp-dashboard-row-split > div {
+	width: 100% !important;
+	margin-bottom: 30px !important;
+}
+.rp-exporting .rp-stat-card,
+.rp-exporting .rp-incident-card,
+.rp-exporting article,
+.rp-exporting tr {
+	page-break-inside: avoid !important;
+	break-inside: avoid !important;
+}
 </style>
 
 <script>
@@ -384,6 +400,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		btn.disabled = true;
 
 		var element = document.getElementById('primary');
+		element.classList.add('rp-exporting');
 		
 		var opt = {
 			margin:       [0.4, 0.4, 0.4, 0.4],
@@ -396,14 +413,17 @@ document.addEventListener('DOMContentLoaded', function() {
 				logging: false,
 				windowWidth: 1200
 			},
-			jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+			jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' },
+			pagebreak:    { mode: ['avoid-all', 'css'] }
 		};
 
 		html2pdf().set(opt).from(element).save().then(function() {
+			element.classList.remove('rp-exporting');
 			btn.innerHTML = originalText;
 			btn.disabled = false;
 		}).catch(function(err) {
 			console.error(err);
+			element.classList.remove('rp-exporting');
 			btn.innerHTML = originalText;
 			btn.disabled = false;
 		});
@@ -419,6 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		btn.disabled = true;
 
 		var element = document.getElementById('primary');
+		element.classList.add('rp-exporting');
 		
 		html2canvas(element, {
 			scale: 2,
@@ -432,10 +453,12 @@ document.addEventListener('DOMContentLoaded', function() {
 			link.href = canvas.toDataURL('image/png');
 			link.click();
 			
+			element.classList.remove('rp-exporting');
 			btn.innerHTML = originalText;
 			btn.disabled = false;
 		}).catch(function(err) {
 			console.error(err);
+			element.classList.remove('rp-exporting');
 			btn.innerHTML = originalText;
 			btn.disabled = false;
 		});

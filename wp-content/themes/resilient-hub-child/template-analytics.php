@@ -163,6 +163,25 @@ get_header();
 	display: inline-block;
 	animation: spin 1s linear infinite;
 }
+/* Print/Export PDF layout overrides */
+.rp-exporting .rp-analytics-grid {
+	grid-template-columns: 1fr 1fr 1fr !important;
+}
+.rp-exporting .rp-analytics-tables-row {
+	display: block !important;
+}
+.rp-exporting .rp-analytics-table-card {
+	width: 100% !important;
+	margin-bottom: 30px !important;
+	page-break-inside: avoid !important;
+	break-inside: avoid !important;
+}
+.rp-exporting .rp-chart-container,
+.rp-exporting .rp-analytics-card,
+.rp-exporting tr {
+	page-break-inside: avoid !important;
+	break-inside: avoid !important;
+}
 .rp-analytics-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -746,6 +765,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		btn.disabled = true;
 
 		var element = document.getElementById('primary');
+		element.classList.add('rp-exporting');
 		
 		var opt = {
 			margin:       [0.4, 0.4, 0.4, 0.4],
@@ -758,14 +778,17 @@ document.addEventListener('DOMContentLoaded', function() {
 				logging: false,
 				windowWidth: 1200
 			},
-			jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+			jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' },
+			pagebreak:    { mode: ['avoid-all', 'css'] }
 		};
 
 		html2pdf().set(opt).from(element).save().then(function() {
+			element.classList.remove('rp-exporting');
 			btn.innerHTML = originalText;
 			btn.disabled = false;
 		}).catch(function(err) {
 			console.error(err);
+			element.classList.remove('rp-exporting');
 			btn.innerHTML = originalText;
 			btn.disabled = false;
 		});
@@ -781,6 +804,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		btn.disabled = true;
 
 		var element = document.getElementById('primary');
+		element.classList.add('rp-exporting');
 		
 		html2canvas(element, {
 			scale: 2,
@@ -794,10 +818,12 @@ document.addEventListener('DOMContentLoaded', function() {
 			link.href = canvas.toDataURL('image/png');
 			link.click();
 			
+			element.classList.remove('rp-exporting');
 			btn.innerHTML = originalText;
 			btn.disabled = false;
 		}).catch(function(err) {
 			console.error(err);
+			element.classList.remove('rp-exporting');
 			btn.innerHTML = originalText;
 			btn.disabled = false;
 		});
