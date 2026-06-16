@@ -1169,7 +1169,9 @@ img {
 }
 
 .rp-checkbox-list input[type="checkbox"],
-.rp-upload-form input[type="checkbox"] {
+.rp-upload-form input[type="checkbox"],
+.rp-checkbox-list input[type="radio"],
+.rp-upload-form input[type="radio"] {
   width: 18px !important;
   height: 18px !important;
   min-height: 0 !important;
