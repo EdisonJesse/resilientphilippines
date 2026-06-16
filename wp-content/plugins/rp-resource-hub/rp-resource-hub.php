@@ -1233,7 +1233,7 @@ function rp_resource_hub_render_grid_items( $resources ) {
 				<?php if ( $is_web_app && $can_download ) : ?>
 					<?php $web_app_url = rp_resource_hub_get_web_app_url( $post_id ); ?>
 					<?php if ( $web_app_url ) : ?>
-						<a class="rp-button rp-resource-download" href="<?php echo esc_url( $web_app_url ); ?>" target="_blank"><?php esc_html_e( 'Launch Web App', 'rp-resource-hub' ); ?></a>
+						<a class="rp-button rp-resource-download" href="<?php echo esc_url( $web_app_url ); ?>" target="_blank"><?php esc_html_e( 'Launch', 'rp-resource-hub' ); ?></a>
 					<?php endif; ?>
 				<?php elseif ( $download_url && $can_download ) : ?>
 					<a class="rp-button rp-resource-download" href="<?php echo esc_url( $download_url ); ?>"><?php esc_html_e( 'Download', 'rp-resource-hub' ); ?></a>

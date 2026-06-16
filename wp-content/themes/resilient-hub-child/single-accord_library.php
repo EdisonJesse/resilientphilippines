@@ -85,7 +85,7 @@ get_header();
                                 <a class="rp-button-download-large" href="<?php echo esc_url( $web_app_url ); ?>" target="_blank">
                                     <span class="rp-btn-icon">🚀</span>
                                     <span class="rp-btn-text">
-                                        <strong><?php esc_html_e( 'Launch Web App', 'resilient-hub' ); ?></strong>
+                                        <strong><?php esc_html_e( 'Launch', 'resilient-hub' ); ?></strong>
                                     </span>
                                 </a>
                             <?php else : ?>
@@ -261,6 +261,7 @@ get_header();
                         while ( $related_query->have_posts() ) :
                             $related_query->the_post();
                             $rel_file_id = absint( get_post_meta( get_the_ID(), '_rp_resource_file_id', true ) );
+                            $rel_is_web_app = get_post_meta( get_the_ID(), '_rp_is_web_app', true );
                             $rel_download_url = $rel_file_id ? rp_resource_hub_download_url( get_the_ID() ) : '';
                             $rel_is_member = rp_resource_hub_is_member_only( get_the_ID() );
                             $rel_can_download = ! $rel_is_member || current_user_can( 'read_member_resources' );
@@ -272,7 +273,12 @@ get_header();
                                 <h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
                                 <div class="rp-resource-meta"><?php echo esc_html( get_the_date() ); ?></div>
                                 <?php the_excerpt(); ?>
-                                <?php if ( $rel_download_url && $rel_can_download ) : ?>
+                                <?php if ( $rel_is_web_app && $rel_can_download ) : ?>
+                                    <?php $rel_web_app_url = rp_resource_hub_get_web_app_url( get_the_ID() ); ?>
+                                    <?php if ( $rel_web_app_url ) : ?>
+                                        <a class="rp-button rp-resource-download" href="<?php echo esc_url( $rel_web_app_url ); ?>" target="_blank"><?php esc_html_e( 'Launch', 'rp-resource-hub' ); ?></a>
+                                    <?php endif; ?>
+                                <?php elseif ( $rel_download_url && $rel_can_download ) : ?>
                                     <a class="rp-button rp-resource-download" href="<?php echo esc_url( $rel_download_url ); ?>"><?php esc_html_e( 'Download', 'rp-resource-hub' ); ?></a>
                                 <?php elseif ( $rel_is_member ) : ?>
                                     <span class="rp-resource-locked"><?php esc_html_e( 'Member-only', 'rp-resource-hub' ); ?></span>
