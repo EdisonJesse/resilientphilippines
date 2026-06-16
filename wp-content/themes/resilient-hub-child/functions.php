@@ -262,7 +262,7 @@ function rp_ajax_approve_resource_handler() {
 	}
 
 	$post = get_post( $post_id );
-	if ( ! $post || ! in_array( $post->post_type, array( 'partner_resources', 'rp_sitrep' ), true ) || 'pending' !== $post->post_status ) {
+	if ( ! $post || ! in_array( $post->post_type, array( 'partner_resources', 'rp_sitrep', 'accord_library' ), true ) || 'pending' !== $post->post_status ) {
 		wp_send_json_error( array( 'message' => __( 'Submission not found or is not pending review.', 'resilient-hub' ) ) );
 	}
 

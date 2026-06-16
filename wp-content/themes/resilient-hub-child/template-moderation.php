@@ -37,9 +37,9 @@ get_header();
 
         <div class="rp-moderation-container">
             <?php
-            // Query pending partner resources and situation reports
+            // Query pending partner resources, situation reports, and accord library products
             $pending_query = new WP_Query( array(
-                'post_type'      => array( 'partner_resources', 'rp_sitrep' ),
+                'post_type'      => array( 'partner_resources', 'rp_sitrep', 'accord_library' ),
                 'post_status'    => 'pending',
                 'posts_per_page' => -1, // Retrieve all pending
                 'orderby'        => 'date',
@@ -93,8 +93,24 @@ get_header();
                                         </div>
                                     </td>
                                     <td>
-                                        <span class="rp-moderation-badge rp-badge-<?php echo esc_attr( get_post_type() ); ?>" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; background: <?php echo 'rp_sitrep' === get_post_type() ? '#fef3c7; color: #d97706;' : '#dbeafe; color: #2563eb;'; ?>">
-                                            <?php echo 'rp_sitrep' === get_post_type() ? esc_html__( 'Situation Report', 'resilient-hub' ) : esc_html__( 'Partner Resource', 'resilient-hub' ); ?>
+                                        <span class="rp-moderation-badge rp-badge-<?php echo esc_attr( get_post_type() ); ?>" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; background: <?php 
+                                            if ( 'rp_sitrep' === get_post_type() ) {
+                                                echo '#fef3c7; color: #d97706;';
+                                            } elseif ( 'accord_library' === get_post_type() ) {
+                                                echo '#f0fdf4; color: #16a34a;';
+                                            } else {
+                                                echo '#dbeafe; color: #2563eb;';
+                                            }
+                                        ?>">
+                                            <?php 
+                                                if ( 'rp_sitrep' === get_post_type() ) {
+                                                    echo esc_html__( 'Situation Report', 'resilient-hub' );
+                                                } elseif ( 'accord_library' === get_post_type() ) {
+                                                    echo esc_html__( 'ACCORD Library', 'resilient-hub' );
+                                                } else {
+                                                    echo esc_html__( 'Partner Resource', 'resilient-hub' );
+                                                }
+                                            ?>
                                         </span>
                                     </td>
                                     <td>
