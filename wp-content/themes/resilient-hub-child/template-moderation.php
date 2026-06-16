@@ -39,7 +39,7 @@ get_header();
             <?php
             // Query pending partner resources, situation reports, and accord library products
             $pending_query = new WP_Query( array(
-                'post_type'      => array( 'partner_resources', 'rp_sitrep', 'accord_library' ),
+                'post_type'      => array( 'partner_resources', 'rp_sitrep', 'accord_library', 'post' ),
                 'post_status'    => 'pending',
                 'posts_per_page' => -1, // Retrieve all pending
                 'orderby'        => 'date',
@@ -98,6 +98,8 @@ get_header();
                                                 echo '#fef3c7; color: #d97706;';
                                             } elseif ( 'accord_library' === get_post_type() ) {
                                                 echo '#f0fdf4; color: #16a34a;';
+                                            } elseif ( 'post' === get_post_type() ) {
+                                                echo '#f3e8ff; color: #7c3aed;';
                                             } else {
                                                 echo '#dbeafe; color: #2563eb;';
                                             }
@@ -107,6 +109,8 @@ get_header();
                                                     echo esc_html__( 'Situation Report', 'resilient-hub' );
                                                 } elseif ( 'accord_library' === get_post_type() ) {
                                                     echo esc_html__( 'ACCORD Library', 'resilient-hub' );
+                                                } elseif ( 'post' === get_post_type() ) {
+                                                    echo esc_html__( 'Post / Story', 'resilient-hub' );
                                                 } else {
                                                     echo esc_html__( 'Partner Resource', 'resilient-hub' );
                                                 }

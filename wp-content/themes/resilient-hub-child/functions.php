@@ -56,6 +56,23 @@ function rp_child_enqueue_assets() {
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
 		)
 	);
+
+	if ( is_page( 'news-stories' ) ) {
+		wp_enqueue_script(
+			'rp-news-ajax',
+			get_stylesheet_directory_uri() . '/assets/js/news-ajax.js',
+			array(),
+			wp_get_theme()->get( 'Version' ),
+			true
+		);
+		wp_localize_script(
+			'rp-news-ajax',
+			'rp_ajax',
+			array(
+				'ajax_url' => admin_url( 'admin-ajax.php' ),
+			)
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'rp_child_enqueue_assets', 20 );
 
@@ -133,6 +150,11 @@ function rp_child_submit_resource_auth_gate() {
 		if ( is_page( 'submit-resource' ) ) {
 			$login_url    = home_url( '/portal-entry/' );
 			$redirect_url = add_query_arg( 'redirect_to', esc_url( home_url( '/submit-resource/' ) ), $login_url );
+			wp_safe_redirect( $redirect_url );
+			exit;
+		} elseif ( is_page( 'submit-post' ) ) {
+			$login_url    = home_url( '/portal-entry/' );
+			$redirect_url = add_query_arg( 'redirect_to', esc_url( home_url( '/submit-post/' ) ), $login_url );
 			wp_safe_redirect( $redirect_url );
 			exit;
 		} elseif ( is_page( 'my-contributions' ) ) {
@@ -269,7 +291,7 @@ function rp_ajax_approve_resource_handler() {
 	}
 
 	$post = get_post( $post_id );
-	if ( ! $post || ! in_array( $post->post_type, array( 'partner_resources', 'rp_sitrep', 'accord_library' ), true ) || 'pending' !== $post->post_status ) {
+	if ( ! $post || ! in_array( $post->post_type, array( 'partner_resources', 'rp_sitrep', 'accord_library', 'post' ), true ) || 'pending' !== $post->post_status ) {
 		wp_send_json_error( array( 'message' => __( 'Submission not found or is not pending review.', 'resilient-hub' ) ) );
 	}
 
@@ -283,7 +305,7 @@ function rp_ajax_approve_resource_handler() {
 		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 	}
 
-	wp_send_json_success( array( 'message' => __( 'Resource published successfully.', 'resilient-hub' ) ) );
+	wp_send_json_success( array( 'message' => __( 'Published successfully.', 'resilient-hub' ) ) );
 }
 add_action( 'wp_ajax_rp_approve_resource', 'rp_ajax_approve_resource_handler' );
 
@@ -435,7 +457,7 @@ add_action( 'init', 'rp_child_create_compliance_pages' );
  * Runs once, controlled by an option flag.
  */
 function rp_child_consolidate_navigation_menu() {
-	if ( get_option( 'rp_nav_consolidated_v9' ) ) {
+	if ( get_option( 'rp_nav_consolidated_v10' ) ) {
 		return;
 	}
 
@@ -613,42 +635,21 @@ function rp_child_consolidate_navigation_menu() {
 		}
 	}
 
-	// ── Posts ─────────────────────────────────────────────────────────────
-	$posts_page = get_page_by_path( 'posts' );
-	if ( $posts_page ) {
+	// ── News & Stories ────────────────────────────────────────────────────
+	$news_stories_page = get_page_by_path( 'news-stories' );
+	if ( $news_stories_page ) {
 		wp_update_nav_menu_item( $menu_id, 0, array(
-			'menu-item-title'     => __( 'Posts', 'resilient-hub' ),
+			'menu-item-title'     => __( 'News & Stories', 'resilient-hub' ),
 			'menu-item-object'    => 'page',
-			'menu-item-object-id' => $posts_page->ID,
+			'menu-item-object-id' => $news_stories_page->ID,
 			'menu-item-type'      => 'post_type',
 			'menu-item-status'    => 'publish',
 			'menu-item-position'  => ++$position,
 		) );
 	} else {
 		wp_update_nav_menu_item( $menu_id, 0, array(
-			'menu-item-title'     => __( 'Posts', 'resilient-hub' ),
-			'menu-item-url'       => home_url( '/category/posts/' ),
-			'menu-item-type'      => 'custom',
-			'menu-item-status'    => 'publish',
-			'menu-item-position'  => ++$position,
-		) );
-	}
-
-	// ── Stories ───────────────────────────────────────────────────────────
-	$stories_page = get_page_by_path( 'stories' );
-	if ( $stories_page ) {
-		wp_update_nav_menu_item( $menu_id, 0, array(
-			'menu-item-title'     => __( 'Stories', 'resilient-hub' ),
-			'menu-item-object'    => 'page',
-			'menu-item-object-id' => $stories_page->ID,
-			'menu-item-type'      => 'post_type',
-			'menu-item-status'    => 'publish',
-			'menu-item-position'  => ++$position,
-		) );
-	} else {
-		wp_update_nav_menu_item( $menu_id, 0, array(
-			'menu-item-title'     => __( 'Stories', 'resilient-hub' ),
-			'menu-item-url'       => home_url( '/category/stories/' ),
+			'menu-item-title'     => __( 'News & Stories', 'resilient-hub' ),
+			'menu-item-url'       => home_url( '/news-stories/' ),
 			'menu-item-type'      => 'custom',
 			'menu-item-status'    => 'publish',
 			'menu-item-position'  => ++$position,
@@ -761,7 +762,7 @@ function rp_child_consolidate_navigation_menu() {
 	$locations[ $menu_location ]  = $menu_id;
 	set_theme_mod( 'nav_menu_locations', $locations );
 
-	update_option( 'rp_nav_consolidated_v9', true );
+	update_option( 'rp_nav_consolidated_v10', true );
 }
 add_action( 'admin_init', 'rp_child_consolidate_navigation_menu' );
 

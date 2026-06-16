@@ -364,8 +364,8 @@ function rp_resource_hub_create_analytics_tables() {
 }
 
 function rp_resource_hub_maybe_upgrade() {
-	// Fallback: Ensure the contributions page is created if missing
-	if ( ! get_page_by_path( 'my-contributions' ) ) {
+	// Fallback: Ensure required pages are created if missing
+	if ( ! get_page_by_path( 'my-contributions' ) || ! get_page_by_path( 'news-stories' ) || ! get_page_by_path( 'submit-post' ) ) {
 		rp_resource_hub_create_pages();
 		flush_rewrite_rules();
 	}
@@ -592,6 +592,14 @@ function rp_resource_hub_create_pages() {
 			'title'   => __( 'My Contributions', 'rp-resource-hub' ),
 			'content' => '[rp_my_contributions]',
 		),
+		'news-stories' => array(
+			'title'   => __( 'News & Stories', 'rp-resource-hub' ),
+			'content' => '[rp_news_catalog]',
+		),
+		'submit-post' => array(
+			'title'   => __( 'Submit Post or Story', 'rp-resource-hub' ),
+			'content' => '[rp_submit_post_form]',
+		),
 	);
 
 	foreach ( $pages as $slug => $page ) {
@@ -616,6 +624,10 @@ function rp_resource_hub_create_pages() {
 				update_post_meta( $post_id, '_wp_page_template', 'template-moderation.php' );
 			} elseif ( 'sitrep-dashboard' === $slug ) {
 				update_post_meta( $post_id, '_wp_page_template', 'template-sitrep-dashboard.php' );
+			} elseif ( 'news-stories' === $slug ) {
+				update_post_meta( $post_id, '_wp_page_template', 'template-news-stories.php' );
+			} elseif ( 'submit-post' === $slug ) {
+				update_post_meta( $post_id, '_wp_page_template', 'template-submit-post.php' );
 			}
 		}
 	}
@@ -2252,7 +2264,7 @@ function rp_resource_hub_handle_my_contributions_actions() {
 		}
 
 		$post = get_post( $post_id );
-		if ( ! $post || ! in_array( $post->post_type, array( 'accord_library', 'partner_resources' ), true ) ) {
+		if ( ! $post || ! in_array( $post->post_type, array( 'accord_library', 'partner_resources', 'post' ), true ) ) {
 			wp_die( esc_html__( 'Invalid resource.', 'rp-resource-hub' ) );
 		}
 
@@ -2280,7 +2292,7 @@ function rp_resource_hub_handle_my_contributions_actions() {
 		}
 
 		$post = get_post( $post_id );
-		if ( ! $post || ! in_array( $post->post_type, array( 'accord_library', 'partner_resources' ), true ) ) {
+		if ( ! $post || ! in_array( $post->post_type, array( 'accord_library', 'partner_resources', 'post' ), true ) ) {
 			wp_die( esc_html__( 'Invalid resource.', 'rp-resource-hub' ) );
 		}
 
@@ -2288,8 +2300,13 @@ function rp_resource_hub_handle_my_contributions_actions() {
 			wp_die( esc_html__( 'Permission denied.', 'rp-resource-hub' ) );
 		}
 
-		$title       = isset( $_POST['rp_title'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_title'] ) ) : '';
-		$description = isset( $_POST['rp_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['rp_description'] ) ) : '';
+		$title = isset( $_POST['rp_title'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_title'] ) ) : '';
+		
+		if ( 'post' === $post->post_type ) {
+			$description = isset( $_POST['rp_content'] ) ? wp_kses_post( wp_unslash( $_POST['rp_content'] ) ) : '';
+		} else {
+			$description = isset( $_POST['rp_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['rp_description'] ) ) : '';
+		}
 
 		if ( empty( $title ) || empty( $description ) ) {
 			wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'empty_fields' ), home_url( '/my-contributions/' ) ) );
@@ -2301,76 +2318,118 @@ function rp_resource_hub_handle_my_contributions_actions() {
 			exit;
 		}
 
-		$submitted_terms = isset( $_POST['rp_terms'] ) && is_array( $_POST['rp_terms'] ) ? wp_unslash( $_POST['rp_terms'] ) : array();
-		$post_type       = 'partner_resources';
-		$accord_term     = get_term_by( 'name', 'ACCORD', 'contributing_org' );
-		if ( $accord_term && ! empty( $submitted_terms['contributing_org'] ) && is_array( $submitted_terms['contributing_org'] ) ) {
-			if ( in_array( (int) $accord_term->term_id, array_map( 'intval', $submitted_terms['contributing_org'] ), true ) ) {
-				$post_type = 'accord_library';
-			}
-		}
+		if ( 'post' === $post->post_type ) {
+			// Handle featured image update (if uploaded)
+			if ( ! empty( $_FILES['rp_featured_image']['name'] ) ) {
+				$file = $_FILES['rp_featured_image'];
+				if ( $file['size'] > 5 * 1024 * 1024 ) {
+					wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'file_too_large' ), home_url( '/my-contributions/' ) ) );
+					exit;
+				}
+				$file_type = wp_check_filetype( $file['name'] );
+				$allowed_mimes = array( 'jpg', 'jpeg', 'png', 'gif', 'webp' );
+				if ( ! in_array( strtolower( $file_type['ext'] ), $allowed_mimes, true ) ) {
+					wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'invalid_file_type' ), home_url( '/my-contributions/' ) ) );
+					exit;
+				}
 
-		// Handle file update (if uploaded)
-		$attachment_id = 0;
-		if ( ! empty( $_FILES['rp_file']['name'] ) ) {
-			$file = $_FILES['rp_file'];
-			$file_type = wp_check_filetype_and_ext( $file['tmp_name'], $file['name'], rp_resource_hub_allowed_mimes() );
+				$_FILES['rp_featured_image']['name'] = sanitize_file_name( $file['name'] );
+				require_once ABSPATH . 'wp-admin/includes/file.php';
+				require_once ABSPATH . 'wp-admin/includes/media.php';
+				require_once ABSPATH . 'wp-admin/includes/image.php';
 
-			if ( empty( $file_type['ext'] ) || empty( $file_type['type'] ) ) {
-				wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'invalid_file_type' ), home_url( '/my-contributions/' ) ) );
-				exit;
-			}
-
-			// Validate file size limit
-			if ( ! current_user_can( 'manage_options' ) && $file['size'] > RP_RESOURCE_HUB_MAX_UPLOAD_BYTES ) {
-				wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'file_too_large' ), home_url( '/my-contributions/' ) ) );
-				exit;
-			}
-
-			$_FILES['rp_file']['name'] = sanitize_file_name( $file['name'] );
-
-			add_filter( 'upload_dir', 'rp_resource_hub_secure_upload_dir' );
-			$attachment_id = media_handle_upload( 'rp_file', $post_id );
-			remove_filter( 'upload_dir', 'rp_resource_hub_secure_upload_dir' );
-
-			if ( is_wp_error( $attachment_id ) ) {
-				wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'upload_error' ), home_url( '/my-contributions/' ) ) );
-				exit;
+				$attachment_id = media_handle_upload( 'rp_featured_image', $post_id );
+				if ( ! is_wp_error( $attachment_id ) ) {
+					$old_thumbnail_id = get_post_thumbnail_id( $post_id );
+					if ( $old_thumbnail_id ) {
+						wp_delete_attachment( $old_thumbnail_id, true );
+					}
+					set_post_thumbnail( $post_id, $attachment_id );
+				} else {
+					wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'upload_error' ), home_url( '/my-contributions/' ) ) );
+					exit;
+				}
 			}
 
-			// Delete old attachment if replacement succeeded
-			$old_attachment_id = absint( get_post_meta( $post_id, '_rp_resource_file_id', true ) );
-			if ( $old_attachment_id ) {
-				wp_delete_attachment( $old_attachment_id, true );
-			}
-			update_post_meta( $post_id, '_rp_resource_file_id', absint( $attachment_id ) );
+			// Update post details
+			wp_update_post( array(
+				'ID'           => $post_id,
+				'post_title'   => $title,
+				'post_content' => $description,
+				'post_status'  => 'pending',
+			) );
 
-			// Check if file is ZIP for web apps
-			if ( 'zip' === strtolower( $file_type['ext'] ) ) {
-				update_post_meta( $post_id, '_rp_is_web_app', 1 );
-			} else {
-				delete_post_meta( $post_id, '_rp_is_web_app' );
+			// Update category
+			$submitted_category = isset( $_POST['rp_category'] ) ? absint( $_POST['rp_category'] ) : 0;
+			if ( $submitted_category ) {
+				wp_set_post_categories( $post_id, array( $submitted_category ) );
 			}
-		}
+		} else {
+			// Handle secure resource CPT uploads
+			$attachment_id = 0;
+			if ( ! empty( $_FILES['rp_file']['name'] ) ) {
+				$file = $_FILES['rp_file'];
+				$file_type = wp_check_filetype_and_ext( $file['tmp_name'], $file['name'], rp_resource_hub_allowed_mimes() );
 
-		// Update post details
-		wp_update_post(
-			array(
+				if ( empty( $file_type['ext'] ) || empty( $file_type['type'] ) ) {
+					wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'invalid_file_type' ), home_url( '/my-contributions/' ) ) );
+					exit;
+				}
+
+				if ( ! current_user_can( 'manage_options' ) && $file['size'] > RP_RESOURCE_HUB_MAX_UPLOAD_BYTES ) {
+					wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'file_too_large' ), home_url( '/my-contributions/' ) ) );
+					exit;
+				}
+
+				$_FILES['rp_file']['name'] = sanitize_file_name( $file['name'] );
+
+				add_filter( 'upload_dir', 'rp_resource_hub_secure_upload_dir' );
+				$attachment_id = media_handle_upload( 'rp_file', $post_id );
+				remove_filter( 'upload_dir', 'rp_resource_hub_secure_upload_dir' );
+
+				if ( is_wp_error( $attachment_id ) ) {
+					wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'upload_error' ), home_url( '/my-contributions/' ) ) );
+					exit;
+				}
+
+				$old_attachment_id = absint( get_post_meta( $post_id, '_rp_resource_file_id', true ) );
+				if ( $old_attachment_id ) {
+					wp_delete_attachment( $old_attachment_id, true );
+				}
+				update_post_meta( $post_id, '_rp_resource_file_id', absint( $attachment_id ) );
+
+				if ( 'zip' === strtolower( $file_type['ext'] ) ) {
+					update_post_meta( $post_id, '_rp_is_web_app', 1 );
+				} else {
+					delete_post_meta( $post_id, '_rp_is_web_app' );
+				}
+			}
+
+			// Update CPT taxonomies
+			$submitted_terms = isset( $_POST['rp_terms'] ) && is_array( $_POST['rp_terms'] ) ? wp_unslash( $_POST['rp_terms'] ) : array();
+			$post_type       = 'partner_resources';
+			$accord_term     = get_term_by( 'name', 'ACCORD', 'contributing_org' );
+			if ( $accord_term && ! empty( $submitted_terms['contributing_org'] ) && is_array( $submitted_terms['contributing_org'] ) ) {
+				if ( in_array( (int) $accord_term->term_id, array_map( 'intval', $submitted_terms['contributing_org'] ), true ) ) {
+					$post_type = 'accord_library';
+				}
+			}
+
+			wp_update_post( array(
 				'ID'           => $post_id,
 				'post_type'    => $post_type,
 				'post_title'   => $title,
 				'post_content' => $description,
-				'post_status'  => 'pending', // Revert to pending for re-moderation
-			)
-		);
+				'post_status'  => 'pending',
+			) );
 
-		// Update taxonomies
-		$taxonomies = array( 'resource_format', 'resource_category', 'hazard_type', 'target_audience', 'contributing_org', 'resource_visibility' );
-		foreach ( $taxonomies as $taxonomy ) {
-			$terms = ! empty( $submitted_terms[ $taxonomy ] ) && is_array( $submitted_terms[ $taxonomy ] )
-				? array_map( 'intval', $submitted_terms[ $taxonomy ] )
-				: array();
-			wp_set_object_terms( $post_id, $terms, $taxonomy );
+			$taxonomies = array( 'resource_format', 'resource_category', 'hazard_type', 'target_audience', 'contributing_org', 'resource_visibility' );
+			foreach ( $taxonomies as $taxonomy ) {
+				$terms = ! empty( $submitted_terms[ $taxonomy ] ) && is_array( $submitted_terms[ $taxonomy ] )
+					? array_map( 'intval', $submitted_terms[ $taxonomy ] )
+					: array();
+				wp_set_object_terms( $post_id, $terms, $taxonomy );
+			}
 		}
 
 		wp_safe_redirect( add_query_arg( 'message', 'updated', home_url( '/my-contributions/' ) ) );
@@ -2435,8 +2494,91 @@ function rp_resource_hub_my_contributions_shortcode() {
 	// Render Edit View
 	if ( 'edit' === $action && $post_id ) {
 		$post = get_post( $post_id );
-		if ( ! $post || ! in_array( $post->post_type, array( 'accord_library', 'partner_resources' ), true ) || ( (int) $post->post_author !== get_current_user_id() && ! current_user_can( 'manage_options' ) ) ) {
+		if ( ! $post || ! in_array( $post->post_type, array( 'accord_library', 'partner_resources', 'post' ), true ) || ( (int) $post->post_author !== get_current_user_id() && ! current_user_can( 'manage_options' ) ) ) {
 			echo '<div class="rp-notice rp-notice-error">' . esc_html__( 'Invalid resource or permission denied.', 'rp-resource-hub' ) . '</div>';
+			return ob_get_clean();
+		}
+
+		if ( 'post' === $post->post_type ) {
+			$selected_cat = 0;
+			$cats = get_the_category( $post_id );
+			if ( ! empty( $cats ) ) {
+				$selected_cat = $cats[0]->term_id;
+			}
+			?>
+			<div class="rp-edit-resource-container">
+				<h3 style="margin-bottom: 20px; font-weight:800; color:var(--rp-color-navy);"><?php echo esc_html( sprintf( __( 'Edit Post/Story: %s', 'rp-resource-hub' ), $post->post_title ) ); ?></h3>
+				<form class="rp-upload-form" action="<?php echo esc_url( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id ), home_url( '/my-contributions/' ) ) ); ?>" method="post" enctype="multipart/form-data">
+					<?php wp_nonce_field( 'rp_edit_resource_' . $post_id, 'rp_edit_resource_nonce' ); ?>
+					
+					<div class="rp-field">
+						<label for="rp_title"><?php esc_html_e( 'Post Title', 'rp-resource-hub' ); ?></label>
+						<input id="rp_title" name="rp_title" type="text" required value="<?php echo esc_attr( $post->post_title ); ?>" maxlength="160">
+					</div>
+					
+					<div class="rp-field">
+						<label for="rp_category"><?php esc_html_e( 'Category', 'rp-resource-hub' ); ?></label>
+						<select id="rp_category" name="rp_category" required>
+							<option value=""><?php esc_html_e( 'Select a Category...', 'rp-resource-hub' ); ?></option>
+							<?php
+							$categories = get_categories( array( 'hide_empty' => false ) );
+							foreach ( $categories as $cat ) :
+								?>
+								<option value="<?php echo absint( $cat->term_id ); ?>" <?php selected( $selected_cat, $cat->term_id ); ?>><?php echo esc_html( $cat->name ); ?></option>
+								<?php
+							endforeach;
+							?>
+						</select>
+					</div>
+
+					<div class="rp-field">
+						<label for="rp_content"><?php esc_html_e( 'Content Body', 'rp-resource-hub' ); ?></label>
+						<?php
+						wp_editor(
+							$post->post_content,
+							'rp_content',
+							array(
+								'textarea_name' => 'rp_content',
+								'textarea_rows' => 12,
+								'media_buttons' => false,
+								'teeny'         => true,
+								'quicktags'     => true,
+							)
+						);
+						?>
+					</div>
+
+					<div class="rp-field">
+						<label><?php esc_html_e( 'Current Featured Image', 'rp-resource-hub' ); ?></label>
+						<?php if ( has_post_thumbnail( $post_id ) ) : ?>
+							<div class="rp-current-image-preview" style="margin-top:8px; margin-bottom:12px;">
+								<?php echo get_the_post_thumbnail( $post_id, array( 150, 150 ), array( 'style' => 'border-radius:4px; border:1px solid var(--rp-color-border);' ) ); ?>
+							</div>
+						<?php else : ?>
+							<p><?php esc_html_e( 'No featured image set.', 'rp-resource-hub' ); ?></p>
+						<?php endif; ?>
+					</div>
+
+					<div class="rp-field">
+						<label for="rp_featured_image"><?php esc_html_e( 'Replace Featured Image (Optional)', 'rp-resource-hub' ); ?></label>
+						<input id="rp_featured_image" name="rp_featured_image" type="file" accept="image/*">
+						<p class="rp-field-help"><?php esc_html_e( 'Upload a new featured image if you want to replace the current one. Max size: 5MB.', 'rp-resource-hub' ); ?></p>
+					</div>
+
+					<div class="rp-field rp-field-consent">
+						<label style="display: flex; align-items: flex-start; gap: 8px; font-weight: normal; cursor: pointer;">
+							<input id="rp_authorized_consent" name="rp_authorized_consent" type="checkbox" value="1" required style="margin-top: 4px; width: auto; height: auto;">
+							<span><?php esc_html_e( 'I confirm that I am authorized to share this content publicly.', 'rp-resource-hub' ); ?></span>
+						</label>
+					</div>
+
+					<div class="rp-edit-actions" style="margin-top:20px; display:flex; gap:12px;">
+						<button type="submit" name="rp_edit_resource_submit" class="rp-button"><?php esc_html_e( 'Save Changes', 'rp-resource-hub' ); ?></button>
+						<a href="<?php echo esc_url( home_url( '/my-contributions/' ) ); ?>" class="rp-button rp-button-secondary"><?php esc_html_e( 'Cancel', 'rp-resource-hub' ); ?></a>
+					</div>
+				</form>
+			</div>
+			<?php
 			return ob_get_clean();
 		}
 
@@ -2516,7 +2658,7 @@ function rp_resource_hub_my_contributions_shortcode() {
 	// Render List View
 	$paged = isset( $_GET['rp_page'] ) ? max( 1, absint( $_GET['rp_page'] ) ) : 1;
 	$args = array(
-		'post_type'           => array( 'accord_library', 'partner_resources' ),
+		'post_type'           => array( 'accord_library', 'partner_resources', 'post' ),
 		'post_status'         => array( 'publish', 'pending', 'draft' ),
 		'author'              => get_current_user_id(),
 		'posts_per_page'      => 10,
@@ -2559,7 +2701,15 @@ function rp_resource_hub_my_contributions_shortcode() {
 									<?php endif; ?>
 								</td>
 								<td style="padding:16px 18px; color:var(--rp-color-muted); font-size:14px;">
-									<?php echo esc_html( 'accord_library' === $post_type ? __( 'ACCORD Library', 'rp-resource-hub' ) : __( 'Partner Resource', 'rp-resource-hub' ) ); ?>
+									<?php 
+									if ( 'accord_library' === $post_type ) {
+										echo esc_html__( 'ACCORD Library', 'rp-resource-hub' );
+									} elseif ( 'partner_resources' === $post_type ) {
+										echo esc_html__( 'Partner Resource', 'rp-resource-hub' );
+									} elseif ( 'post' === $post_type ) {
+										echo esc_html__( 'Post / Story', 'rp-resource-hub' );
+									}
+									?>
 								</td>
 								<td style="padding:16px 18px; color:var(--rp-color-muted); font-size:14px;">
 									<?php echo esc_html( get_the_date() ); ?>
@@ -2630,4 +2780,342 @@ function rp_resource_hub_my_contributions_shortcode() {
 	return ob_get_clean();
 }
 add_shortcode( 'rp_my_contributions', 'rp_resource_hub_my_contributions_shortcode' );
+
+/**
+ * News & Stories Hub Catalog Shortcode
+ */
+function rp_resource_hub_news_catalog_shortcode( $atts ) {
+	$atts = shortcode_atts(
+		array(
+			'limit' => 12,
+		),
+		$atts,
+		'rp_news_catalog'
+	);
+
+	$limit        = max( 1, min( 24, absint( $atts['limit'] ) ) );
+	$paged        = isset( $_GET['rp_page'] ) ? max( 1, absint( $_GET['rp_page'] ) ) : 1;
+	$search_query = isset( $_GET['rp_q'] ) ? sanitize_text_field( wp_unslash( $_GET['rp_q'] ) ) : '';
+	$search_query = substr( $search_query, 0, 120 );
+	$category_id  = isset( $_GET['rp_news_category'] ) ? absint( $_GET['rp_news_category'] ) : 0;
+
+	$args = array(
+		'post_type'           => 'post',
+		'post_status'         => 'publish',
+		'posts_per_page'      => $limit,
+		'paged'               => $paged,
+		'ignore_sticky_posts' => true,
+		's'                   => $search_query,
+	);
+
+	if ( $category_id ) {
+		$args['cat'] = $category_id;
+	}
+
+	$query = new WP_Query( $args );
+
+	ob_start();
+	?>
+	<div class="rp-catalog rp-news-catalog">
+		<form class="rp-news-filters" method="get">
+			<div class="rp-field">
+				<label for="rp_q"><?php esc_html_e( 'Search news & stories', 'rp-resource-hub' ); ?></label>
+				<input id="rp_q" name="rp_q" type="search" value="<?php echo esc_attr( $search_query ); ?>">
+			</div>
+			<div class="rp-field">
+				<label for="rp_news_category"><?php esc_html_e( 'Category', 'rp-resource-hub' ); ?></label>
+				<select id="rp_news_category" name="rp_news_category">
+					<option value="0"><?php esc_html_e( 'All Categories', 'rp-resource-hub' ); ?></option>
+					<?php
+					$categories = get_categories( array( 'hide_empty' => true ) );
+					foreach ( $categories as $cat ) :
+						?>
+						<option value="<?php echo absint( $cat->term_id ); ?>" <?php selected( $category_id, $cat->term_id ); ?>><?php echo esc_html( $cat->name ); ?></option>
+						<?php
+					endforeach;
+					?>
+				</select>
+			</div>
+			<button class="rp-catalog-submit" type="submit"><?php esc_html_e( 'Filter', 'rp-resource-hub' ); ?></button>
+		</form>
+
+		<div class="rp-news-grid-wrapper" style="position: relative;">
+			<div class="rp-news-grid rp-resource-grid">
+				<?php echo rp_resource_hub_render_news_grid_items( $query ); ?>
+			</div>
+			<div class="rp-news-pagination-wrapper">
+				<?php echo rp_resource_hub_render_news_pagination( $query, $paged ); ?>
+			</div>
+		</div>
+	</div>
+	<?php
+	return ob_get_clean();
+}
+add_shortcode( 'rp_news_catalog', 'rp_resource_hub_news_catalog_shortcode' );
+
+function rp_resource_hub_render_news_grid_items( $query ) {
+	ob_start();
+	if ( $query->have_posts() ) :
+		while ( $query->have_posts() ) :
+			$query->the_post();
+			$post_id = get_the_ID();
+			$categories = get_the_category();
+			$cat_list = array();
+			if ( ! empty( $categories ) ) {
+				foreach ( $categories as $cat ) {
+					$cat_list[] = $cat->name;
+				}
+			}
+			$cat_string = implode( ', ', $cat_list );
+			?>
+			<article class="rp-resource-card rp-news-card">
+				<?php if ( has_post_thumbnail() ) : ?>
+					<div class="rp-card-image">
+						<a href="<?php the_permalink(); ?>">
+							<?php the_post_thumbnail( 'medium' ); ?>
+						</a>
+					</div>
+				<?php endif; ?>
+				<p class="rp-resource-type" style="color: var(--rp-color-green);"><?php echo esc_html( $cat_string ? $cat_string : __( 'News & Stories', 'rp-resource-hub' ) ); ?></p>
+				<h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+				<div class="rp-resource-meta"><?php echo esc_html( get_the_date() ); ?></div>
+				<?php the_excerpt(); ?>
+				<a class="rp-resource-readmore" href="<?php the_permalink(); ?>"><?php esc_html_e( 'Read more', 'rp-resource-hub' ); ?></a>
+				<div class="rp-card-spacer"></div>
+			</article>
+			<?php
+		endwhile;
+		wp_reset_postdata();
+	else :
+		?>
+		<p class="rp-no-results"><?php esc_html_e( 'No posts or stories found matching your criteria.', 'rp-resource-hub' ); ?></p>
+		<?php
+	endif;
+	return ob_get_clean();
+}
+
+function rp_resource_hub_render_news_pagination( $query, $paged ) {
+	ob_start();
+	if ( $query->max_num_pages > 1 ) :
+		?>
+		<nav class="rp-pagination" aria-label="<?php esc_attr_e( 'News pagination', 'rp-resource-hub' ); ?>">
+			<ul>
+				<?php
+				echo wp_kses_post(
+					paginate_links(
+						array(
+							'base'      => esc_url_raw( add_query_arg( 'rp_page', '%#%' ) ),
+							'format'    => '',
+							'current'   => $paged,
+							'total'     => $query->max_num_pages,
+							'type'      => 'plain',
+							'prev_text' => __( 'Previous', 'rp-resource-hub' ),
+							'next_text' => __( 'Next', 'rp-resource-hub' ),
+						)
+					)
+				);
+				?>
+			</ul>
+		</nav>
+		<?php
+	endif;
+	return ob_get_clean();
+}
+
+function rp_ajax_filter_news() {
+	$paged        = isset( $_POST['paged'] ) ? max( 1, absint( $_POST['paged'] ) ) : 1;
+	$search_query = isset( $_POST['q'] ) ? sanitize_text_field( wp_unslash( $_POST['q'] ) ) : '';
+	$category_id  = isset( $_POST['category'] ) ? absint( $_POST['category'] ) : 0;
+
+	$args = array(
+		'post_type'           => 'post',
+		'post_status'         => 'publish',
+		'posts_per_page'      => 12,
+		'paged'               => $paged,
+		'ignore_sticky_posts' => true,
+		's'                   => $search_query,
+	);
+
+	if ( $category_id ) {
+		$args['cat'] = $category_id;
+	}
+
+	$query = new WP_Query( $args );
+
+	$grid_html       = rp_resource_hub_render_news_grid_items( $query );
+	$pagination_html = rp_resource_hub_render_news_pagination( $query, $paged );
+
+	wp_send_json_success( array(
+		'grid'       => $grid_html,
+		'pagination' => $pagination_html,
+	) );
+}
+add_action( 'wp_ajax_rp_filter_news', 'rp_ajax_filter_news' );
+add_action( 'wp_ajax_nopriv_rp_filter_news', 'rp_ajax_filter_news' );
+
+/**
+ * Submit Post Form Shortcode
+ */
+function rp_resource_hub_submit_post_shortcode() {
+	ob_start();
+
+	if ( ! is_user_logged_in() ) {
+		echo '<div class="rp-notice rp-notice-error">' . sprintf(
+			__( 'Please <a href="%s">log in</a> to submit a post or story.', 'rp-resource-hub' ),
+			esc_url( home_url( '/portal-entry/?redirect_to=' . urlencode( home_url( '/submit-post/' ) ) ) )
+		) . '</div>';
+		return ob_get_clean();
+	}
+
+	$notice = rp_resource_hub_get_upload_notice();
+	if ( $notice ) {
+		$notice_class = 'success' === $notice['type'] ? 'rp-notice-success' : 'rp-notice-error';
+		echo '<div class="rp-notice ' . esc_attr( $notice_class ) . '">' . esc_html( $notice['message'] ) . '</div>';
+	}
+	?>
+	<form class="rp-upload-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" enctype="multipart/form-data">
+		<input type="hidden" name="action" value="rp_post_upload">
+		<?php wp_nonce_field( 'rp_post_upload', 'rp_post_upload_nonce' ); ?>
+		
+		<div class="rp-field">
+			<label for="rp_title"><?php esc_html_e( 'Post Title', 'rp-resource-hub' ); ?></label>
+			<input id="rp_title" name="rp_title" type="text" required maxlength="160">
+		</div>
+
+		<div class="rp-field">
+			<label for="rp_category"><?php esc_html_e( 'Category', 'rp-resource-hub' ); ?></label>
+			<select id="rp_category" name="rp_category" required>
+				<option value=""><?php esc_html_e( 'Select a Category...', 'rp-resource-hub' ); ?></option>
+				<?php
+				$categories = get_categories( array( 'hide_empty' => false ) );
+				foreach ( $categories as $cat ) :
+					?>
+					<option value="<?php echo absint( $cat->term_id ); ?>"><?php echo esc_html( $cat->name ); ?></option>
+					<?php
+				endforeach;
+				?>
+			</select>
+		</div>
+
+		<div class="rp-field">
+			<label for="rp_content"><?php esc_html_e( 'Content Body', 'rp-resource-hub' ); ?></label>
+			<?php
+			wp_editor(
+				'',
+				'rp_content',
+				array(
+					'textarea_name' => 'rp_content',
+					'textarea_rows' => 12,
+					'media_buttons' => false,
+					'teeny'         => true,
+					'quicktags'     => true,
+				)
+			);
+			?>
+		</div>
+
+		<div class="rp-field">
+			<label for="rp_featured_image"><?php esc_html_e( 'Featured Image', 'rp-resource-hub' ); ?></label>
+			<input id="rp_featured_image" name="rp_featured_image" type="file" accept="image/*" required>
+			<p class="rp-field-help"><?php esc_html_e( 'Upload a featured image for your post (JPEG, PNG, WebP). Max size: 5MB.', 'rp-resource-hub' ); ?></p>
+		</div>
+		
+		<div class="rp-field rp-field-consent">
+			<label style="display: flex; align-items: flex-start; gap: 8px; font-weight: normal; cursor: pointer;">
+				<input id="rp_authorized_consent" name="rp_authorized_consent" type="checkbox" value="1" required style="margin-top: 4px; width: auto; height: auto;">
+				<span><?php esc_html_e( 'I confirm that I am authorized to share this content publicly.', 'rp-resource-hub' ); ?></span>
+			</label>
+		</div>
+
+		<button type="submit" class="rp-button" style="margin-top: 20px;"><?php esc_html_e( 'Submit Post', 'rp-resource-hub' ); ?></button>
+	</form>
+	<?php
+	return ob_get_clean();
+}
+add_shortcode( 'rp_submit_post_form', 'rp_resource_hub_submit_post_shortcode' );
+
+function rp_resource_hub_handle_post_upload() {
+	if ( ! is_user_logged_in() ) {
+		wp_safe_redirect( wp_login_url( home_url( '/submit-post/' ) ) );
+		exit;
+	}
+
+	$nonce = isset( $_POST['rp_post_upload_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_post_upload_nonce'] ) ) : '';
+	if ( ! wp_verify_nonce( $nonce, 'rp_post_upload' ) ) {
+		wp_die( esc_html__( 'Security check failed.', 'rp-resource-hub' ) );
+	}
+
+	if ( ! isset( $_POST['rp_authorized_consent'] ) || '1' !== $_POST['rp_authorized_consent'] ) {
+		$notice_key = rp_resource_hub_store_upload_notice( 'error', __( 'You must confirm that you are authorized to share this content.', 'rp-resource-hub' ) );
+		wp_safe_redirect( add_query_arg( 'rp_upload_notice', $notice_key, home_url( '/submit-post/' ) ) );
+		exit;
+	}
+
+	$title    = isset( $_POST['rp_title'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_title'] ) ) : '';
+	$content  = isset( $_POST['rp_content'] ) ? wp_kses_post( wp_unslash( $_POST['rp_content'] ) ) : '';
+	$category = isset( $_POST['rp_category'] ) ? absint( $_POST['rp_category'] ) : 0;
+
+	if ( empty( $title ) || empty( $content ) || empty( $category ) ) {
+		$notice_key = rp_resource_hub_store_upload_notice( 'error', __( 'Title, content, and category are required.', 'rp-resource-hub' ) );
+		wp_safe_redirect( add_query_arg( 'rp_upload_notice', $notice_key, home_url( '/submit-post/' ) ) );
+		exit;
+	}
+
+	if ( empty( $_FILES['rp_featured_image']['name'] ) ) {
+		$notice_key = rp_resource_hub_store_upload_notice( 'error', __( 'Featured image is required.', 'rp-resource-hub' ) );
+		wp_safe_redirect( add_query_arg( 'rp_upload_notice', $notice_key, home_url( '/submit-post/' ) ) );
+		exit;
+	}
+
+	$file = $_FILES['rp_featured_image'];
+	if ( $file['size'] > 5 * 1024 * 1024 ) {
+		$notice_key = rp_resource_hub_store_upload_notice( 'error', __( 'Image file size exceeds the 5MB limit.', 'rp-resource-hub' ) );
+		wp_safe_redirect( add_query_arg( 'rp_upload_notice', $notice_key, home_url( '/submit-post/' ) ) );
+		exit;
+	}
+
+	$file_type = wp_check_filetype( $file['name'] );
+	$allowed_mimes = array( 'jpg', 'jpeg', 'png', 'gif', 'webp' );
+	if ( ! in_array( strtolower( $file_type['ext'] ), $allowed_mimes, true ) ) {
+		$notice_key = rp_resource_hub_store_upload_notice( 'error', __( 'Only JPG, JPEG, PNG, GIF, and WebP images are allowed.', 'rp-resource-hub' ) );
+		wp_safe_redirect( add_query_arg( 'rp_upload_notice', $notice_key, home_url( '/submit-post/' ) ) );
+		exit;
+	}
+
+	$post_id = wp_insert_post( array(
+		'post_type'    => 'post',
+		'post_title'   => $title,
+		'post_content' => $content,
+		'post_status'  => 'pending',
+		'post_author'  => get_current_user_id(),
+	), true );
+
+	if ( is_wp_error( $post_id ) ) {
+		$notice_key = rp_resource_hub_store_upload_notice( 'error', $post_id->get_error_message() );
+		wp_safe_redirect( add_query_arg( 'rp_upload_notice', $notice_key, home_url( '/submit-post/' ) ) );
+		exit;
+	}
+
+	wp_set_post_categories( $post_id, array( $category ) );
+
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+	require_once ABSPATH . 'wp-admin/includes/media.php';
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+
+	$_FILES['rp_featured_image']['name'] = sanitize_file_name( $file['name'] );
+	$attachment_id = media_handle_upload( 'rp_featured_image', $post_id );
+
+	if ( is_wp_error( $attachment_id ) ) {
+		wp_delete_post( $post_id, true );
+		$notice_key = rp_resource_hub_store_upload_notice( 'error', __( 'Failed to upload featured image. Please try again.', 'rp-resource-hub' ) );
+		wp_safe_redirect( add_query_arg( 'rp_upload_notice', $notice_key, home_url( '/submit-post/' ) ) );
+		exit;
+	}
+
+	set_post_thumbnail( $post_id, $attachment_id );
+
+	wp_safe_redirect( home_url( '/resource-submitted/' ) );
+	exit;
+}
+add_action( 'admin_post_rp_post_upload', 'rp_resource_hub_handle_post_upload' );
 
