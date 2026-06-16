@@ -134,6 +134,7 @@ img {
 .rp-brand {
   color: var(--rp-color-navy);
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .rp-brand-logo-wrap {
