@@ -176,11 +176,23 @@ if ( $incidents_query->have_posts() ) {
                 <h2 style="font-size: 1.5rem; color: #0f172a; margin: 0; font-family: 'Outfit', sans-serif; font-weight: 700;">
                     <?php esc_html_e( 'Consolidated Disaster Impact Metrics', 'resilient-hub' ); ?>
                 </h2>
-                <?php if ( is_user_logged_in() && ( current_user_can( 'edit_rp_sitreps' ) || current_user_can( 'manage_options' ) ) ) : ?>
-                    <a href="<?php echo esc_url( home_url( '/submit-sitrep/' ) ); ?>" class="rp-button" style="background: #ef4444; color: #fff; font-weight: 600; padding: 10px 20px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
-                        <span>✍️</span> <?php esc_html_e( 'Submit New SitRep', 'resilient-hub' ); ?>
-                    </a>
-                <?php endif; ?>
+				<div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;" data-html2canvas-ignore="true">
+					<!-- Export Actions -->
+					<div style="display: flex; gap: 8px;">
+						<button id="rp-export-pdf" class="rp-button" style="background: #0f172a; border: 1px solid #e2e8f0; color: #fff; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#ef4444'; this.style.borderColor='#ef4444'" onmouseout="this.style.background='#0f172a'; this.style.borderColor='#e2e8f0'">
+							<span class="dashicons dashicons-pdf" style="font-size: 18px; width: 18px; height: 18px; line-height: 1; margin-top: 3px;"></span> <?php esc_html_e( 'Export PDF', 'resilient-hub' ); ?>
+						</button>
+						<button id="rp-export-png" class="rp-button" style="background: #0f172a; border: 1px solid #e2e8f0; color: #fff; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 10px 20px; border-radius: 6px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#ef4444'; this.style.borderColor='#ef4444'" onmouseout="this.style.background='#0f172a'; this.style.borderColor='#e2e8f0'">
+							<span class="dashicons dashicons-format-image" style="font-size: 18px; width: 18px; height: 18px; line-height: 1; margin-top: 3px;"></span> <?php esc_html_e( 'Export PNG', 'resilient-hub' ); ?>
+						</button>
+					</div>
+
+					<?php if ( is_user_logged_in() && ( current_user_can( 'edit_rp_sitreps' ) || current_user_can( 'manage_options' ) ) ) : ?>
+						<a href="<?php echo esc_url( home_url( '/submit-sitrep/' ) ); ?>" class="rp-button" style="background: #ef4444; color: #fff; font-weight: 600; padding: 10px 20px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+							<span>✍️</span> <?php esc_html_e( 'Submit New SitRep', 'resilient-hub' ); ?>
+						</a>
+					<?php endif; ?>
+				</div>
             </div>
 
             <!-- Aggregates Grid -->
@@ -343,6 +355,91 @@ if ( $incidents_query->have_posts() ) {
         </div>
     </section>
 </main>
+
+<!-- Load html2pdf.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+.spin {
+	display: inline-block;
+	animation: spin 1s linear infinite;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	// PDF Export Handler
+	document.getElementById('rp-export-pdf').addEventListener('click', function(e) {
+		e.preventDefault();
+		
+		var btn = this;
+		var originalText = btn.innerHTML;
+		btn.innerHTML = '<span class="dashicons dashicons-update spin" style="font-size: 18px; width: 18px; height: 18px; line-height: 1; margin-top: 3px;"></span> <?php esc_html_e( 'Generating...', 'resilient-hub' ); ?>';
+		btn.disabled = true;
+
+		var element = document.getElementById('primary');
+		
+		var opt = {
+			margin:       [0.4, 0.4, 0.4, 0.4],
+			filename:     'Resilience_Hub_SitRep_Dashboard_' + new Date().toISOString().slice(0,10) + '.pdf',
+			image:        { type: 'jpeg', quality: 0.98 },
+			html2canvas:  { 
+				scale: 2, 
+				useCORS: true, 
+				letterRendering: true,
+				logging: false,
+				windowWidth: 1200
+			},
+			jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+		};
+
+		html2pdf().set(opt).from(element).save().then(function() {
+			btn.innerHTML = originalText;
+			btn.disabled = false;
+		}).catch(function(err) {
+			console.error(err);
+			btn.innerHTML = originalText;
+			btn.disabled = false;
+		});
+	});
+
+	// PNG Export Handler
+	document.getElementById('rp-export-png').addEventListener('click', function(e) {
+		e.preventDefault();
+		
+		var btn = this;
+		var originalText = btn.innerHTML;
+		btn.innerHTML = '<span class="dashicons dashicons-update spin" style="font-size: 18px; width: 18px; height: 18px; line-height: 1; margin-top: 3px;"></span> <?php esc_html_e( 'Generating...', 'resilient-hub' ); ?>';
+		btn.disabled = true;
+
+		var element = document.getElementById('primary');
+		
+		html2canvas(element, {
+			scale: 2,
+			useCORS: true,
+			logging: false,
+			windowWidth: 1200,
+			backgroundColor: '#f8fafc'
+		}).then(function(canvas) {
+			var link = document.createElement('a');
+			link.download = 'Resilience_Hub_SitRep_Dashboard_' + new Date().toISOString().slice(0,10) + '.png';
+			link.href = canvas.toDataURL('image/png');
+			link.click();
+			
+			btn.innerHTML = originalText;
+			btn.disabled = false;
+		}).catch(function(err) {
+			console.error(err);
+			btn.innerHTML = originalText;
+			btn.disabled = false;
+		});
+	});
+});
+</script>
 
 <?php
 get_footer();
