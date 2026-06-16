@@ -2885,3 +2885,59 @@ input[type="submit"].give-submit:focus {
     justify-content: flex-end;
   }
 }
+
+/* My Contributions Dashboard Styles */
+.rp-my-contributions-dashboard {
+  margin-top: 20px;
+}
+.rp-contributions-table tr:hover {
+  background-color: var(--rp-color-soft);
+}
+.rp-contributions-table th, 
+.rp-contributions-table td {
+  border-bottom: 1px solid var(--rp-color-border);
+}
+.rp-status-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.rp-status-publish {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+.rp-status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+.rp-status-draft {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+.rp-edit-resource-container {
+  background: #ffffff;
+  border: 1px solid var(--rp-color-border);
+  border-radius: var(--rp-radius);
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(16, 32, 39, 0.03);
+}
+.rp-edit-resource-container fieldset.rp-checkbox-list {
+  border: 1px solid var(--rp-color-border);
+  border-radius: var(--rp-radius);
+  padding: 18px;
+  margin-bottom: 20px;
+}
+.rp-edit-resource-container fieldset.rp-checkbox-list legend {
+  font-weight: 800;
+  color: var(--rp-color-navy);
+  padding: 0 8px;
+  font-size: 15px;
+}
+.rp-current-file-link {
+  margin: 6px 0;
+}

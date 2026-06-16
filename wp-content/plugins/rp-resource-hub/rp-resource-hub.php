@@ -582,6 +582,10 @@ function rp_resource_hub_create_pages() {
 			'title'   => __( 'Situation Report Dashboard', 'rp-resource-hub' ),
 			'content' => '',
 		),
+		'my-contributions' => array(
+			'title'   => __( 'My Contributions', 'rp-resource-hub' ),
+			'content' => '[rp_my_contributions]',
+		),
 	);
 
 	foreach ( $pages as $slug => $page ) {
@@ -2218,3 +2222,406 @@ function rp_resource_hub_delete_sitrep_records( $post_id ) {
 	$wpdb->delete( $table_name, array( 'sitrep_id' => $post_id ), array( '%d' ) );
 }
 add_action( 'before_delete_post', 'rp_resource_hub_delete_sitrep_records' );
+
+/**
+ * Handle My Contributions Dashboard actions (Unpublish, Publish, Edit submission)
+ */
+function rp_resource_hub_handle_my_contributions_actions() {
+	if ( ! is_user_logged_in() ) {
+		return;
+	}
+
+	$action  = isset( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : '';
+	$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
+
+	if ( ! $post_id ) {
+		return;
+	}
+
+	// 1. Status Changes: unpublish / publish
+	if ( in_array( $action, array( 'unpublish', 'publish' ), true ) ) {
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'rp_toggle_status_' . $post_id ) ) {
+			wp_die( esc_html__( 'Security check failed.', 'rp-resource-hub' ) );
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post || ! in_array( $post->post_type, array( 'accord_library', 'partner_resources' ), true ) ) {
+			wp_die( esc_html__( 'Invalid resource.', 'rp-resource-hub' ) );
+		}
+
+		if ( (int) $post->post_author !== get_current_user_id() && ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Permission denied.', 'rp-resource-hub' ) );
+		}
+
+		$new_status = ( 'unpublish' === $action ) ? 'draft' : 'pending';
+		wp_update_post(
+			array(
+				'ID'          => $post_id,
+				'post_status' => $new_status,
+			)
+		);
+
+		wp_safe_redirect( add_query_arg( 'message', $action . 'ed', home_url( '/my-contributions/' ) ) );
+		exit;
+	}
+
+	// 2. Edit Resource Form Submission
+	if ( isset( $_POST['rp_edit_resource_submit'] ) ) {
+		$nonce = isset( $_POST['rp_edit_resource_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_edit_resource_nonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'rp_edit_resource_' . $post_id ) ) {
+			wp_die( esc_html__( 'Security check failed.', 'rp-resource-hub' ) );
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post || ! in_array( $post->post_type, array( 'accord_library', 'partner_resources' ), true ) ) {
+			wp_die( esc_html__( 'Invalid resource.', 'rp-resource-hub' ) );
+		}
+
+		if ( (int) $post->post_author !== get_current_user_id() && ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Permission denied.', 'rp-resource-hub' ) );
+		}
+
+		$title       = isset( $_POST['rp_title'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_title'] ) ) : '';
+		$description = isset( $_POST['rp_description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['rp_description'] ) ) : '';
+
+		if ( empty( $title ) || empty( $description ) ) {
+			wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'empty_fields' ), home_url( '/my-contributions/' ) ) );
+			exit;
+		}
+
+		if ( empty( $_POST['rp_authorized_consent'] ) ) {
+			wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'consent_required' ), home_url( '/my-contributions/' ) ) );
+			exit;
+		}
+
+		$submitted_terms = isset( $_POST['rp_terms'] ) && is_array( $_POST['rp_terms'] ) ? wp_unslash( $_POST['rp_terms'] ) : array();
+		$post_type       = 'partner_resources';
+		$accord_term     = get_term_by( 'name', 'ACCORD', 'contributing_org' );
+		if ( $accord_term && ! empty( $submitted_terms['contributing_org'] ) && is_array( $submitted_terms['contributing_org'] ) ) {
+			if ( in_array( (int) $accord_term->term_id, array_map( 'intval', $submitted_terms['contributing_org'] ), true ) ) {
+				$post_type = 'accord_library';
+			}
+		}
+
+		// Handle file update (if uploaded)
+		$attachment_id = 0;
+		if ( ! empty( $_FILES['rp_file']['name'] ) ) {
+			$file = $_FILES['rp_file'];
+			$file_type = wp_check_filetype_and_ext( $file['tmp_name'], $file['name'], rp_resource_hub_allowed_mimes() );
+
+			if ( empty( $file_type['ext'] ) || empty( $file_type['type'] ) ) {
+				wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'invalid_file_type' ), home_url( '/my-contributions/' ) ) );
+				exit;
+			}
+
+			// Validate file size limit
+			if ( ! current_user_can( 'manage_options' ) && $file['size'] > RP_RESOURCE_HUB_MAX_UPLOAD_BYTES ) {
+				wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'file_too_large' ), home_url( '/my-contributions/' ) ) );
+				exit;
+			}
+
+			$_FILES['rp_file']['name'] = sanitize_file_name( $file['name'] );
+
+			add_filter( 'upload_dir', 'rp_resource_hub_secure_upload_dir' );
+			$attachment_id = media_handle_upload( 'rp_file', $post_id );
+			remove_filter( 'upload_dir', 'rp_resource_hub_secure_upload_dir' );
+
+			if ( is_wp_error( $attachment_id ) ) {
+				wp_safe_redirect( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id, 'err' => 'upload_error' ), home_url( '/my-contributions/' ) ) );
+				exit;
+			}
+
+			// Delete old attachment if replacement succeeded
+			$old_attachment_id = absint( get_post_meta( $post_id, '_rp_resource_file_id', true ) );
+			if ( $old_attachment_id ) {
+				wp_delete_attachment( $old_attachment_id, true );
+			}
+			update_post_meta( $post_id, '_rp_resource_file_id', absint( $attachment_id ) );
+
+			// Check if file is ZIP for web apps
+			if ( 'zip' === strtolower( $file_type['ext'] ) ) {
+				update_post_meta( $post_id, '_rp_is_web_app', 1 );
+			} else {
+				delete_post_meta( $post_id, '_rp_is_web_app' );
+			}
+		}
+
+		// Update post details
+		wp_update_post(
+			array(
+				'ID'           => $post_id,
+				'post_type'    => $post_type,
+				'post_title'   => $title,
+				'post_content' => $description,
+				'post_status'  => 'pending', // Revert to pending for re-moderation
+			)
+		);
+
+		// Update taxonomies
+		$taxonomies = array( 'resource_format', 'resource_category', 'hazard_type', 'target_audience', 'contributing_org', 'resource_visibility' );
+		foreach ( $taxonomies as $taxonomy ) {
+			$terms = ! empty( $submitted_terms[ $taxonomy ] ) && is_array( $submitted_terms[ $taxonomy ] )
+				? array_map( 'intval', $submitted_terms[ $taxonomy ] )
+				: array();
+			wp_set_object_terms( $post_id, $terms, $taxonomy );
+		}
+
+		wp_safe_redirect( add_query_arg( 'message', 'updated', home_url( '/my-contributions/' ) ) );
+		exit;
+	}
+}
+add_action( 'template_redirect', 'rp_resource_hub_handle_my_contributions_actions' );
+
+/**
+ * Render the [rp_my_contributions] shortcode
+ */
+function rp_resource_hub_my_contributions_shortcode() {
+	if ( ! is_user_logged_in() ) {
+		return '<div class="rp-notice rp-notice-error">' . sprintf(
+			__( 'Please <a href="%s">log in</a> to view and manage your contributions.', 'rp-resource-hub' ),
+			esc_url( home_url( '/portal-entry/?redirect_to=' . urlencode( home_url( '/my-contributions/' ) ) ) )
+		) . '</div>';
+	}
+
+	ob_start();
+
+	$action  = isset( $_GET['action'] ) ? sanitize_key( $_GET['action'] ) : '';
+	$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
+
+	// Show messages
+	$message = isset( $_GET['message'] ) ? sanitize_key( $_GET['message'] ) : '';
+	if ( $message ) {
+		$msg_text = '';
+		$msg_class = 'rp-notice-success';
+		if ( 'unpublished' === $message ) {
+			$msg_text = __( 'Resource unpublished successfully. It is now saved as a draft.', 'rp-resource-hub' );
+		} elseif ( 'published' === $message ) {
+			$msg_text = __( 'Resource submitted for review successfully.', 'rp-resource-hub' );
+		} elseif ( 'updated' === $message ) {
+			$msg_text = __( 'Resource updated successfully and sent for review.', 'rp-resource-hub' );
+		}
+		if ( $msg_text ) {
+			echo '<div class="rp-notice ' . esc_attr( $msg_class ) . '">' . esc_html( $msg_text ) . '</div>';
+		}
+	}
+
+	// Show error messages
+	$err = isset( $_GET['err'] ) ? sanitize_key( $_GET['err'] ) : '';
+	if ( $err ) {
+		$err_text = '';
+		if ( 'empty_fields' === $err ) {
+			$err_text = __( 'Title and Description fields are required.', 'rp-resource-hub' );
+		} elseif ( 'consent_required' === $err ) {
+			$err_text = __( 'You must confirm that you are authorized to share this resource.', 'rp-resource-hub' );
+		} elseif ( 'invalid_file_type' === $err ) {
+			$err_text = __( 'Only PDF, DOC, DOCX, XLS, XLSX, HTML, and ZIP files are allowed.', 'rp-resource-hub' );
+		} elseif ( 'file_too_large' === $err ) {
+			$err_text = sprintf( __( 'File size exceeds the limit of %s.', 'rp-resource-hub' ), rp_resource_hub_format_bytes( RP_RESOURCE_HUB_MAX_UPLOAD_BYTES ) );
+		} elseif ( 'upload_error' === $err ) {
+			$err_text = __( 'Failed to upload the file. Please try again.', 'rp-resource-hub' );
+		}
+		if ( $err_text ) {
+			echo '<div class="rp-notice rp-notice-error">' . esc_html( $err_text ) . '</div>';
+		}
+	}
+
+	// Render Edit View
+	if ( 'edit' === $action && $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post || ! in_array( $post->post_type, array( 'accord_library', 'partner_resources' ), true ) || ( (int) $post->post_author !== get_current_user_id() && ! current_user_can( 'manage_options' ) ) ) {
+			echo '<div class="rp-notice rp-notice-error">' . esc_html__( 'Invalid resource or permission denied.', 'rp-resource-hub' ) . '</div>';
+			return ob_get_clean();
+		}
+
+		?>
+		<div class="rp-edit-resource-container">
+			<h3 style="margin-bottom: 20px; font-weight:800; color:var(--rp-color-navy);"><?php echo esc_html( sprintf( __( 'Edit Resource: %s', 'rp-resource-hub' ), $post->post_title ) ); ?></h3>
+			<form class="rp-upload-form" action="<?php echo esc_url( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id ), home_url( '/my-contributions/' ) ) ); ?>" method="post" enctype="multipart/form-data">
+				<?php wp_nonce_field( 'rp_edit_resource_' . $post_id, 'rp_edit_resource_nonce' ); ?>
+				
+				<div class="rp-field">
+					<label for="rp_title"><?php esc_html_e( 'Resource Title', 'rp-resource-hub' ); ?></label>
+					<input id="rp_title" name="rp_title" type="text" required value="<?php echo esc_attr( $post->post_title ); ?>" maxlength="160">
+				</div>
+				
+				<div class="rp-field">
+					<label for="rp_description"><?php esc_html_e( 'Description', 'rp-resource-hub' ); ?></label>
+					<textarea id="rp_description" name="rp_description" rows="6" required><?php echo esc_textarea( $post->post_content ); ?></textarea>
+				</div>
+				
+				<?php 
+				$taxonomies = array( 'resource_format', 'resource_category', 'hazard_type', 'target_audience', 'contributing_org', 'resource_visibility' );
+				foreach ( $taxonomies as $taxonomy ) : 
+					$taxonomy_object = get_taxonomy( $taxonomy );
+					if ( ! $taxonomy_object ) {
+						continue;
+					}
+					$selected_terms = wp_get_object_terms( $post_id, $taxonomy, array( 'fields' => 'ids' ) );
+					?>
+					<fieldset class="rp-field rp-checkbox-list">
+						<legend><?php echo esc_html( $taxonomy_object->labels->name ); ?></legend>
+						<?php rp_resource_hub_term_options( $taxonomy, $selected_terms ); ?>
+					</fieldset>
+				<?php endforeach; ?>
+				
+				<div class="rp-field">
+					<label><?php esc_html_e( 'Current File', 'rp-resource-hub' ); ?></label>
+					<?php 
+					$file_id = get_post_meta( $post_id, '_rp_resource_file_id', true );
+					if ( $file_id ) {
+						$file_url = wp_get_attachment_url( $file_id );
+						$file_name = basename( get_attached_file( $file_id ) );
+						echo '<p class="rp-current-file-link"><a href="' . esc_url( rp_resource_hub_download_url( $post_id ) ) . '" class="rp-button rp-button-secondary" style="min-height:0; padding:6px 12px; font-size:13px;"><span class="dashicons dashicons-media-document" style="margin-right:4px; font-size:16px; width:16px; height:16px; display:inline-block; vertical-align:middle;"></span>' . esc_html( $file_name ? $file_name : __( 'Download File', 'rp-resource-hub' ) ) . '</a></p>';
+					} else {
+						echo '<p>' . esc_html__( 'No file attached.', 'rp-resource-hub' ) . '</p>';
+					}
+					?>
+				</div>
+
+				<div class="rp-field">
+					<label for="rp_file"><?php esc_html_e( 'Replace File (Optional)', 'rp-resource-hub' ); ?></label>
+					<input id="rp_file" name="rp_file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.html,.zip">
+					<?php
+					$max_size_text = current_user_can( 'manage_options' ) 
+						? __( 'No limit (Administrator)', 'rp-resource-hub' ) 
+						: rp_resource_hub_format_bytes( RP_RESOURCE_HUB_MAX_UPLOAD_BYTES );
+					?>
+					<p class="rp-field-help"><?php echo esc_html( sprintf( __( 'Accepted file types: PDF, DOC, DOCX, XLS, XLSX, HTML, ZIP (for Web Apps). Maximum size: %s. Leave blank to keep current file.', 'rp-resource-hub' ), $max_size_text ) ); ?></p>
+				</div>
+				
+				<div class="rp-field rp-field-consent">
+					<label style="display: flex; align-items: flex-start; gap: 8px; font-weight: normal; cursor: pointer;">
+						<input id="rp_authorized_consent" name="rp_authorized_consent" type="checkbox" value="1" required style="margin-top: 4px; width: auto; height: auto;">
+						<span><?php esc_html_e( 'I confirm that I am authorized to share this resource publicly or on this website.', 'rp-resource-hub' ); ?></span>
+					</label>
+				</div>
+				
+				<div class="rp-edit-actions" style="margin-top:20px; display:flex; gap:12px;">
+					<button type="submit" name="rp_edit_resource_submit" class="rp-button"><?php esc_html_e( 'Save Changes', 'rp-resource-hub' ); ?></button>
+					<a href="<?php echo esc_url( home_url( '/my-contributions/' ) ); ?>" class="rp-button rp-button-secondary"><?php esc_html_e( 'Cancel', 'rp-resource-hub' ); ?></a>
+				</div>
+			</form>
+		</div>
+		<?php
+		return ob_get_clean();
+	}
+
+	// Render List View
+	$paged = isset( $_GET['rp_page'] ) ? max( 1, absint( $_GET['rp_page'] ) ) : 1;
+	$args = array(
+		'post_type'           => array( 'accord_library', 'partner_resources' ),
+		'post_status'         => array( 'publish', 'pending', 'draft' ),
+		'author'              => get_current_user_id(),
+		'posts_per_page'      => 10,
+		'paged'               => $paged,
+		'ignore_sticky_posts' => true,
+	);
+
+	$query = new WP_Query( $args );
+	?>
+	<div class="rp-my-contributions-dashboard">
+		<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; flex-wrap: wrap; gap:12px;">
+			<p class="rp-dashboard-subtitle" style="margin:0; color:var(--rp-color-muted);"><?php esc_html_e( 'Manage your uploaded resource publications, check moderation status, or unpublish listings.', 'rp-resource-hub' ); ?></p>
+			<a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>" class="rp-button" style="min-height:40px; padding:8px 16px;"><span class="dashicons dashicons-plus-alt" style="margin-right:6px; font-size:18px; width:18px; height:18px; display:inline-block; vertical-align:-3px;"></span><?php esc_html_e( 'Submit New Resource', 'rp-resource-hub' ); ?></a>
+		</div>
+
+		<?php if ( $query->have_posts() ) : ?>
+			<div class="rp-table-wrapper" style="background:#ffffff; border:1px solid var(--rp-color-border); border-radius:var(--rp-radius); overflow-x:auto; box-shadow: 0 1px 4px rgba(16, 32, 39, 0.04);">
+				<table class="rp-contributions-table" style="width:100%; border-collapse:collapse; text-align:left; min-width: 600px;">
+					<thead>
+						<tr style="border-bottom:1px solid var(--rp-color-border); background:var(--rp-color-sky, #f0f5f3);">
+							<th style="padding:14px 18px; font-weight:800; color:var(--rp-color-navy);"><?php esc_html_e( 'Title', 'rp-resource-hub' ); ?></th>
+							<th style="padding:14px 18px; font-weight:800; color:var(--rp-color-navy);"><?php esc_html_e( 'Type', 'rp-resource-hub' ); ?></th>
+							<th style="padding:14px 18px; font-weight:800; color:var(--rp-color-navy);"><?php esc_html_e( 'Submitted Date', 'rp-resource-hub' ); ?></th>
+							<th style="padding:14px 18px; font-weight:800; color:var(--rp-color-navy);"><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></th>
+							<th style="padding:14px 18px; font-weight:800; color:var(--rp-color-navy); text-align:right;"><?php esc_html_e( 'Actions', 'rp-resource-hub' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php while ( $query->have_posts() ) : $query->the_post(); 
+							$post_id = get_the_ID();
+							$status = get_post_status( $post_id );
+							$post_type = get_post_type( $post_id );
+							?>
+							<tr style="border-bottom:1px solid var(--rp-color-border); transition: background-color 150ms ease;">
+								<td style="padding:16px 18px; font-weight:700;">
+									<?php if ( 'publish' === $status ) : ?>
+										<a href="<?php the_permalink(); ?>" target="_blank" style="color:var(--rp-color-navy); text-decoration:none;"><?php the_title(); ?></a>
+									<?php else : ?>
+										<span style="color:var(--rp-color-navy);"><?php the_title(); ?></span>
+									<?php endif; ?>
+								</td>
+								<td style="padding:16px 18px; color:var(--rp-color-muted); font-size:14px;">
+									<?php echo esc_html( 'accord_library' === $post_type ? __( 'ACCORD Library', 'rp-resource-hub' ) : __( 'Partner Resource', 'rp-resource-hub' ) ); ?>
+								</td>
+								<td style="padding:16px 18px; color:var(--rp-color-muted); font-size:14px;">
+									<?php echo esc_html( get_the_date() ); ?>
+								</td>
+								<td style="padding:16px 18px;">
+									<?php 
+									if ( 'publish' === $status ) {
+										echo '<span class="rp-status-badge rp-status-publish">' . esc_html__( 'Published', 'rp-resource-hub' ) . '</span>';
+									} elseif ( 'pending' === $status ) {
+										echo '<span class="rp-status-badge rp-status-pending">' . esc_html__( 'Pending Review', 'rp-resource-hub' ) . '</span>';
+									} elseif ( 'draft' === $status ) {
+										echo '<span class="rp-status-badge rp-status-draft">' . esc_html__( 'Unpublished', 'rp-resource-hub' ) . '</span>';
+									}
+									?>
+								</td>
+								<td style="padding:16px 18px; text-align:right;">
+									<div style="display:inline-flex; gap:8px;">
+										<a href="<?php echo esc_url( add_query_arg( array( 'action' => 'edit', 'post_id' => $post_id ), home_url( '/my-contributions/' ) ) ); ?>" class="rp-button rp-button-secondary" style="min-height:0; padding:6px 12px; font-size:13px; font-weight:700;"><?php esc_html_e( 'Edit', 'rp-resource-hub' ); ?></a>
+										
+										<?php if ( 'publish' === $status ) : ?>
+											<?php $unpub_url = wp_nonce_url( add_query_arg( array( 'action' => 'unpublish', 'post_id' => $post_id ), home_url( '/my-contributions/' ) ), 'rp_toggle_status_' . $post_id ); ?>
+											<a href="<?php echo esc_url( $unpub_url ); ?>" class="rp-button rp-button-secondary rp-unpublish-btn" style="min-height:0; padding:6px 12px; font-size:13px; font-weight:700; color: #b91c1c !important; border-color: #fca5a5;"><?php esc_html_e( 'Unpublish', 'rp-resource-hub' ); ?></a>
+										<?php elseif ( 'draft' === $status ) : ?>
+											<?php $pub_url = wp_nonce_url( add_query_arg( array( 'action' => 'publish', 'post_id' => $post_id ), home_url( '/my-contributions/' ) ), 'rp_toggle_status_' . $post_id ); ?>
+											<a href="<?php echo esc_url( $pub_url ); ?>" class="rp-button" style="min-height:0; padding:6px 12px; font-size:13px; font-weight:700;"><?php esc_html_e( 'Submit for Review', 'rp-resource-hub' ); ?></a>
+										<?php endif; ?>
+									</div>
+								</td>
+							</tr>
+						<?php endwhile; wp_reset_postdata(); ?>
+					</tbody>
+				</table>
+			</div>
+			
+			<?php 
+			// Pagination
+			if ( $query->max_num_pages > 1 ) :
+				?>
+				<nav class="rp-pagination" aria-label="<?php esc_attr_e( 'Contributions pagination', 'rp-resource-hub' ); ?>" style="margin-top:20px;">
+					<ul>
+						<?php 
+						echo wp_kses_post(
+							paginate_links(
+								array(
+									'base'      => esc_url_raw( add_query_arg( 'rp_page', '%#%' ) ),
+									'format'    => '',
+									'current'   => $paged,
+									'total'     => $query->max_num_pages,
+									'type'      => 'plain',
+									'prev_text' => __( 'Previous', 'rp-resource-hub' ),
+									'next_text' => __( 'Next', 'rp-resource-hub' ),
+								)
+							)
+						);
+						?>
+					</ul>
+				</nav>
+			<?php endif; ?>
+
+		<?php else : ?>
+			<div class="rp-notice rp-notice-info">
+				<?php esc_html_e( 'You have not submitted any resources yet.', 'rp-resource-hub' ); ?>
+				<a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>" style="font-weight:bold; margin-left:6px; color:var(--rp-color-green); text-decoration:underline;"><?php esc_html_e( 'Submit your first resource', 'rp-resource-hub' ); ?> &rarr;</a>
+			</div>
+		<?php endif; ?>
+	</div>
+	<?php
+	return ob_get_clean();
+}
+add_shortcode( 'rp_my_contributions', 'rp_resource_hub_my_contributions_shortcode' );
+
