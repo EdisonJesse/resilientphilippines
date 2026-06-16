@@ -563,6 +563,7 @@ img {
 .rp-page-content .entry-content figcaption,
 .rp-page-content .entry-content .wp-caption-text {
   color: var(--rp-color-muted);
+  display: block !important;
   font-size: 0.95rem;
   font-style: italic;
   line-height: 1.55;
@@ -688,11 +689,13 @@ img {
 .rp-single-content figcaption,
 .rp-single-content .wp-caption-text {
   color: var(--rp-color-muted);
+  display: block !important;
   font-size: 0.95rem;
   font-style: italic;
   line-height: 1.55;
   margin: 10px auto 0;
   max-width: 920px;
+  width: 100%;
 }
 
 .rp-single-body {
