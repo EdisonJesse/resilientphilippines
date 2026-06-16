@@ -1,0 +1,37 @@
+# ==========================================
+# Resilient Philippines Root .gitignore
+# Only tracks custom theme, custom plugin, and GitHub workflows
+# ==========================================
+
+# Ignore everything in the root by default
+/*
+
+# Allow root .gitignore and configuration documentation
+!.gitignore
+!LOCAL-SETUP.md
+
+# Allow GitHub Action workflows
+!/.github/
+!/.github/workflows/
+!/.github/workflows/deploy.yml
+
+# Ignore wp-admin and wp-includes entirely
+/wp-admin/
+/wp-includes/
+
+# Ignore wp-content contents by default
+/wp-content/*
+
+# Allow our custom theme
+!/wp-content/themes/
+/wp-content/themes/*
+!/wp-content/themes/resilient-hub-child/
+
+# Allow our custom plugin
+!/wp-content/plugins/
+/wp-content/plugins/*
+!/wp-content/plugins/rp-resource-hub/
+
+# Ignore internal backup git folders inside custom plugin/theme
+**/.git_bak/
+**/node_modules/
