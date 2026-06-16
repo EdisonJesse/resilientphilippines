@@ -155,6 +155,14 @@ get_header();
 
 <style>
 /* Glassmorphic Analytics Dashboard Styling */
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+.spin {
+	display: inline-block;
+	animation: spin 1s linear infinite;
+}
 .rp-analytics-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -333,25 +341,36 @@ get_header();
 		<div class="rp-page-shell">
 			
 			<!-- Controls & Filter Toolbar -->
-			<div class="rp-analytics-controls-bar">
+			<div class="rp-analytics-controls-bar" data-html2canvas-ignore="true">
 				<form method="get" class="rp-analytics-search-form">
 					<input type="hidden" name="rp_days" value="<?php echo esc_attr( $days ); ?>">
 					<input type="search" name="rp_search_log" value="<?php echo esc_attr( $search_log ); ?>" placeholder="<?php esc_attr_e( 'Search download logs by resource title, user name, email, or IP...', 'resilient-hub' ); ?>">
 					<button class="rp-button" type="submit"><?php esc_html_e( 'Search', 'resilient-hub' ); ?></button>
 				</form>
 				
-				<form method="get" style="display: flex; align-items: center; gap: 8px;">
-					<?php if ( $search_log ) : ?>
-						<input type="hidden" name="rp_search_log" value="<?php echo esc_attr( $search_log ); ?>">
-					<?php endif; ?>
-					<label for="rp_days" style="font-size: 14px; font-weight: 600; color: #4b5563;"><?php esc_html_e( 'Range:', 'resilient-hub' ); ?></label>
-					<select id="rp_days" name="rp_days" onchange="this.form.submit()" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 12px; font-size: 14px; background: #fff;">
-						<option value="7" <?php selected( $days, 7 ); ?>><?php esc_html_e( 'Last 7 Days', 'resilient-hub' ); ?></option>
-						<option value="30" <?php selected( $days, 30 ); ?>><?php esc_html_e( 'Last 30 Days', 'resilient-hub' ); ?></option>
-						<option value="90" <?php selected( $days, 90 ); ?>><?php esc_html_e( 'Last 90 Days', 'resilient-hub' ); ?></option>
-						<option value="0" <?php selected( $days, 0 ); ?>><?php esc_html_e( 'All Time', 'resilient-hub' ); ?></option>
-					</select>
-				</form>
+				<div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+					<form method="get" style="display: flex; align-items: center; gap: 8px; margin: 0;">
+						<?php if ( $search_log ) : ?>
+							<input type="hidden" name="rp_search_log" value="<?php echo esc_attr( $search_log ); ?>">
+						<?php endif; ?>
+						<label for="rp_days" style="font-size: 14px; font-weight: 600; color: #4b5563;"><?php esc_html_e( 'Range:', 'resilient-hub' ); ?></label>
+						<select id="rp_days" name="rp_days" onchange="this.form.submit()" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 12px; font-size: 14px; background: #fff;">
+							<option value="7" <?php selected( $days, 7 ); ?>><?php esc_html_e( 'Last 7 Days', 'resilient-hub' ); ?></option>
+							<option value="30" <?php selected( $days, 30 ); ?>><?php esc_html_e( 'Last 30 Days', 'resilient-hub' ); ?></option>
+							<option value="90" <?php selected( $days, 90 ); ?>><?php esc_html_e( 'Last 90 Days', 'resilient-hub' ); ?></option>
+							<option value="0" <?php selected( $days, 0 ); ?>><?php esc_html_e( 'All Time', 'resilient-hub' ); ?></option>
+						</select>
+					</form>
+
+					<div style="display: flex; gap: 8px;">
+						<button id="rp-export-pdf" class="rp-button" style="background: #ef4444; color: #fff; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">
+							<span class="dashicons dashicons-pdf" style="font-size: 18px; width: 18px; height: 18px; line-height: 1; margin-top: 3px;"></span> <?php esc_html_e( 'Export PDF', 'resilient-hub' ); ?>
+						</button>
+						<button id="rp-export-png" class="rp-button" style="background: #2563eb; color: #fff; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+							<span class="dashicons dashicons-format-image" style="font-size: 18px; width: 18px; height: 18px; line-height: 1; margin-top: 3px;"></span> <?php esc_html_e( 'Export PNG', 'resilient-hub' ); ?>
+						</button>
+					</div>
+				</div>
 			</div>
 
 			<!-- Summary Cards Grid -->
@@ -602,6 +621,8 @@ get_header();
 
 <!-- Load Chart.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<!-- Load html2pdf.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -709,8 +730,74 @@ document.addEventListener('DOMContentLoaded', function() {
 						maxTicksLimit: 15
 					}
 				}
-			}
 		}
+	});
+
+	// PDF Export Handler
+	document.getElementById('rp-export-pdf').addEventListener('click', function(e) {
+		e.preventDefault();
+		
+		var btn = this;
+		var originalText = btn.innerHTML;
+		btn.innerHTML = '<span class="dashicons dashicons-update spin" style="font-size: 18px; width: 18px; height: 18px; line-height: 1; margin-top: 3px;"></span> <?php esc_html_e( 'Generating...', 'resilient-hub' ); ?>';
+		btn.disabled = true;
+
+		var element = document.getElementById('primary');
+		
+		var opt = {
+			margin:       [0.4, 0.4, 0.4, 0.4],
+			filename:     'Resilience_Hub_Analytics_' + new Date().toISOString().slice(0,10) + '.pdf',
+			image:        { type: 'jpeg', quality: 0.98 },
+			html2canvas:  { 
+				scale: 2, 
+				useCORS: true, 
+				letterRendering: true,
+				logging: false,
+				windowWidth: 1200
+			},
+			jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+		};
+
+		html2pdf().set(opt).from(element).save().then(function() {
+			btn.innerHTML = originalText;
+			btn.disabled = false;
+		}).catch(function(err) {
+			console.error(err);
+			btn.innerHTML = originalText;
+			btn.disabled = false;
+		});
+	});
+
+	// PNG Export Handler
+	document.getElementById('rp-export-png').addEventListener('click', function(e) {
+		e.preventDefault();
+		
+		var btn = this;
+		var originalText = btn.innerHTML;
+		btn.innerHTML = '<span class="dashicons dashicons-update spin" style="font-size: 18px; width: 18px; height: 18px; line-height: 1; margin-top: 3px;"></span> <?php esc_html_e( 'Generating...', 'resilient-hub' ); ?>';
+		btn.disabled = true;
+
+		var element = document.getElementById('primary');
+		
+		html2canvas(element, {
+			scale: 2,
+			useCORS: true,
+			logging: false,
+			windowWidth: 1200,
+			backgroundColor: '#f4f8f6'
+		}).then(function(canvas) {
+			var link = document.createElement('a');
+			link.download = 'Resilience_Hub_Analytics_' + new Date().toISOString().slice(0,10) + '.png';
+			link.href = canvas.toDataURL('image/png');
+			link.click();
+			
+			btn.innerHTML = originalText;
+			btn.disabled = false;
+		}).catch(function(err) {
+			console.error(err);
+			btn.innerHTML = originalText;
+			btn.disabled = false;
+		});
 	});
 });
 </script>
