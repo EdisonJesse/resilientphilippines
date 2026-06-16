@@ -937,3 +937,15 @@ function rp_ajax_save_user_profile_handler() {
 	wp_send_json_success( array( 'message' => __( 'Profile details saved successfully.', 'resilient-hub' ) ) );
 }
 add_action( 'wp_ajax_rp_save_user_profile', 'rp_ajax_save_user_profile_handler' );
+
+/**
+ * Customize the excerpt more link for resource hub knowledge products and partner resources.
+ */
+function rp_child_resource_excerpt_more( $more ) {
+	if ( is_singular( array( 'accord_library', 'partner_resources' ) ) || get_post_type() === 'accord_library' || get_post_type() === 'partner_resources' ) {
+		return ' &hellip;';
+	}
+	return $more;
+}
+add_filter( 'excerpt_more', 'rp_child_resource_excerpt_more', 100 );
+

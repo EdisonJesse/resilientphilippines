@@ -454,8 +454,8 @@ img {
 .rp-card-grid,
 .rp-resource-grid {
   display: grid;
-  gap: 18px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 }
 
 .rp-card,
@@ -463,28 +463,37 @@ img {
   background: var(--rp-color-surface);
   border: 1px solid var(--rp-color-border);
   border-radius: var(--rp-radius);
+  box-shadow: 0 1px 4px rgba(16, 32, 39, 0.06);
+  display: flex;
+  flex-direction: column;
   padding: 24px;
   transition: box-shadow 160ms ease, transform 160ms ease;
 }
 
 .rp-card:hover,
 .rp-resource-card:hover {
-  box-shadow: var(--rp-shadow-soft);
+  box-shadow: 0 6px 20px rgba(16, 32, 39, 0.10);
   transform: translateY(-2px);
 }
 
 .rp-card h3,
 .rp-resource-card h3 {
   color: var(--rp-color-navy);
-  font-size: 1.2rem;
-  line-height: 1.25;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.3;
   margin: 0 0 10px;
 }
 
 .rp-card p,
-.rp-resource-card p,
-.rp-resource-meta {
+.rp-resource-card p {
   color: var(--rp-color-muted);
+}
+
+.rp-resource-meta {
+  color: #8e9fa8;
+  font-size: 0.82rem;
+  margin-bottom: 8px;
 }
 
 .rp-resource-type {
@@ -496,10 +505,32 @@ img {
   text-transform: uppercase;
 }
 
+.rp-resource-card .rp-card-spacer {
+  flex: 1;
+}
+
 .rp-card h3 a,
 .rp-resource-card h3 a {
   color: inherit;
   text-decoration: none;
+}
+
+.rp-resource-card h3 a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rp-resource-readmore {
+  color: var(--rp-color-green);
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 150ms ease;
+}
+
+.rp-resource-readmore:hover {
+  color: var(--rp-color-green-dark);
 }
 
 .rp-card-image {
@@ -1006,7 +1037,8 @@ img {
 .rp-catalog {
   display: grid;
   gap: 26px;
-  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
+  align-items: start;
 }
 
 .rp-catalog-no-filters {
@@ -1015,10 +1047,49 @@ img {
 
 .rp-catalog-filters,
 .rp-upload-form {
-  background: #ffffff;
+  background: var(--rp-color-sky, #f0f5f3);
   border: 1px solid var(--rp-color-border);
   border-radius: var(--rp-radius);
   padding: 22px;
+  position: sticky;
+  top: 110px;
+}
+
+.rp-catalog-filters .rp-field {
+  margin-bottom: 14px;
+}
+
+.rp-catalog-filters .rp-field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--rp-color-navy);
+  margin-bottom: 5px;
+}
+
+.rp-catalog-filters .rp-field input,
+.rp-catalog-filters .rp-field select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--rp-color-border);
+  border-radius: var(--rp-radius);
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: #ffffff;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.rp-catalog-filters .rp-field input:focus,
+.rp-catalog-filters .rp-field select:focus {
+  border-color: var(--rp-color-green);
+  box-shadow: 0 0 0 3px rgba(23, 107, 82, 0.10);
+  outline: none;
+}
+
+.rp-catalog-filters .rp-catalog-submit {
+  width: 100%;
+  margin-top: 6px;
 }
 
 /* Upload form within page content */
@@ -1569,7 +1640,7 @@ img {
   .rp-card-grid,
   .rp-resource-grid,
   .rp-archive-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   }
 
   .rp-single-hero {

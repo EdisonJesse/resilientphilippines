@@ -16,6 +16,7 @@
 
 .rp-resource-download {
   margin-top: 14px;
+  align-self: flex-start;
 }
 
 .rp-resource-locked {

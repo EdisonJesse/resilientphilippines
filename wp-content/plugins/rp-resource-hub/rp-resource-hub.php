@@ -1206,6 +1206,8 @@ function rp_resource_hub_render_grid_items( $resources ) {
 				<h3><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
 				<div class="rp-resource-meta"><?php echo esc_html( get_the_date() ); ?></div>
 				<?php the_excerpt(); ?>
+				<a class="rp-resource-readmore" href="<?php the_permalink(); ?>"><?php esc_html_e( 'Read more', 'rp-resource-hub' ); ?></a>
+				<div class="rp-card-spacer"></div>
 				<?php if ( $is_web_app && $can_download ) : ?>
 					<?php $web_app_url = rp_resource_hub_get_web_app_url( $post_id ); ?>
 					<?php if ( $web_app_url ) : ?>
