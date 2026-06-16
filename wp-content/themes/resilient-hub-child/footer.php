@@ -75,8 +75,39 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
+	function getCookie(name) {
+		var nameEQ = name + "=";
+		var ca = document.cookie.split(';');
+		for(var i=0; i < ca.length; i++) {
+			var c = ca[i];
+			while (c.charAt(0)==' ') c = c.substring(1, c.length);
+			if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+		}
+		return null;
+	}
+	
+	function setCookie(name, value, days) {
+		var expires = "";
+		if (days) {
+			var date = new Date();
+			date.setTime(date.getTime() + (days*24*60*60*1000));
+			expires = "; expires=" + date.toUTCString();
+		}
+		var secure = window.location.protocol === 'https:' ? '; Secure' : '';
+		document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Lax" + secure;
+		try {
+			localStorage.setItem(name, value);
+		} catch (e) {}
+	}
+
 	var consent = getCookie('rp_cookie_consent');
+	try {
+		if (!consent) {
+			consent = localStorage.getItem('rp_cookie_consent');
+		}
+	} catch (e) {}
+
 	var banner = document.getElementById('rp-cookie-banner');
 	
 	if (!consent && banner) {
@@ -92,29 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		setCookie('rp_cookie_consent', 'declined', 365);
 		if (banner) banner.style.display = 'none';
 	});
-	
-	function setCookie(name, value, days) {
-		var expires = "";
-		if (days) {
-			var date = new Date();
-			date.setTime(date.getTime() + (days*24*60*60*1000));
-			expires = "; expires=" + date.toUTCString();
-		}
-		var secure = window.location.protocol === 'https:' ? '; Secure' : '';
-		document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Lax" + secure;
-	}
-	
-	function getCookie(name) {
-		var nameEQ = name + "=";
-		var ca = document.cookie.split(';');
-		for(var i=0; i < ca.length; i++) {
-			var c = ca[i];
-			while (c.charAt(0)==' ') c = c.substring(1, c.length);
-			if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-		}
-		return null;
-	}
-});
+})();
 </script>
 </div>
 </div>

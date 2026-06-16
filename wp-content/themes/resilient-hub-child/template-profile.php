@@ -328,6 +328,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	var consentToggle = document.getElementById('rp-analytics-toggle');
 	if (consentToggle) {
 		var consentCookie = getCookie('rp_cookie_consent');
+		if (!consentCookie) {
+			try {
+				consentCookie = localStorage.getItem('rp_cookie_consent');
+			} catch (e) {}
+		}
 		
 		// If cookie is empty or accepted, toggle is ON. If cookie is declined, toggle is OFF.
 		consentToggle.checked = (consentCookie !== 'declined');
@@ -416,6 +421,11 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 		var secure = window.location.protocol === 'https:' ? '; Secure' : '';
 		document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Lax" + secure;
+		if (name === 'rp_cookie_consent') {
+			try {
+				localStorage.setItem(name, value);
+			} catch (e) {}
+		}
 	}
 	
 	function getCookie(name) {
