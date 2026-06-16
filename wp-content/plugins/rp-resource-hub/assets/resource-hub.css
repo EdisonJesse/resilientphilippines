@@ -1,0 +1,76 @@
+.rp-resource-type {
+  color: var(--rp-color-amber, #b85f12);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+
+.rp-resource-card .wp-post-image {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--rp-radius, 8px);
+  object-fit: cover;
+  width: 100%;
+}
+
+.rp-resource-download {
+  margin-top: 14px;
+}
+
+.rp-resource-locked {
+  background: #f8eadb;
+  border-radius: var(--rp-radius, 8px);
+  color: #7a3d08;
+  display: inline-block;
+  font-weight: 800;
+  margin-top: 14px;
+  padding: 8px 10px;
+}
+
+.rp-upload-form .rp-checkbox-list > label:first-child {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.rp-pagination {
+  grid-column: 2;
+  margin-top: 26px;
+}
+
+.rp-pagination ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rp-pagination a,
+.rp-pagination span {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--rp-color-border, #d9e2de);
+  border-radius: var(--rp-radius, 8px);
+  color: var(--rp-color-navy, #12324a);
+  display: inline-flex;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 40px;
+  min-width: 40px;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
+.rp-pagination .current {
+  background: var(--rp-color-green, #176b52);
+  border-color: var(--rp-color-green, #176b52);
+  color: #ffffff;
+}
+
+@media (max-width: 860px) {
+  .rp-pagination {
+    grid-column: auto;
+  }
+}

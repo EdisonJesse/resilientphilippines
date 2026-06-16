@@ -1,0 +1,247 @@
+/*
+Theme Name: ForeverWood
+Description: Adds support for languages written in a Right To Left (RTL) direction.
+*/
+
+p, ul, ol, li, dl, address {
+  text-align: right;
+}
+ul {
+  margin-left: 0;
+  margin-right: 16px;   
+}
+ol {
+	margin-left: 0;
+  margin-right: 20px;
+}
+table, td, th {
+  text-align: right;
+}
+blockquote, q { 
+  border-left: none;
+  border-right: 1px solid #e3e3e3;
+  padding-left: 0;
+  padding-right: 20px;
+}
+
+
+/* basic structure
+-------------------------------------------------------------- */
+
+#main-content {
+  float: right;         
+}
+#sidebar {
+  float: left;
+  margin-left: 0px;
+  margin-right: 30px;      
+}
+.scroll-top {
+  left: 10px;
+  right: auto;            
+}
+
+
+/* header
+-------------------------------------------------------------- */
+
+.title-box {
+  float: right;           
+}
+.menu-box {
+  float: left;         
+}
+
+/* menu */
+.menu-box ul {
+  float: left;
+  text-align: left;
+}
+.menu-box ul li {
+  float: right;
+  margin-right: 37px;
+  margin-left: 0;
+}
+.menu-box a,
+.menu-box a:visited {
+  float: right;
+  text-align: left;
+}
+#wrapper-header .menu-box ul ul a,
+#wrapper-header .menu-box ul ul a:visited {
+  padding-left: 12px;
+  padding-right: 0;
+  text-align: left;
+}
+.menu-box ul ul {
+  left: 0;
+  right: auto;
+}
+.menu-box ul ul ul {
+  left: auto;
+  right: -212px;
+} 
+.menu-panel a,
+.menu-panel a:visited {
+  float: right;                      
+}
+#wrapper-header .menu-panel ul ul a,
+#wrapper-header .menu-panel ul ul a:visited {
+  padding: 0 16px 0 0;
+  text-align: right;
+}
+.menu-panel ul ul {
+  left: auto;
+  right: 0px;
+}
+.menu-panel ul ul ul {
+  left: auto;
+  right: 212px;
+}
+
+/* main content
+-------------------------------------------------------------- */
+
+#main-content .nav-previous {
+  float: right;                            
+}
+#main-content .nav-next {
+  float: left;
+  text-align: left;                            
+}
+
+/* default post entry */
+.attachment-post-thumbnail { 
+  float: right;
+  margin-left: 15px;
+  margin-right: 0;
+}
+
+/* post entry - column */
+.post-entry-column img {
+  float: right;
+  margin: 0 0 0 14px;              
+}
+#main-content .post-entry-column .post-content {
+  margin-left: 0;
+  margin-right: 72px;             
+}
+#main-content .post-entry-column .post-meta {
+  clear: left;                                                                 
+}
+
+/* post entry - grid */
+.js-masonry { 
+  float: right;
+  margin: 0 -10px 0 0;                     
+}
+.grid-entry .grid-entry-inner {
+  margin: 0 20px 0 0;                            
+}
+
+/* post entry - slider */
+#content .wrapper-related-posts .unordered-list {
+  margin: -7px 16px 0 0;                      
+}
+.flexslider .flex-direction-nav {
+  left: 0;
+  right: auto;                               
+}
+.flexslider .slides li {
+  float: right !important;                       
+}
+
+/* post entry - thumbnail */
+.post-entry-thumbnail {
+  float: right;                        
+} 
+
+
+/* sidebar
+-------------------------------------------------------------- */
+
+.sidebar-widget ul li {
+  padding-left: 0;
+  padding-right: 10px;                       
+} 
+
+
+/* footer
+-------------------------------------------------------------- */  
+
+.footer-widget-area {
+  float: right;
+  margin-left: 30px;
+  margin-right: 0;               
+}
+#footer .footer-widget-area-3 {
+  margin-left: 0;                              
+}                                 
+
+
+/* default widgets
+-------------------------------------------------------------- */
+
+#wp-calendar #prev {
+  text-align: right;                   
+}
+#wp-calendar #next {
+  text-align: left;                   
+}
+
+/* Page Builder Custom Widgets */
+#wrapper .panel-row-style-foreverwood .origin-widget-button {
+  left: 2em;
+  right: auto;                                                              
+}
+#wrapper .panel-row-style .origin-widget-list ul {
+  margin-left: 0;
+  margin-right: 24px;
+  padding-left: 0;
+}
+#wrapper #main-content .panel-row-style .home-latest-posts .attachment-post-thumbnail { 
+  float: right;
+  margin: 0 0 5px 15px;
+}
+
+
+/* form fields
+-------------------------------------------------------------- */
+
+#searchform .searchform-wrapper #s {
+  padding: 5px 3% 5px 0;
+  left: auto;
+  right: 0;              
+}
+#searchform .searchform-wrapper .send {
+  left: 0;
+  right: auto;
+}
+
+
+/* comments area
+-------------------------------------------------------------- */
+
+#comments ol {
+  margin-left: auto;
+  margin-right: 0;             
+}
+#comments .avatar,
+#comments .fn {
+  float: right;
+  margin: 0 0 0 6px
+}
+#comments time,
+#comments .edit-link {
+  float: left;             
+}
+
+
+/* media queries
+-------------------------------------------------------------- */
+
+@media screen and (max-width: 990px) {
+  .js .selectnav {
+    float: right;
+}
+}

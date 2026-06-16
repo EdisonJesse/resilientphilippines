@@ -1,0 +1,1157 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ForeverWood v1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-09-06 18:51+0100\n"
+"PO-Revision-Date: 2014-09-08 08:08+0100\n"
+"Last-Translator: andew <andew@andew.ru>\n"
+"Language-Team: \n"
+"Language: Russian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 1.5.7\n"
+
+# @ foreverwood
+#: 404.php:13 search.php:49
+msgid "Nothing Found"
+msgstr "Ничего не найдено"
+
+# @ foreverwood
+#: 404.php:17
+msgid ""
+"Apologies, but no results were found for your request. Perhaps searching "
+"will help you to find a related content."
+msgstr ""
+"К сожалению ничего не найдено по Вашему запросу. Попробуйте воспользоваться "
+"поиском."
+
+# @ foreverwood
+#: archive.php:15
+#, php-format
+msgid "Daily Archive: %s"
+msgstr "Дневной архив: %s"
+
+# @ foreverwood
+#: archive.php:17
+#, php-format
+msgid "Monthly Archive: %s"
+msgstr "Месячный архив: %s"
+
+# @ foreverwood
+#: archive.php:19
+#, php-format
+msgid "Yearly Archive: %s"
+msgstr "Годовой архив: %s"
+
+# @ foreverwood
+#: archive.php:21
+msgid "Archive"
+msgstr "Архив"
+
+# @ foreverwood
+#: author.php:14
+#, php-format
+msgid "Author Archive: %s"
+msgstr "Архив автора: %s"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:156
+msgid "Install Required Plugins"
+msgstr "Установить необходимые плагины"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:157 functions.php:516
+msgid "Install Plugins"
+msgstr "Установить плагины"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:158 functions.php:520
+#, php-format
+msgid "Installing Plugin: %s"
+msgstr "Установка плагина: %s"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:159
+msgid "Something went wrong."
+msgstr "Что то пошло не так."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:170
+msgid "Return to Required Plugins Installer"
+msgstr "Вернуться к установщику необходимых плагинов"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:171
+msgid "Return to the dashboard"
+msgstr "Вернуться к панели инструментов"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:172 class-tgm-plugin-activation.php:1840
+msgid "Plugin activated successfully."
+msgstr "Плагин активирован успешно."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:173 class-tgm-plugin-activation.php:1538
+msgid "The following plugin was activated successfully:"
+msgstr "Следующий плагин был активирован успешно:"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:174
+#, php-format
+msgid "All plugins installed and activated successfully. %1$s"
+msgstr "Все плагины установлены и активированы успешно. %1$s"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:175
+msgid "Dismiss this notice"
+msgstr "Игнорировать это уведомление"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1085
+msgid "External Link"
+msgstr "Внешняя ссылка"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1090
+msgid "Private Repository"
+msgstr "Личное Хранилище"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1093
+msgid "Pre-Packaged"
+msgstr "Предварительно упакованные"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1097
+msgid "WordPress Repository"
+msgstr "WordPress репозитория"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1100
+msgid "Required"
+msgstr "Необходимый"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1100
+msgid "Recommended"
+msgstr "Рекомендованный"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1103
+msgid "Not Installed"
+msgstr "Не установленный"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1105
+msgid "Installed But Not Activated"
+msgstr "Установленный но не активированный"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1275
+#, php-format
+msgid ""
+"No plugins to install or activate. <a href=\"%1$s\" title=\"Return to the "
+"Dashboard\">Return to the Dashboard</a>"
+msgstr ""
+"Нет плагинов для инсталляции или активации. <a href=\"%1$s\" title="
+"\"Вернуться к панели инструментов\">Вернуться к панели инструментов</a>"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1291
+msgid "Plugin"
+msgstr "Плагин"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1292
+msgid "Source"
+msgstr "Источник"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1293
+msgid "Type"
+msgstr "Тип"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1294
+msgid "Status"
+msgstr "Статус"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1312
+msgid "Install"
+msgstr "Установить"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1313
+msgid "Activate"
+msgstr "Активировать"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1823
+msgid "Install package not available."
+msgstr "Установочный пакет не доступен."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1824
+#, php-format
+msgid "Downloading install package from <span class=\"code\">%s</span>&#8230;"
+msgstr "Загрузка установочного пакета с <span class=\"code\">%s</span>&#8230;"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1825
+msgid "Unpacking the package&#8230;"
+msgstr "Распаковка пакета&#8230;"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1826
+msgid "Installing the plugin&#8230;"
+msgstr "Установка плагина&#8230;"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1827
+msgid "Plugin install failed."
+msgstr "Неудачная установка плагина."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1828
+msgid "Plugin installed successfully."
+msgstr "Плагин установлен успешно."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1839
+msgid "Plugin activation failed."
+msgstr "Неудачная активация плагина."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1949
+msgid ""
+"The installation and activation process is starting. This process may take a "
+"while on some hosts, so please be patient."
+msgstr ""
+"Процесс установки и активации начался. Этот процесс может занять некоторое "
+"время, поэтому, пожалуйста, будьте терпеливы."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1950
+#, php-format
+msgid "%1$s installed and activated successfully."
+msgstr "%1$s установлен и активирован успешно."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1950 class-tgm-plugin-activation.php:1959
+msgid "Show Details"
+msgstr "Показать детали"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1950 class-tgm-plugin-activation.php:1959
+msgid "Hide Details"
+msgstr "Скрыть детали"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1951
+msgid "All installations and activations have been completed."
+msgstr "Все установки и активации завершены."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1952
+#, php-format
+msgid "Installing and Activating Plugin %1$s (%2$d/%3$d)"
+msgstr "Установка и активация плагина %1$s (%2$d/%3$d)"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1956
+msgid ""
+"The installation process is starting. This process may take a while on some "
+"hosts, so please be patient."
+msgstr ""
+"Процесс инсталляции запущен. Этот процесс может занять некоторое время, "
+"пожалуйста, будьте терпеливы."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1957
+#, php-format
+msgid "An error occurred while installing %1$s: <strong>%2$s</strong>."
+msgstr "Произошла ошибка при установке %1$s: <strong>%2$s</strong>."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1958
+#, php-format
+msgid "The installation of %1$s failed."
+msgstr "Установка %1$s не удалась."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1959
+#, php-format
+msgid "%1$s installed successfully."
+msgstr "%1$s установлен успешно."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1960
+msgid "All installations have been completed."
+msgstr "Все установки завершены."
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:1961
+#, php-format
+msgid "Installing Plugin %1$s (%2$d/%3$d)"
+msgstr "Установка плагина %1$s (%2$d/%3$d)"
+
+# @ foreverwood
+#: class-tgm-plugin-activation.php:2052
+msgid "Return to the Dashboard"
+msgstr "Вернуться к панели инструментов."
+
+# @ foreverwood
+#: comments.php:21
+msgid "1 Comment"
+msgid_plural "%1$s Comments"
+msgstr[0] "1 Комментарий"
+msgstr[1] "%1$s Комментарии"
+
+# @ foreverwood
+#: comments.php:30
+msgid "&larr; Older Comments"
+msgstr "&larr; старые комментарии"
+
+# @ foreverwood
+#: comments.php:31
+msgid "Newer Comments &rarr;"
+msgstr "Новые Комментарии &rarr;"
+
+# @ foreverwood
+#: comments.php:37
+msgid "Comments are closed."
+msgstr "Комментарии закрыты."
+
+# @ foreverwood
+#: comments.php:42
+msgid "Your name"
+msgstr "Ваше имя"
+
+# @ foreverwood
+#: comments.php:43
+msgid "Website"
+msgstr "Веб сайт"
+
+# @ foreverwood
+#: comments.php:44
+msgid "Comment..."
+msgstr "Комментарий..."
+
+# @ foreverwood
+#: comments.php:48
+msgid "Leave a Comment"
+msgstr "Оставить комментарий"
+
+#: functions.php:148
+msgid "Video Thumbnail"
+msgstr "Видео Миниатюра"
+
+# @ foreverwood
+#: functions.php:160
+msgid "Insert here the full URL address of the Video Thumbnail."
+msgstr "Вставьте полный URL Вашей Видео Миниатюра."
+
+# @ foreverwood
+#: functions.php:215
+msgid "Main Header Menu"
+msgstr "Основное меню шапки"
+
+#: functions.php:216
+msgid "Social Networks Links"
+msgstr "Социальные сети Ссылки"
+
+# @ foreverwood
+#: functions.php:228
+msgid "Right Sidebar"
+msgstr "Правый Sidebar"
+
+# @ foreverwood
+#: functions.php:230
+msgid "Right sidebar which appears on all posts and pages."
+msgstr "Правый Sidebar с отображением всех записей и страниц."
+
+# @ foreverwood
+#: functions.php:237
+msgid "Footer left widget area"
+msgstr "Футера левая область"
+
+# @ foreverwood
+#: functions.php:239
+msgid "Left column with widgets in footer."
+msgstr "Виджет - левый столбец футера."
+
+# @ foreverwood
+#: functions.php:246
+msgid "Footer middle widget area"
+msgstr "Футера средняя область"
+
+# @ foreverwood
+#: functions.php:248
+msgid "Middle column with widgets in footer."
+msgstr "Виджет - средний столбец футера"
+
+# @ foreverwood
+#: functions.php:255
+msgid "Footer right widget area"
+msgstr "Футера правая область"
+
+# @ foreverwood
+#: functions.php:257
+msgid "Right column with widgets in footer."
+msgstr "Виджет - правый столбец футера."
+
+# @ foreverwood
+#: functions.php:264
+msgid "Footer notices"
+msgstr "Футера заметок область"
+
+# @ foreverwood
+#: functions.php:266
+msgid ""
+"The line for copyright and other notices below the footer widget areas. "
+"Insert here one Text widget. The \"Title\" field at this widget should stay "
+"empty."
+msgstr ""
+"Место для авторского права и других уведомлений в нижней области виджета "
+"колонтитула. Вставьте здесь один текстовый виджет. Поле название для этого "
+"виджета нужно оставить пустым."
+
+#: functions.php:273
+msgid "Homepage slideshow"
+msgstr "Слайдшоу на главной"
+
+#: functions.php:275
+msgid ""
+"The area for Cyclone Slider Widget which displays a slideshow on your "
+"homepage."
+msgstr ""
+"Место для Cyclone Slider Widget, который осуществляет показ слайдов на Вашей "
+"главной странице."
+
+# @ foreverwood
+#: functions.php:294
+msgid "Read more"
+msgstr "ДАЛЕЕ"
+
+# @ foreverwood
+#: functions.php:340
+msgid "Post navigation"
+msgstr "Навигация записи"
+
+# @ foreverwood
+#: functions.php:348 search.php:35
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:462
+msgid "&larr; Previous"
+msgstr "&larr; Предыдущая"
+
+# @ foreverwood
+#: functions.php:349 search.php:36
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:465
+msgid "Next &rarr;"
+msgstr "Следующая &rarr;"
+
+# @ foreverwood
+#: functions.php:370
+msgid "&larr; Previous post"
+msgstr "&larr; Предыдущая запись"
+
+# @ foreverwood
+#: functions.php:372
+msgid "Next post &rarr;"
+msgstr "Следующая запись &rarr;"
+
+# @ foreverwood
+#: functions.php:390
+msgid "Pingback:"
+msgstr "Pingback:"
+
+# @ foreverwood
+#: functions.php:390 page.php:20 single.php:44
+#: template-full-width-without-sharing.php:21 template-full-width.php:21
+#: template-landing-page.php:21 template-sitemap.php:21
+#: template-without-sharing.php:21 template-without-title.php:18
+msgid "(Edit)"
+msgstr "(Изменить)"
+
+# @ foreverwood
+#: functions.php:403
+msgid "(Post author)"
+msgstr "(Автор записи)"
+
+# @ foreverwood
+#: functions.php:409
+#, php-format
+msgid "%1$s at %2$s"
+msgstr "%1$s в %2$s"
+
+# @ foreverwood
+#: functions.php:415
+msgid "Your comment is awaiting moderation."
+msgstr "Ваш комментарий ожидает модерации."
+
+# @ foreverwood
+#: functions.php:421
+msgid "Reply"
+msgstr "Ответить"
+
+# @ foreverwood
+#: functions.php:423
+msgid "Edit"
+msgstr "Изменить"
+
+# @ foreverwood
+#: functions.php:515
+msgid "Install Recommended Plugins"
+msgstr "Установить необходимые плагины"
+
+# @ foreverwood
+#: functions.php:517
+#, php-format
+msgid ""
+"The %1$s plugin is required for this theme. Click on the big blue button "
+"below to install and activate %1$s."
+msgstr ""
+"%1$s плагин необходим для этой темы. Нажмите на большую голубую кнопку ниже "
+"для инсталляции и активации плагина. %1$s."
+
+# @ foreverwood
+#: functions.php:518
+#, php-format
+msgid ""
+"The %1$s is installed but currently inactive. Please go to the <a href=\"%2$s"
+"\">plugin administration page</a> page to activate it."
+msgstr ""
+"%1$s установлен но не активирован. Перейдите <a href=\"%2$s\">страница "
+"управления плагином</a> для его активации."
+
+# @ foreverwood
+#: functions.php:519
+#, php-format
+msgid "Install %s Now"
+msgstr "Установить %s сейчас"
+
+# @ foreverwood
+#: functions.php:521
+msgid "Something went wrong with the plugin API."
+msgstr "Что пошло не так с API плагина."
+
+# @ foreverwood
+#: functions.php:522
+#, php-format
+msgid ""
+"This theme requires the %1$s plugin. <a href=\"%2$s\"><strong>Click here to "
+"begin the installation process</strong></a>. You may be asked for FTP "
+"credentials based on your server setup."
+msgstr ""
+"Для этой темы необходим %1$s плагин. <a href=\"%2$s\"><strong>Нажмите здесь "
+"для начала процесс установки</strong></a>. От вас могут потребоваться "
+"учетные записи FTP от вашего сервера."
+
+# @ foreverwood
+#: functions.php:523
+#, php-format
+msgid ""
+"Sorry, but you do not have the correct permissions to install the %s plugin. "
+"Contact the administrator of this site for help on getting the plugin "
+"installed."
+msgstr ""
+"Извините, но вы не имеете текущих полномочий устанавливать %s плагин. "
+"Свяжитесь с администратором сайта для получения помощи в установке этого "
+"плагина."
+
+# @ foreverwood
+#: functions.php:524
+#, php-format
+msgid ""
+"This theme requires the %1$s plugin. That plugin is currently inactive, so "
+"please go to the <a href=\"%2$s\">plugin administration page</a> to activate "
+"it."
+msgstr ""
+"Для этой темы необходим %1$s плагин. Этот плагин сейчас неактивен, перейдите "
+"на <a href=\"%2$s\">страницу управления плагинами</a> для активации "
+"требуемого плагина."
+
+# @ foreverwood
+#: functions.php:525
+#, php-format
+msgid ""
+"Sorry, but you do not have the correct permissions to activate the %s "
+"plugin. Contact the administrator of this site for help on getting the "
+"plugin activated."
+msgstr ""
+"Извините, но Вы не имеете текущих полномочий активировать %s плагин. "
+"Свяжитесь с администратором сайта для получения помощи в активации этого "
+"плагина."
+
+# @ foreverwood
+#: functions.php:526
+msgid "Return to Recommended Plugins Installer"
+msgstr "Вернуться к установщику необходимых плагинов"
+
+# @ foreverwood
+#: functions.php:537
+msgid "ForeverWood"
+msgstr "ForeverWood"
+
+#: functions.php:538
+msgid "ForeverWood - full screen"
+msgstr "ForeverWood - full screen"
+
+# @ foreverwood
+#: search.php:13
+#, php-format
+msgid "Search Results for: %s"
+msgstr "Результаты поиска для: %s"
+
+# @ foreverwood
+#: search.php:17
+msgid "<strong>Number of Results</strong>: "
+msgstr "<strong>Количество результатов</strong>: "
+
+# @ foreverwood
+#: search.php:27
+msgid "Search results navigation"
+msgstr "Навигация по результатам поиска"
+
+# @ foreverwood
+#: search.php:53
+msgid ""
+"Sorry, but nothing matched your search criteria. Please try again with some "
+"different keywords."
+msgstr ""
+"Извините, но ничего не соответствуют критериям поиска. Пожалуйста, "
+"попробуйте еще раз с использованием других ключевых слов."
+
+# @ foreverwood
+#: searchform.php:9
+msgid "Search here..."
+msgstr "Искать здесь..."
+
+# @ foreverwood
+#: single.php:45
+msgid "Pages:"
+msgstr "Страницы:"
+
+# @ foreverwood
+#: tag.php:13
+#, php-format
+msgid "Tag Archive: %s"
+msgstr "Архив тегов: %s"
+
+#: cycloneslider/dark/slider.php:43
+msgid "View Larger Image"
+msgstr "Просмотреть увеличенное изображение"
+
+#: cycloneslider/dark/slider.php:46 cycloneslider/dark/slider.php:48
+msgid "Learn More"
+msgstr "Узнать подробнее"
+
+#: cycloneslider/dark/slider.php:64 cycloneslider/default/slider.php:62
+#: cycloneslider/default/slider.php:66 cycloneslider/default/slider.php:70
+#: cycloneslider/standard/slider.php:70 cycloneslider/thumbnails/slider.php:70
+msgid "Slide type not supported."
+msgstr "Тип Презентация не поддерживается."
+
+# @ foreverwood
+#: functions/be/fw-options.php:1300
+msgid "settings reset."
+msgstr "сброса настроек."
+
+# @ foreverwood
+#: functions/be/fw-setup.php:16
+msgid "Theme Options"
+msgstr "Опции темы"
+
+# @ foreverwood
+#: functions/fe/google-map-shortcode.php:100
+msgid "No location found for the entered address."
+msgstr "Не найдено расположение для введенного адреса."
+
+# @ foreverwood
+#: functions/fe/google-map-shortcode.php:102
+msgid "Invalid request. Did you enter an address?"
+msgstr "Неверный запрос. Вы ввели адрес?"
+
+# @ foreverwood
+#: functions/fe/google-map-shortcode.php:104
+msgid ""
+"Something went wrong while retrieving your map, please ensure you have "
+"entered the short code correctly."
+msgstr ""
+"Что-то пошло не так при получении Вашей карты, пожалуйста, убедитесь, что вы "
+"правильно ввели короткий код."
+
+# @ foreverwood
+#: functions/fe/google-map-shortcode.php:107
+msgid "Unable to contact Google API service."
+msgstr "Невозможно связаться со службой API Google."
+
+# @ foreverwood
+#: functions/fe/widget-facebook.php:12
+msgid "Displays Facebook Like Box."
+msgstr "Отображает Facebook как Box."
+
+# @ foreverwood
+#: functions/fe/widget-facebook.php:14
+msgid "ForeverWood Facebook Like Box Widget"
+msgstr "ForeverWood Facebook как Box Widget"
+
+# @ foreverwood
+#: functions/fe/widget-facebook.php:56 functions/fe/widget-image-box.php:116
+#: functions/fe/widget-info-box.php:58 functions/fe/widget-posts-column.php:41
+#: functions/fe/widget-posts-default.php:41
+#: functions/fe/widget-posts-grid.php:41 functions/fe/widget-posts-list.php:41
+#: functions/fe/widget-posts-slider.php:41
+#: functions/fe/widget-posts-thumbnail.php:41
+#: functions/fe/widget-presentation-box.php:58
+#: functions/fe/widget-twitter.php:39
+msgid "Title:"
+msgstr "Заголовок:"
+
+# @ foreverwood
+#: functions/fe/widget-facebook.php:63
+msgid "Facebook Page URL:"
+msgstr "Facebook Page URL:"
+
+# @ foreverwood
+#: functions/fe/widget-facebook.php:67
+msgid ""
+"Insert here the full URL of your Facebook Page that will be liked (example: "
+"http://www.facebook.com/FacebookDevelopers)."
+msgstr ""
+"Вставьте здесь полный адрес вашей странице Facebook  (пример: http://www."
+"facebook.com/FacebookDevelopers)."
+
+# @ foreverwood
+#: functions/fe/widget-facebook.php:73
+msgid "Like Box Height: (optional)"
+msgstr "Like Box Высота: (необязательно)"
+
+# @ foreverwood
+#: functions/fe/widget-facebook.php:77
+msgid ""
+"Insert here the height of Like Box. The value is in pixels, but in the field "
+"please write ONLY NUMBERS (without symbol \"px\")!"
+msgstr ""
+"Сюда вставляем высоту для Like Box. Значение в пикселях, но и в области "
+"пишите только цифры (без символа \\ \\\"PX \")!"
+
+# @ foreverwood
+#: functions/fe/widget-facebook.php:83
+msgid "Show Faces:"
+msgstr "Показать Лица:"
+
+# @ foreverwood
+#: functions/fe/widget-facebook.php:90
+msgid "Specify whether to display profile photos of people who like the page."
+msgstr ""
+"Укажите, следует ли отображать фотографии людей, которым нравиться страница."
+
+# @ foreverwood
+#: functions/fe/widget-facebook.php:96
+msgid "Show Stream:"
+msgstr "Показывать направления:"
+
+# @ foreverwood
+#: functions/fe/widget-facebook.php:103
+msgid "Specify whether to display a stream of the latest posts by the Page."
+msgstr ""
+"Укажите, следует ли отображать направления последних сообщений на странице."
+
+# @ foreverwood
+#: functions/fe/widget-image-box.php:12
+msgid ""
+"Displays a full screen box with your custom background image, text and link."
+msgstr "Отображает ящик с вашей таможней фоновое изображение, текст и ссылку."
+
+# @ foreverwood
+#: functions/fe/widget-image-box.php:14
+msgid "ForeverWood Box-Image"
+msgstr "ForeverWood Box-Image"
+
+#: functions/fe/widget-image-box.php:76
+#: functions/fe/widget-presentation-box.php:48
+msgid "Image:"
+msgstr "картинка:"
+
+# @ foreverwood
+#: functions/fe/widget-image-box.php:80
+#: functions/fe/widget-presentation-box.php:52
+msgid "Insert here the full URL address of your image."
+msgstr "Вставьте полный URL Вашей образ."
+
+#: functions/fe/widget-image-box.php:86
+msgid "Height:"
+msgstr "высота:"
+
+#: functions/fe/widget-image-box.php:90
+msgid "Set here the height of the image box (in pixels)."
+msgstr "Установите здесь высоту окна изображения (в пикселях)."
+
+#: functions/fe/widget-image-box.php:96
+msgid "Background image size:"
+msgstr "Фон размер изображения:"
+
+#: functions/fe/widget-image-box.php:99
+msgid "Auto"
+msgstr "автоматический"
+
+#: functions/fe/widget-image-box.php:100
+msgid "Cover"
+msgstr "покрытие"
+
+#: functions/fe/widget-image-box.php:106
+msgid "Scrolling:"
+msgstr "Прокрутка:"
+
+#: functions/fe/widget-image-box.php:109
+msgid "Fixed"
+msgstr "фиксированный"
+
+#: functions/fe/widget-image-box.php:110
+msgid "Scrolled"
+msgstr "прокрутки"
+
+# @ foreverwood
+#: functions/fe/widget-image-box.php:123
+#: functions/fe/widget-presentation-box.php:65
+msgid "Subtitle:"
+msgstr "подзаголовок:"
+
+#: functions/fe/widget-image-box.php:130
+msgid "Button link:"
+msgstr "Кнопка ссылки:"
+
+# @ foreverwood
+#: functions/fe/widget-image-box.php:134
+msgid "Insert here the full URL address of your custom link."
+msgstr "Вставьте полный URL Вашей пользовательские ссылка."
+
+#: functions/fe/widget-image-box.php:140
+msgid "Button text:"
+msgstr "Кнопка текст:"
+
+# @ foreverwood
+#: functions/fe/widget-image-box.php:144
+msgid "Insert here a text which will be displayed in the button."
+msgstr "Текст, отображаемый на кнопке."
+
+# @ foreverwood
+#: functions/fe/widget-info-box.php:12
+msgid "Displays a box with your custom text and link."
+msgstr "Отображает окно с Вашими текстом и ссылкой."
+
+# @ foreverwood
+#: functions/fe/widget-info-box.php:14
+msgid "ForeverWood Box-Info"
+msgstr "ForeverWood Box-Info"
+
+# @ foreverwood
+#: functions/fe/widget-info-box.php:48
+msgid "Icon:"
+msgstr "Иконка:"
+
+#: functions/fe/widget-info-box.php:52
+msgid ""
+"Insert here the name of an icon (example: <strong>icon_calendar</strong>)."
+msgstr "Вставьте имя значка (например:<strong>icon_calendar</strong>)."
+
+# @ foreverwood
+#: functions/fe/widget-info-box.php:65
+#: functions/fe/widget-presentation-box.php:72
+msgid "Text:"
+msgstr "Текст:"
+
+# @ foreverwood
+#: functions/fe/widget-info-box.php:72
+msgid "Link:"
+msgstr "Ссылка:"
+
+# @ foreverwood
+#: functions/fe/widget-info-box.php:76
+msgid "Insert here the full URL which will be displayed as a link (optional)."
+msgstr ""
+"Здесь следует вставить полный URL, который будет отображаться в виде кнопки "
+"(опция)."
+
+# @ foreverwood
+#: functions/fe/widget-info-box.php:108
+msgid "Read More &gt;"
+msgstr "ДАЛЕЕ &gt;"
+
+# @ foreverwood
+#: functions/fe/widget-posts-column.php:12
+msgid ""
+"Displays the latest posts from the selected category as a column with "
+"highlighted first post."
+msgstr ""
+"Отображает последние записи из выбранной категории как колонка с выделением "
+"первой записи."
+
+# @ foreverwood
+#: functions/fe/widget-posts-column.php:14
+msgid "ForeverWood Posts-Column"
+msgstr "ForeverWood Posts-Column"
+
+# @ foreverwood
+#: functions/fe/widget-posts-column.php:48
+#: functions/fe/widget-posts-default.php:48
+#: functions/fe/widget-posts-grid.php:48 functions/fe/widget-posts-list.php:48
+#: functions/fe/widget-posts-slider.php:48
+#: functions/fe/widget-posts-thumbnail.php:48
+msgid "Category:"
+msgstr "Рубрика:"
+
+# @ foreverwood
+#: functions/fe/widget-posts-column.php:58
+#: functions/fe/widget-posts-default.php:58
+#: functions/fe/widget-posts-grid.php:58 functions/fe/widget-posts-list.php:58
+#: functions/fe/widget-posts-slider.php:58
+#: functions/fe/widget-posts-thumbnail.php:58
+msgid "Select a category of posts."
+msgstr "Выберите рубрику записей."
+
+# @ foreverwood
+#: functions/fe/widget-posts-column.php:64
+#: functions/fe/widget-posts-default.php:64
+#: functions/fe/widget-posts-grid.php:64 functions/fe/widget-posts-list.php:64
+#: functions/fe/widget-posts-slider.php:64
+#: functions/fe/widget-posts-thumbnail.php:64
+msgid "Number of posts:"
+msgstr "Номера записей:"
+
+# @ foreverwood
+#: functions/fe/widget-posts-column.php:68
+#: functions/fe/widget-posts-default.php:68
+#: functions/fe/widget-posts-grid.php:68 functions/fe/widget-posts-list.php:68
+#: functions/fe/widget-posts-slider.php:68
+#: functions/fe/widget-posts-thumbnail.php:68
+msgid ""
+"Insert here the number of latest posts from the selected category which you "
+"want to display."
+msgstr ""
+"Здесь следует вставить номера последних записей из выбранной рубрики, "
+"которые вы хотите показать."
+
+# @ foreverwood
+#: functions/fe/widget-posts-default.php:12
+msgid ""
+"Displays the latest posts from the selected category in the default manner."
+msgstr "Отображает последние записи из выбранной категории."
+
+# @ foreverwood
+#: functions/fe/widget-posts-default.php:14
+msgid "ForeverWood Posts-Default"
+msgstr "ForeverWood Posts-Default"
+
+# @ foreverwood
+#: functions/fe/widget-posts-grid.php:12
+msgid "Displays the latest posts from the selected category as a grid."
+msgstr "Отображает последние записи из выбранной категории как таблицу."
+
+# @ foreverwood
+#: functions/fe/widget-posts-grid.php:14
+msgid "ForeverWood Posts-Grid"
+msgstr "ForeverWood Posts-Grid"
+
+# @ foreverwood
+#: functions/fe/widget-posts-list.php:12
+msgid ""
+"Displays the latest posts from the selected category as an unordered list "
+"with highlighted first post."
+msgstr ""
+"Отображает последние записи из выбранной категории как список с выделением "
+"первой записи."
+
+# @ foreverwood
+#: functions/fe/widget-posts-list.php:14
+msgid "ForeverWood Posts-List"
+msgstr "ForeverWood Posts-List"
+
+# @ foreverwood
+#: functions/fe/widget-posts-slider.php:12
+msgid "Displays the latest posts from the selected category as a slider."
+msgstr "Отображает последние записи из выбранной категории как слайдер."
+
+# @ foreverwood
+#: functions/fe/widget-posts-slider.php:14
+msgid "ForeverWood Posts-Slider"
+msgstr "ForeverWood Posts-Slider"
+
+# @ foreverwood
+#: functions/fe/widget-posts-thumbnail.php:12
+msgid "Displays the latest posts from the selected category as the thumbnails."
+msgstr "Отображает последние записи из выбранной категории как эскизы."
+
+# @ foreverwood
+#: functions/fe/widget-posts-thumbnail.php:14
+msgid "ForeverWood Posts-Thumbnail"
+msgstr "ForeverWood Posts-Thumbnail"
+
+# @ foreverwood
+#: functions/fe/widget-presentation-box.php:12
+msgid "Displays a box with your custom image and text."
+msgstr "Отображает окно с Вашими текстом и изображение."
+
+#: functions/fe/widget-presentation-box.php:14
+msgid "ForeverWood Box-Presentation"
+msgstr "ForeverWood Box-Presentation"
+
+#: functions/fe/widget-section-headline.php:12
+msgid "Displays a headline of a section created with the Page Builder."
+msgstr "Отображает заголовок раздела, созданного с помощью Page Builder."
+
+# @ foreverwood
+#: functions/fe/widget-section-headline.php:14
+msgid "ForeverWood Section-Headline"
+msgstr "ForeverWood Section-Headline"
+
+#: functions/fe/widget-section-headline.php:28
+msgid "Headline:"
+msgstr "название:"
+
+# @ foreverwood
+#: functions/fe/widget-twitter.php:13
+msgid "Twitter widget by ForeverWood"
+msgstr "Twitter виджет от ForeverWood"
+
+# @ foreverwood
+#: functions/fe/widget-twitter.php:15
+msgid "ForeverWood Twitter Widget"
+msgstr "ForeverWood Twitter Widget"
+
+# @ foreverwood
+#: functions/fe/widget-twitter.php:25
+msgid "Join us on Twitter"
+msgstr "Присоединяйтесь к нам на Twitter"
+
+# @ foreverwood
+#: functions/fe/widget-twitter.php:46
+msgid "Twitter Username:"
+msgstr "Twitter Имя пользователя:"
+
+# @ foreverwood
+#: functions/fe/widget-twitter.php:50
+msgid "Insert your Twitter username. (ex: foreverwood)."
+msgstr "Вставьте Ваше Twitter имя пользователя. (пр: foreverwood)."
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:19
+msgid ""
+"Display popular posts, recent posts, comments and tags in tabbed format."
+msgstr ""
+"Дисплей популярные сообщения, последние сообщения, комментарии и теги в виде "
+"вкладок."
+
+# @ foreverwood
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:21
+msgid "ForeverWood Tab Widget"
+msgstr "ForeverWood Tab Widget"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:41
+msgid "Select Tabs"
+msgstr "выбрать вкладки"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:46
+msgid "Popular Tab"
+msgstr "популярный"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:50
+msgid "Recent Tab"
+msgstr "недавний"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:54
+msgid "Comments Tab"
+msgstr "Комментарии"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:58
+msgid "Tags Tab"
+msgstr "теги"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:63
+msgid "Tab Order"
+msgstr "вкладки порядок"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:69
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:193
+msgid "Popular"
+msgstr "популярный"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:73
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:194
+msgid "Recent"
+msgstr "недавний"
+
+# @ foreverwood
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:77
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:195
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:314
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:367
+msgid "Comments"
+msgstr "Комментарии"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:81
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:196
+msgid "Tags"
+msgstr "теги"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:86
+msgid "Advanced Options"
+msgstr "Дополнительные настройки"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:92
+msgid "Allow pagination"
+msgstr "Разрешить разбиение на страницы"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:99
+msgid "Number of posts to show:"
+msgstr "Номера записей:"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:108
+msgid "Show post thumbnails"
+msgstr "Показывать эскизы"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:115
+msgid "Show post date"
+msgstr "Показывать дату"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:122
+msgid "Show number of comments"
+msgstr "Показать количество комментариев"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:129
+msgid "Show post excerpt"
+msgstr "Показать отрывок"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:135
+msgid "Excerpt length (words):"
+msgstr "Отрывок длина (слов):"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:148
+msgid "Number of comments on Comments Tab:"
+msgstr "Количество комментариев:"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:157
+msgid "Show avatars on Comments Tab"
+msgstr "Показывать аватары"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:314
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:367
+msgid "No Comment"
+msgstr "0 Комментарии"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:314
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:367
+msgid "One Comment"
+msgstr "1 Комментарий"
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:426
+msgid "No comments yet."
+msgstr "Пока комментариев нет."
+
+#: functions/fe/wp-tab-widget/wp-tab-widget.php:449
+msgid "No tags created."
+msgstr "нет тегов"

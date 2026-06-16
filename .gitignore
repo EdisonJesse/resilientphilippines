@@ -1,37 +1,44 @@
 # ==========================================
 # Resilient Philippines Root .gitignore
-# Only tracks custom theme, custom plugin, and GitHub workflows
+# Only tracks custom/modified code files
 # ==========================================
 
-# Ignore everything in the root by default
-/*
-
-# Allow root .gitignore and configuration documentation
-!.gitignore
-!LOCAL-SETUP.md
-
-# Allow GitHub Action workflows
-!/.github/
-!/.github/workflows/
-!/.github/workflows/deploy.yml
-
-# Ignore wp-admin and wp-includes entirely
+# 1. Ignore WordPress Core Folders
 /wp-admin/
 /wp-includes/
+/rp/
 
-# Ignore wp-content contents by default
-/wp-content/*
+# 2. Ignore Root Files
+/*.php
+/*.html
+/*.txt
+/.htaccess
+/web.config
+/.ftpquota
 
-# Allow our custom theme
-!/wp-content/themes/
-/wp-content/themes/*
-!/wp-content/themes/resilient-hub-child/
+# 3. Ignore wp-content media, cache, and backups
+/wp-content/uploads/
+/wp-content/cache/
+/wp-content/backups/
+/wp-content/backups-dup-lite/
+/wp-content/upgrade/
+/wp-content/upgrade-temp-backup/
+/wp-content/wflogs/
+/wp-content/gallery/
+/wp-content/index.php
+/wp-content/plugins/index.php
+/wp-content/themes/index.php
 
-# Allow our custom plugin
-!/wp-content/plugins/
+# 4. Ignore all plugins except our custom plugin
 /wp-content/plugins/*
 !/wp-content/plugins/rp-resource-hub/
 
-# Ignore internal backup git folders inside custom plugin/theme
+# 5. Ignore all themes except our custom child theme and modified parent theme
+/wp-content/themes/*
+!/wp-content/themes/resilient-hub-child/
+!/wp-content/themes/foreverwood-premium/
+
+# 6. Ignore backup git folders and archives
 **/.git_bak/
 **/node_modules/
+*.zip

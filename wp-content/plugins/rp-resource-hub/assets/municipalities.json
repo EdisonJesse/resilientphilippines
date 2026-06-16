@@ -1,0 +1,6570 @@
+[
+  {
+    "city_name": "Aborlan",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Abra De Ilog",
+    "province_code": "prov_094"
+  },
+  {
+    "city_name": "Abucay",
+    "province_code": "prov_010"
+  },
+  {
+    "city_name": "Abulug",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Abuyog",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Adams",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Agdangan",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Aglipay",
+    "province_code": "prov_104"
+  },
+  {
+    "city_name": "Agno",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Agoncillo",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Agoo",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Aguilar",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Aguinaldo",
+    "province_code": "prov_071"
+  },
+  {
+    "city_name": "Agutaya",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Ajuy",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Akbar",
+    "province_code": "prov_009"
+  },
+  {
+    "city_name": "Al-Barka",
+    "province_code": "prov_009"
+  },
+  {
+    "city_name": "Alabat",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Alabel",
+    "province_code": "prov_108"
+  },
+  {
+    "city_name": "Alamada",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Alaminos",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Alangalang",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Albuera",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Alburquerque",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Alcala",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Alcala",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Alcantara",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Alcantara",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Alcoy",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Alegria",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Alegria",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Aleosan",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Alfonso",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Alfonso Castaneda",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Alfonso Lista",
+    "province_code": "prov_071"
+  },
+  {
+    "city_name": "Aliaga",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Alicia",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Alicia",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Alicia",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Alilem",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Alimodian",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Alitagtag",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Allacapan",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Allen",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Almagro",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Almeria",
+    "province_code": "prov_014"
+  },
+  {
+    "city_name": "Aloguinsan",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Aloran",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Altavas",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Alubijid",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Amadeo",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Amai Manabilang",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Ambaguio",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Amlan",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Ampatuan",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Amulung",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Anahawan",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Anao",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Anda",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Anda",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Angadanan",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Angat",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Angono",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "Anilao",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Anini-Y",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Antequera",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Antipas",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Apalit",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Aparri",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Araceli",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Arakan",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Arayat",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Argao",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Aringay",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Aritao",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Aroroy",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Arteche",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Asingan",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Asipulo",
+    "province_code": "prov_071"
+  },
+  {
+    "city_name": "Asturias",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Asuncion",
+    "province_code": "prov_066"
+  },
+  {
+    "city_name": "Atimonan",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Atok",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Aurora",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Aurora",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Ayungon",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Baao",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Babatngon",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Bacacay",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Bacarra",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Baclayon",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Bacnotan",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Baco",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Bacolod",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Bacolod-Kalawi",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Bacolor",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Bacong",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Bacuag",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Badian",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Badiangan",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Badoc",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Bagabag",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Bagac",
+    "province_code": "prov_010"
+  },
+  {
+    "city_name": "Bagamanoc",
+    "province_code": "prov_023"
+  },
+  {
+    "city_name": "Baganga",
+    "province_code": "prov_064"
+  },
+  {
+    "city_name": "Baggao",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Bagulin",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Bagumbayan",
+    "province_code": "prov_114"
+  },
+  {
+    "city_name": "Bakun",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Balabac",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Balabagan",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Balagtas",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Balamban",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Balangiga",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Balangkayan",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Balaoan",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Balasan",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Balatan",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Balayan",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Balbalan",
+    "province_code": "prov_076"
+  },
+  {
+    "city_name": "Baleno",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Baler",
+    "province_code": "prov_008"
+  },
+  {
+    "city_name": "Balete",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Balete",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Baliangao",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Baliguian",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Balilihan",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Balindong",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Balingasag",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Balingoan",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Ballesteros",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Baloi",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Balud",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Balungao",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Bamban",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Bambang",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Banate",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Banaue",
+    "province_code": "prov_071"
+  },
+  {
+    "city_name": "Banaybanay",
+    "province_code": "prov_064"
+  },
+  {
+    "city_name": "Banayoyo",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Banga",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Banga",
+    "province_code": "prov_111"
+  },
+  {
+    "city_name": "Bangar",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Bangued",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Bangui",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Bani",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Banisilan",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Banna",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Bansalan",
+    "province_code": "prov_067"
+  },
+  {
+    "city_name": "Bansud",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Bantay",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Bantayan",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Banton",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Baras",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "Baras",
+    "province_code": "prov_023"
+  },
+  {
+    "city_name": "Barbaza",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Barcelona",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Barili",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Barira",
+    "province_code": "prov_082"
+  },
+  {
+    "city_name": "Barlig",
+    "province_code": "prov_088"
+  },
+  {
+    "city_name": "Barobo",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Barotac Nuevo",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Barotac Viejo",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Baroy",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Barugo",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Basay",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Basco",
+    "province_code": "prov_011"
+  },
+  {
+    "city_name": "Basey",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Basilisa",
+    "province_code": "prov_068"
+  },
+  {
+    "city_name": "Basista",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Basud",
+    "province_code": "prov_019"
+  },
+  {
+    "city_name": "Batad",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Batan",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Batangas City",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Bataraza",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Bato",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Bato",
+    "province_code": "prov_023"
+  },
+  {
+    "city_name": "Bato",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Batuan",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Batuan",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Bauan",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Bauang",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Bauko",
+    "province_code": "prov_088"
+  },
+  {
+    "city_name": "Baungon",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Bautista",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Bay",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Bayabas",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Bayambang",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Bayang",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Bayog",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Bayombong",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Belison",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Benito Soliven",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Besao",
+    "province_code": "prov_088"
+  },
+  {
+    "city_name": "Bien Unido",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Bilar",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Biliran",
+    "province_code": "prov_014"
+  },
+  {
+    "city_name": "Binalbagan",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Binalonan",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Binangonan",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "Bindoy",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Bingawan",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Binidayan",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Binmaley",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Binuangan",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Biri",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Boac",
+    "province_code": "prov_084"
+  },
+  {
+    "city_name": "Bobon",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Bocaue",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Bokod",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Bolinao",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Boliney",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Boljoon",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Bombon",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Bongabon",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Bongabong",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Bongao",
+    "province_code": "prov_119"
+  },
+  {
+    "city_name": "Bonifacio",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Bontoc",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Bontoc",
+    "province_code": "prov_088"
+  },
+  {
+    "city_name": "Borbon",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Boston",
+    "province_code": "prov_064"
+  },
+  {
+    "city_name": "Botolan",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "Braulio E. Dujali",
+    "province_code": "prov_066"
+  },
+  {
+    "city_name": "Brooke's Point",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Buadiposo-Buntong",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Bubong",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Bucay",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Bucloc",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Buenavista",
+    "province_code": "prov_002"
+  },
+  {
+    "city_name": "Buenavista",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Buenavista",
+    "province_code": "prov_070"
+  },
+  {
+    "city_name": "Buenavista",
+    "province_code": "prov_084"
+  },
+  {
+    "city_name": "Buenavista",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Bugallon",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Bugasong",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Buguey",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Buguias",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Buhi",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Bula",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Bulacan",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Bulalacao",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Bulan",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Buldon",
+    "province_code": "prov_082"
+  },
+  {
+    "city_name": "Buluan",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Bulusan",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Bunawan",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "Burauen",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Burdeos",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Burgos",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Burgos",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Burgos",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Burgos",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Burgos",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Burgos",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Buruanga",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Bustos",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Busuanga",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Butig",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Buug",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Caba",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Cabagan",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Cabangan",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "Cabanglasan",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Cabarroguis",
+    "province_code": "prov_104"
+  },
+  {
+    "city_name": "Cabatuan",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Cabatuan",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Cabiao",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Cabucgayan",
+    "province_code": "prov_014"
+  },
+  {
+    "city_name": "Cabugao",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Cabusao",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Cagayancillo",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Cagdianao",
+    "province_code": "prov_068"
+  },
+  {
+    "city_name": "Cagwait",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Caibiran",
+    "province_code": "prov_014"
+  },
+  {
+    "city_name": "Cainta",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "Cajidiocan",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Calabanga",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Calamba",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Calanasan",
+    "province_code": "prov_007"
+  },
+  {
+    "city_name": "Calanogas",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Calape",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Calasiao",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Calatagan",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Calatrava",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Calatrava",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Calauag",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Calauan",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Calayan",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Calbiga",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Calinog",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Calintaan",
+    "province_code": "prov_094"
+  },
+  {
+    "city_name": "Calubian",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Calumpit",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Caluya",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Camalaniugan",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Camalig",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Camaligan",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Camiling",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Can-Avid",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Canaman",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Candaba",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Candelaria",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "Candelaria",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Candijay",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Candoni",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Cantilan",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Caoayan",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Capalonga",
+    "province_code": "prov_019"
+  },
+  {
+    "city_name": "Capas",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Capoocan",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Capul",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Caraga",
+    "province_code": "prov_064"
+  },
+  {
+    "city_name": "Caramoan",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Caramoran",
+    "province_code": "prov_023"
+  },
+  {
+    "city_name": "Carasi",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Cardona",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "Carigara",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Carles",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Carmen",
+    "province_code": "prov_002"
+  },
+  {
+    "city_name": "Carmen",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Carmen",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Carmen",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Carmen",
+    "province_code": "prov_066"
+  },
+  {
+    "city_name": "Carmen",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Carranglan",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Carrascal",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Casiguran",
+    "province_code": "prov_008"
+  },
+  {
+    "city_name": "Casiguran",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Castilla",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Castillejos",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "Cataingan",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Catanauan",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Catarman",
+    "province_code": "prov_021"
+  },
+  {
+    "city_name": "Catarman",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Cateel",
+    "province_code": "prov_064"
+  },
+  {
+    "city_name": "Catigbian",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Catmon",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Catubig",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Cauayan",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Cavinti",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Cawayan",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Cervantes",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "City of Alaminos",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "City of Angeles",
+    "province_code": "prov_026"
+  },
+  {
+    "city_name": "City of Antipolo",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "City of Bacolod",
+    "province_code": "prov_027"
+  },
+  {
+    "city_name": "City of Bacoor",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "City of Bago",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "City of Baguio",
+    "province_code": "prov_028"
+  },
+  {
+    "city_name": "City of Bais",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "City of Balanga",
+    "province_code": "prov_010"
+  },
+  {
+    "city_name": "City of Baliwag",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "City of Batac",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "City of Bayawan",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "City of Baybay",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "City of Bayugan",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "City of Bislig",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "City of Biñan",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "City of Bogo",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "City of Borongan",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "City of Butuan",
+    "province_code": "prov_029"
+  },
+  {
+    "city_name": "City of Cabadbaran",
+    "province_code": "prov_002"
+  },
+  {
+    "city_name": "City of Cabanatuan",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "City of Cabuyao",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "City of Cadiz",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "City of Cagayan De Oro",
+    "province_code": "prov_030"
+  },
+  {
+    "city_name": "City of Calaca",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "City of Calamba",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "City of Calapan",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "City of Calbayog",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "City of Caloocan",
+    "province_code": "prov_031"
+  },
+  {
+    "city_name": "City of Candon",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "City of Canlaon",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "City of Carcar",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "City of Carmona",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "City of Catbalogan",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "City of Cauayan",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "City of Cavite",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "City of Cebu",
+    "province_code": "prov_032"
+  },
+  {
+    "city_name": "City of Cotabato",
+    "province_code": "prov_033"
+  },
+  {
+    "city_name": "City of Dagupan",
+    "province_code": "prov_034"
+  },
+  {
+    "city_name": "City of Dapitan",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "City of Dasmariñas",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "City of Davao",
+    "province_code": "prov_035"
+  },
+  {
+    "city_name": "City of Digos",
+    "province_code": "prov_067"
+  },
+  {
+    "city_name": "City of Dipolog",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "City of Dumaguete",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "City of El Salvador",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "City of Escalante",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "City of Gapan",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "City of General Santos",
+    "province_code": "prov_036"
+  },
+  {
+    "city_name": "City of General Trias",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "City of Gingoog",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "City of Guihulngan",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "City of Himamaylan",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "City of Ilagan",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "City of Iligan",
+    "province_code": "prov_037"
+  },
+  {
+    "city_name": "City of Iloilo",
+    "province_code": "prov_038"
+  },
+  {
+    "city_name": "City of Imus",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "City of Iriga",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "City of Isabela",
+    "province_code": "prov_039"
+  },
+  {
+    "city_name": "City of Kabankalan",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "City of Kidapawan",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "City of Koronadal",
+    "province_code": "prov_111"
+  },
+  {
+    "city_name": "City of La Carlota",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "City of Lamitan",
+    "province_code": "prov_009"
+  },
+  {
+    "city_name": "City of Laoag",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "City of Lapu-Lapu",
+    "province_code": "prov_040"
+  },
+  {
+    "city_name": "City of Las Piñas",
+    "province_code": "prov_041"
+  },
+  {
+    "city_name": "City of Legazpi",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "City of Ligao",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "City of Lipa",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "City of Lucena",
+    "province_code": "prov_042"
+  },
+  {
+    "city_name": "City of Maasin",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "City of Makati",
+    "province_code": "prov_043"
+  },
+  {
+    "city_name": "City of Malabon",
+    "province_code": "prov_044"
+  },
+  {
+    "city_name": "City of Malaybalay",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "City of Malolos",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "City of Mandaluyong",
+    "province_code": "prov_045"
+  },
+  {
+    "city_name": "City of Mandaue",
+    "province_code": "prov_046"
+  },
+  {
+    "city_name": "City of Manila",
+    "province_code": "prov_047"
+  },
+  {
+    "city_name": "City of Marawi",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "City of Marikina",
+    "province_code": "prov_048"
+  },
+  {
+    "city_name": "City of Masbate",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "City of Mati",
+    "province_code": "prov_064"
+  },
+  {
+    "city_name": "City of Meycauayan",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "City of Muntinlupa",
+    "province_code": "prov_049"
+  },
+  {
+    "city_name": "City of Naga",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "City of Naga",
+    "province_code": "prov_050"
+  },
+  {
+    "city_name": "City of Navotas",
+    "province_code": "prov_051"
+  },
+  {
+    "city_name": "City of Olongapo",
+    "province_code": "prov_052"
+  },
+  {
+    "city_name": "City of Oroquieta",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "City of Ozamiz",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "City of Pagadian",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "City of Palayan",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "City of Panabo",
+    "province_code": "prov_066"
+  },
+  {
+    "city_name": "City of Parañaque",
+    "province_code": "prov_053"
+  },
+  {
+    "city_name": "City of Pasig",
+    "province_code": "prov_054"
+  },
+  {
+    "city_name": "City of Passi",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "City of Puerto Princesa",
+    "province_code": "prov_055"
+  },
+  {
+    "city_name": "City of Roxas",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "City of Sagay",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "City of San Carlos",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "City of San Carlos",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "City of San Fernando",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "City of San Fernando",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "City of San Jose Del Monte",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "City of San Juan",
+    "province_code": "prov_056"
+  },
+  {
+    "city_name": "City of San Pablo",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "City of San Pedro",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "City of Santa Rosa",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "City of Santiago",
+    "province_code": "prov_057"
+  },
+  {
+    "city_name": "City of Silay",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "City of Sipalay",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "City of Sorsogon",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "City of Sto. Tomas",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "City of Surigao",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "City of Tabaco",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "City of Tabuk",
+    "province_code": "prov_076"
+  },
+  {
+    "city_name": "City of Tacloban",
+    "province_code": "prov_058"
+  },
+  {
+    "city_name": "City of Tacurong",
+    "province_code": "prov_114"
+  },
+  {
+    "city_name": "City of Tagaytay",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "City of Tagbilaran",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "City of Taguig",
+    "province_code": "prov_059"
+  },
+  {
+    "city_name": "City of Tagum",
+    "province_code": "prov_066"
+  },
+  {
+    "city_name": "City of Talisay",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "City of Talisay",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "City of Tanauan",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "City of Tandag",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "City of Tangub",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "City of Tanjay",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "City of Tarlac",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "City of Tayabas",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "City of Toledo",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "City of Trece Martires",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "City of Urdaneta",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "City of Valencia",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "City of Valenzuela",
+    "province_code": "prov_060"
+  },
+  {
+    "city_name": "City of Victorias",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "City of Vigan",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "City of Zamboanga",
+    "province_code": "prov_061"
+  },
+  {
+    "city_name": "Clarin",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Clarin",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Claver",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Claveria",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Claveria",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Claveria",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Columbio",
+    "province_code": "prov_114"
+  },
+  {
+    "city_name": "Compostela",
+    "province_code": "prov_065"
+  },
+  {
+    "city_name": "Compostela",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Concepcion",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Concepcion",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Concepcion",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Concepcion",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Conner",
+    "province_code": "prov_007"
+  },
+  {
+    "city_name": "Consolacion",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Corcuera",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Cordon",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Cordova",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Corella",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Coron",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Cortes",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Cortes",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Cuartero",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Cuenca",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Culaba",
+    "province_code": "prov_014"
+  },
+  {
+    "city_name": "Culasi",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Culion",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Currimao",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Cuyapo",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Cuyo",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Daanbantayan",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Daet",
+    "province_code": "prov_019"
+  },
+  {
+    "city_name": "Dagami",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Dagohoy",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Daguioman",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Dalaguete",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Damulog",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Danao",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Danao City",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Dangcagan",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Danglas",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Dao",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Dapa",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Daraga",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Daram",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Dasol",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Datu Abdullah Sangki",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Datu Anggal Midtimbang",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Datu Blah T. Sinsuat",
+    "province_code": "prov_082"
+  },
+  {
+    "city_name": "Datu Hoffer Ampatuan",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Datu Montawal",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Datu Odin Sinsuat",
+    "province_code": "prov_082"
+  },
+  {
+    "city_name": "Datu Paglas",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Datu Piang",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Datu Salibo",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Datu Saudi Ampatuan",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Datu Unsay",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Dauin",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Dauis",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Del Carmen",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Del Gallego",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Delfin Albano",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Diadi",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Diffun",
+    "province_code": "prov_104"
+  },
+  {
+    "city_name": "Dilasag",
+    "province_code": "prov_008"
+  },
+  {
+    "city_name": "Dimasalang",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Dimataling",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Dimiao",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Dinagat",
+    "province_code": "prov_068"
+  },
+  {
+    "city_name": "Dinalungan",
+    "province_code": "prov_008"
+  },
+  {
+    "city_name": "Dinalupihan",
+    "province_code": "prov_010"
+  },
+  {
+    "city_name": "Dinapigue",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Dinas",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Dingalan",
+    "province_code": "prov_008"
+  },
+  {
+    "city_name": "Dingle",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Dingras",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Dipaculao",
+    "province_code": "prov_008"
+  },
+  {
+    "city_name": "Diplahan",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Ditsaan-Ramain",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Divilacan",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Dolores",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Dolores",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Dolores",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Don Carlos",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Don Marcelino",
+    "province_code": "prov_063"
+  },
+  {
+    "city_name": "Don Victoriano Chiongbian",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Donsol",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Doña Remedios Trinidad",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Dr. Jose P. Rizal",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Duero",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Dueñas",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Dulag",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Dumalag",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Dumalinao",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Dumalneg",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Dumangas",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Dumanjug",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Dumaran",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Dumarao",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Dumingag",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Dupax del Norte",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Dupax del Sur",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Echague",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "El Nido",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Enrile",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Enrique B. Magalona",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Enrique Villanueva",
+    "province_code": "prov_109"
+  },
+  {
+    "city_name": "Esperanza",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "Esperanza",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Esperanza",
+    "province_code": "prov_114"
+  },
+  {
+    "city_name": "Estancia",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Famy",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Ferrol",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Flora",
+    "province_code": "prov_007"
+  },
+  {
+    "city_name": "Floridablanca",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Gabaldon",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Gainza",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Galimuyod",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Gamay",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Gamu",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Ganassi",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Gandara",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Garchitorena",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Garcia Hernandez",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Gasan",
+    "province_code": "prov_084"
+  },
+  {
+    "city_name": "Gattaran",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Gen. Mariano Alvarez",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Gen. S.K. Pendatun",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "General Emilio Aguinaldo",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "General Luna",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "General Luna",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "General Macarthur",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "General Mamerto Natividad",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "General Nakar",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "General Tinio",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Gerona",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Getafe",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Gigaquit",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Gigmoto",
+    "province_code": "prov_023"
+  },
+  {
+    "city_name": "Ginatilan",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Giporlos",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Gitagum",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Glan",
+    "province_code": "prov_108"
+  },
+  {
+    "city_name": "Gloria",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Goa",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Godod",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Gonzaga",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Governor Generoso",
+    "province_code": "prov_064"
+  },
+  {
+    "city_name": "Gregorio del Pilar",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Guagua",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Gubat",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Guiguinto",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Guimba",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Guimbal",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Guinayangan",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Guindulman",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Guindulungan",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Guinobatan",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Guinsiliban",
+    "province_code": "prov_021"
+  },
+  {
+    "city_name": "Guipos",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Guiuan",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Gumaca",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Gutalac",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Hadji Mohammad Ajul",
+    "province_code": "prov_009"
+  },
+  {
+    "city_name": "Hadji Muhtamad",
+    "province_code": "prov_009"
+  },
+  {
+    "city_name": "Hadji Panglima Tahil",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Hagonoy",
+    "province_code": "prov_067"
+  },
+  {
+    "city_name": "Hagonoy",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Hamtic",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Hermosa",
+    "province_code": "prov_010"
+  },
+  {
+    "city_name": "Hernani",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Hilongos",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Hinabangan",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Hinatuan",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Hindang",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Hingyon",
+    "province_code": "prov_071"
+  },
+  {
+    "city_name": "Hinigaran",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Hinoba-an",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Hinunangan",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Hinundayan",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Hungduan",
+    "province_code": "prov_071"
+  },
+  {
+    "city_name": "Iba",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "Ibaan",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Ibajay",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Igbaras",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Iguig",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Ilog",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Imelda",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Impasug-ong",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Inabanga",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Indanan",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Indang",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Infanta",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Infanta",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Initao",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Inopacan",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Ipil",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Irosin",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Isabel",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Isabela",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Island Garden City of Samal",
+    "province_code": "prov_066"
+  },
+  {
+    "city_name": "Isulan",
+    "province_code": "prov_114"
+  },
+  {
+    "city_name": "Itbayat",
+    "province_code": "prov_011"
+  },
+  {
+    "city_name": "Itogon",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Ivana",
+    "province_code": "prov_011"
+  },
+  {
+    "city_name": "Ivisan",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Jabonga",
+    "province_code": "prov_002"
+  },
+  {
+    "city_name": "Jaen",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Jagna",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Jala-Jala",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "Jamindan",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Janiuay",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Jaro",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Jasaan",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Javier",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Jiabong",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Jimalalud",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Jimenez",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Jipapad",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Jolo",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Jomalig",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Jones",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Jordan",
+    "province_code": "prov_070"
+  },
+  {
+    "city_name": "Jose Abad Santos",
+    "province_code": "prov_063"
+  },
+  {
+    "city_name": "Jose Dalman",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Jose Panganiban",
+    "province_code": "prov_019"
+  },
+  {
+    "city_name": "Josefina",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Jovellar",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Juban",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Julita",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Kabacan",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Kabasalan",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Kabayan",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Kabugao",
+    "province_code": "prov_007"
+  },
+  {
+    "city_name": "Kabuntalan",
+    "province_code": "prov_082"
+  },
+  {
+    "city_name": "Kadayangan",
+    "province_code": "prov_113"
+  },
+  {
+    "city_name": "Kadingilan",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Kalamansig",
+    "province_code": "prov_114"
+  },
+  {
+    "city_name": "Kalawit",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Kalayaan",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Kalayaan",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Kalibo",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Kalilangan",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Kalingalan Caluang",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Kananga",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Kapai",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Kapalawan",
+    "province_code": "prov_113"
+  },
+  {
+    "city_name": "Kapalong",
+    "province_code": "prov_066"
+  },
+  {
+    "city_name": "Kapangan",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Kapatagan",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Kapatagan",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Kasibu",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Katipunan",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Kauswagan",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Kawayan",
+    "province_code": "prov_014"
+  },
+  {
+    "city_name": "Kawit",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Kayapa",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Kiamba",
+    "province_code": "prov_108"
+  },
+  {
+    "city_name": "Kiangan",
+    "province_code": "prov_071"
+  },
+  {
+    "city_name": "Kibawe",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Kiblawan",
+    "province_code": "prov_067"
+  },
+  {
+    "city_name": "Kibungan",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Kinoguitan",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Kitaotao",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Kitcharao",
+    "province_code": "prov_002"
+  },
+  {
+    "city_name": "Kolambugan",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Kumalarang",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "La Castellana",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "La Libertad",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "La Libertad",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "La Paz",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "La Paz",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "La Paz",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "La Paz",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "La Trinidad",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Laak",
+    "province_code": "prov_065"
+  },
+  {
+    "city_name": "Labangan",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Labason",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Labo",
+    "province_code": "prov_019"
+  },
+  {
+    "city_name": "Labrador",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Lacub",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Lagangilang",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Lagawe",
+    "province_code": "prov_071"
+  },
+  {
+    "city_name": "Lagayan",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Lagonglong",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Lagonoy",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Laguindingan",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Lake Sebu",
+    "province_code": "prov_111"
+  },
+  {
+    "city_name": "Lakewood",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Lal-Lo",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Lala",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Lambayong",
+    "province_code": "prov_114"
+  },
+  {
+    "city_name": "Lambunao",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Lamut",
+    "province_code": "prov_071"
+  },
+  {
+    "city_name": "Langiden",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Languyan",
+    "province_code": "prov_119"
+  },
+  {
+    "city_name": "Lantapan",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Lantawan",
+    "province_code": "prov_009"
+  },
+  {
+    "city_name": "Lanuza",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Laoac",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Laoang",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Lapinig",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Lapuyan",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Larena",
+    "province_code": "prov_109"
+  },
+  {
+    "city_name": "Las Navas",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Las Nieves",
+    "province_code": "prov_002"
+  },
+  {
+    "city_name": "Lasam",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Laua-An",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Laur",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Laurel",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Lavezares",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Lawaan",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Lazi",
+    "province_code": "prov_109"
+  },
+  {
+    "city_name": "Lebak",
+    "province_code": "prov_114"
+  },
+  {
+    "city_name": "Leganes",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Lemery",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Lemery",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Leon",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Leon T. Postigo",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Leyte",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Lezo",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Lian",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Lianga",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Libacao",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Libagon",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Libertad",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Libertad",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Libjo",
+    "province_code": "prov_068"
+  },
+  {
+    "city_name": "Libmanan",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Libon",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Libona",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Libungan",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Licab",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Licuan-Baay",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Lidlidda",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Ligawasan",
+    "province_code": "prov_113"
+  },
+  {
+    "city_name": "Lila",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Liliw",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Liloan",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Liloan",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Liloy",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Limasawa",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Limay",
+    "province_code": "prov_010"
+  },
+  {
+    "city_name": "Linamon",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Linapacan",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Lingayen",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Lingig",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Llanera",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Llorente",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Loay",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Lobo",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Loboc",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Looc",
+    "province_code": "prov_094"
+  },
+  {
+    "city_name": "Looc",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Loon",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Lope De Vega",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Lopez",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Lopez Jaena",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Loreto",
+    "province_code": "prov_068"
+  },
+  {
+    "city_name": "Loreto",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "Los Baños",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Luba",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Lubang",
+    "province_code": "prov_094"
+  },
+  {
+    "city_name": "Lubao",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Lubuagan",
+    "province_code": "prov_076"
+  },
+  {
+    "city_name": "Lucban",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Lugait",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Lugus",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Luisiana",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Lumba-Bayabao",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Lumbaca-Unayan",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Lumban",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Lumbatan",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Lumbayanague",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Luna",
+    "province_code": "prov_007"
+  },
+  {
+    "city_name": "Luna",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Luna",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Lupao",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Lupi",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Lupon",
+    "province_code": "prov_064"
+  },
+  {
+    "city_name": "Lutayan",
+    "province_code": "prov_114"
+  },
+  {
+    "city_name": "Luuk",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "M'Lang",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Ma-Ayon",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Maasim",
+    "province_code": "prov_108"
+  },
+  {
+    "city_name": "Maasin",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Mabalacat City",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Mabinay",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Mabini",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Mabini",
+    "province_code": "prov_065"
+  },
+  {
+    "city_name": "Mabini",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Mabini",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Mabitac",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Mabuhay",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Macabebe",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Macalelon",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Macarthur",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Maco",
+    "province_code": "prov_065"
+  },
+  {
+    "city_name": "Maconacon",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Macrohon",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Madalag",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Madalum",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Madamba",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Maddela",
+    "province_code": "prov_104"
+  },
+  {
+    "city_name": "Madrid",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Madridejos",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Magalang",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Magallanes",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Magallanes",
+    "province_code": "prov_002"
+  },
+  {
+    "city_name": "Magallanes",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Magarao",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Magdalena",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Magdiwang",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Magpet",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Magsaysay",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Magsaysay",
+    "province_code": "prov_094"
+  },
+  {
+    "city_name": "Magsaysay",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Magsaysay",
+    "province_code": "prov_067"
+  },
+  {
+    "city_name": "Magsaysay",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Magsingal",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Maguing",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Mahaplag",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Mahatao",
+    "province_code": "prov_011"
+  },
+  {
+    "city_name": "Mahayag",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Mahinog",
+    "province_code": "prov_021"
+  },
+  {
+    "city_name": "Maigo",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Maimbung",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Mainit",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Maitum",
+    "province_code": "prov_108"
+  },
+  {
+    "city_name": "Majayjay",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Makato",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Makilala",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Malabang",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Malabuyoc",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Malalag",
+    "province_code": "prov_067"
+  },
+  {
+    "city_name": "Malangas",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Malapatan",
+    "province_code": "prov_108"
+  },
+  {
+    "city_name": "Malasiqui",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Malay",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Malibcong",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Malidegao",
+    "province_code": "prov_113"
+  },
+  {
+    "city_name": "Malilipot",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Malimono",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Malinao",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Malinao",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Malita",
+    "province_code": "prov_063"
+  },
+  {
+    "city_name": "Malitbog",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Malitbog",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Mallig",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Malungon",
+    "province_code": "prov_108"
+  },
+  {
+    "city_name": "Maluso",
+    "province_code": "prov_009"
+  },
+  {
+    "city_name": "Malvar",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Mamasapano",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Mambajao",
+    "province_code": "prov_021"
+  },
+  {
+    "city_name": "Mamburao",
+    "province_code": "prov_094"
+  },
+  {
+    "city_name": "Mambusao",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Manabo",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Manaoag",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Manapla",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Manay",
+    "province_code": "prov_064"
+  },
+  {
+    "city_name": "Mandaon",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Mangaldan",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Mangatarem",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Mangudadatu",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Manito",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Manjuyod",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Mankayan",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Manolo Fortich",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Mansalay",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Manticao",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Manukan",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Mapanas",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Mapandan",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Mapun",
+    "province_code": "prov_119"
+  },
+  {
+    "city_name": "Marabut",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Maragondon",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Maragusan",
+    "province_code": "prov_065"
+  },
+  {
+    "city_name": "Maramag",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Marantao",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Marcos",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Margosatubig",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Maria",
+    "province_code": "prov_109"
+  },
+  {
+    "city_name": "Maria Aurora",
+    "province_code": "prov_008"
+  },
+  {
+    "city_name": "Maribojoc",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Marihatag",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Marilao",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Maripipi",
+    "province_code": "prov_014"
+  },
+  {
+    "city_name": "Mariveles",
+    "province_code": "prov_010"
+  },
+  {
+    "city_name": "Marogong",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Masantol",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Masinloc",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "Masiu",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Maslog",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Mataasnakahoy",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Matag-Ob",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Matalam",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Matalom",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Matanao",
+    "province_code": "prov_067"
+  },
+  {
+    "city_name": "Matanog",
+    "province_code": "prov_082"
+  },
+  {
+    "city_name": "Matnog",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Matuguinao",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Matungao",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Mauban",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Mawab",
+    "province_code": "prov_065"
+  },
+  {
+    "city_name": "Mayantoc",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Maydolong",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Mayorga",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Mayoyao",
+    "province_code": "prov_071"
+  },
+  {
+    "city_name": "Medellin",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Medina",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Mendez",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Mercedes",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Mercedes",
+    "province_code": "prov_019"
+  },
+  {
+    "city_name": "Merida",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Mexico",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Miagao",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Midsalip",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Midsayap",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Milagros",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Milaor",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Mina",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Minalabac",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Minalin",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Minglanilla",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Moalboal",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Mobo",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Mogpog",
+    "province_code": "prov_084"
+  },
+  {
+    "city_name": "Moises Padilla",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Molave",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Moncada",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Mondragon",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Monkayo",
+    "province_code": "prov_065"
+  },
+  {
+    "city_name": "Monreal",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Montevista",
+    "province_code": "prov_065"
+  },
+  {
+    "city_name": "Morong",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "Morong",
+    "province_code": "prov_010"
+  },
+  {
+    "city_name": "Motiong",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Mulanay",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Mulondo",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Munai",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Murcia",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Mutia",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Naawan",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Nabalawag",
+    "province_code": "prov_113"
+  },
+  {
+    "city_name": "Nabas",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Nabua",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Nabunturan",
+    "province_code": "prov_065"
+  },
+  {
+    "city_name": "Naga",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Nagbukel",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Nagcarlan",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Nagtipunan",
+    "province_code": "prov_104"
+  },
+  {
+    "city_name": "Naguilian",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Naguilian",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Naic",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Nampicuan",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Narra",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Narvacan",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Nasipit",
+    "province_code": "prov_002"
+  },
+  {
+    "city_name": "Nasugbu",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Natividad",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Natonin",
+    "province_code": "prov_088"
+  },
+  {
+    "city_name": "Naujan",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Naval",
+    "province_code": "prov_014"
+  },
+  {
+    "city_name": "New Bataan",
+    "province_code": "prov_065"
+  },
+  {
+    "city_name": "New Corella",
+    "province_code": "prov_066"
+  },
+  {
+    "city_name": "New Lucena",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "New Washington",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Norala",
+    "province_code": "prov_111"
+  },
+  {
+    "city_name": "Northern Kabuntalan",
+    "province_code": "prov_082"
+  },
+  {
+    "city_name": "Norzagaray",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Noveleta",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Nueva Era",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Nueva Valencia",
+    "province_code": "prov_070"
+  },
+  {
+    "city_name": "Numancia",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Nunungan",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Oas",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Obando",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Ocampo",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Odiongan",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Old Kaabakan",
+    "province_code": "prov_113"
+  },
+  {
+    "city_name": "Old Panamao",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Olutanga",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Omar",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Opol",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Orani",
+    "province_code": "prov_010"
+  },
+  {
+    "city_name": "Oras",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Orion",
+    "province_code": "prov_010"
+  },
+  {
+    "city_name": "Ormoc City",
+    "province_code": "prov_096"
+  },
+  {
+    "city_name": "Oslob",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Oton",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Padada",
+    "province_code": "prov_067"
+  },
+  {
+    "city_name": "Padre Burgos",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Padre Burgos",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Padre Garcia",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Paete",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Pagalungan",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Pagayawan",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Pagbilao",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Paglat",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Pagsanghan",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Pagsanjan",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Pagudpud",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Pahamuddin",
+    "province_code": "prov_113"
+  },
+  {
+    "city_name": "Pakil",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Palanan",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Palanas",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Palapag",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Palauig",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "Palimbang",
+    "province_code": "prov_114"
+  },
+  {
+    "city_name": "Palo",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Palompon",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Paluan",
+    "province_code": "prov_094"
+  },
+  {
+    "city_name": "Pambujan",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Pamplona",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Pamplona",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Pamplona",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Panaon",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Panay",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Pandag",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Pandami",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Pandan",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Pandan",
+    "province_code": "prov_023"
+  },
+  {
+    "city_name": "Pandi",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Panganiban",
+    "province_code": "prov_023"
+  },
+  {
+    "city_name": "Pangantucan",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Pangil",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Panglao",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Panglima Estino",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Panglima Sugala",
+    "province_code": "prov_119"
+  },
+  {
+    "city_name": "Pangutaran",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Paniqui",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Panitan",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Pantabangan",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Pantao Ragat",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Pantar",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Pantukan",
+    "province_code": "prov_065"
+  },
+  {
+    "city_name": "Panukulan",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Paoay",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Paombong",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Paracale",
+    "province_code": "prov_019"
+  },
+  {
+    "city_name": "Paracelis",
+    "province_code": "prov_088"
+  },
+  {
+    "city_name": "Paranas",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Parang",
+    "province_code": "prov_082"
+  },
+  {
+    "city_name": "Parang",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Pasacao",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Pasay City",
+    "province_code": "prov_100"
+  },
+  {
+    "city_name": "Pasil",
+    "province_code": "prov_076"
+  },
+  {
+    "city_name": "Pastrana",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Pasuquin",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Pata",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Pateros",
+    "province_code": "prov_101"
+  },
+  {
+    "city_name": "Patikul",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Patnanungan",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Patnongon",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Pavia",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Payao",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Perez",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Peñablanca",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Peñaranda",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Peñarrubia",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Piagapo",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Piat",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Picong",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Piddig",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Pidigan",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Pigkawayan",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Pikit",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Pila",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Pilar",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Pilar",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Pilar",
+    "province_code": "prov_010"
+  },
+  {
+    "city_name": "Pilar",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Pilar",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Pilar",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Pilar",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Pili",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Pililla",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "Pinabacdao",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Pinamalayan",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Pinamungajan",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Pinili",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Pintuyan",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Pinukpuk",
+    "province_code": "prov_076"
+  },
+  {
+    "city_name": "Pio Duran",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Pio V. Corpus",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Pitogo",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Pitogo",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Piñan",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Placer",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Placer",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Plaridel",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Plaridel",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Plaridel",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Pola",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Polanco",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Polangui",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Polillo",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Polomolok",
+    "province_code": "prov_111"
+  },
+  {
+    "city_name": "Pontevedra",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Pontevedra",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Poona Bayabao",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Poona Piagapo",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Porac",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Poro",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Pototan",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Pozorrubio",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Pres. Manuel A. Roxas",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Presentacion",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "President Carlos P. Garcia",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "President Quirino",
+    "province_code": "prov_114"
+  },
+  {
+    "city_name": "President Roxas",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "President Roxas",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Prieto Diaz",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Prosperidad",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "Pualas",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Pudtol",
+    "province_code": "prov_007"
+  },
+  {
+    "city_name": "Puerto Galera",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Pugo",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Pulilan",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Pulupandan",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Pura",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Quezon",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Quezon",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Quezon",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Quezon",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Quezon",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Quezon",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Quezon City",
+    "province_code": "prov_103"
+  },
+  {
+    "city_name": "Quinapondan",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Quirino",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Quirino",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Ragay",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Rajah Buayan",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Ramon",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Ramon Magsaysay",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Ramos",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Rapu-Rapu",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Real",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Reina Mercedes",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Remedios T. Romualdez",
+    "province_code": "prov_002"
+  },
+  {
+    "city_name": "Rizal",
+    "province_code": "prov_094"
+  },
+  {
+    "city_name": "Rizal",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Rizal",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Rizal",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Rizal",
+    "province_code": "prov_076"
+  },
+  {
+    "city_name": "Rizal",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Rodriguez",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "Romblon",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Ronda",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Rosales",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Rosario",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Rosario",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Rosario",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "Rosario",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Rosario",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Roseller Lim",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Roxas",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Roxas",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Roxas",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Sabangan",
+    "province_code": "prov_088"
+  },
+  {
+    "city_name": "Sablan",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Sablayan",
+    "province_code": "prov_094"
+  },
+  {
+    "city_name": "Sabtang",
+    "province_code": "prov_011"
+  },
+  {
+    "city_name": "Sadanga",
+    "province_code": "prov_088"
+  },
+  {
+    "city_name": "Sagada",
+    "province_code": "prov_088"
+  },
+  {
+    "city_name": "Sagay",
+    "province_code": "prov_021"
+  },
+  {
+    "city_name": "Sagbayan",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Saguday",
+    "province_code": "prov_104"
+  },
+  {
+    "city_name": "Saguiaran",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Sagñay",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Saint Bernard",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Salay",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Salcedo",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Salcedo",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Sallapadan",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Salug",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Salvador",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Salvador Benedicto",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Samal",
+    "province_code": "prov_010"
+  },
+  {
+    "city_name": "Samboan",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Sampaloc",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "San Agustin",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "San Agustin",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "San Agustin",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "San Andres",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "San Andres",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "San Andres",
+    "province_code": "prov_023"
+  },
+  {
+    "city_name": "San Antonio",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "San Antonio",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "San Antonio",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "San Antonio",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "San Benito",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "San Clemente",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "San Dionisio",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "San Emilio",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "San Enrique",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "San Enrique",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "San Esteban",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "San Fabian",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "San Felipe",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "San Fernando",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "San Fernando",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "San Fernando",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "San Fernando",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "San Fernando",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "San Francisco",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "San Francisco",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "San Francisco",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "San Francisco",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "San Francisco",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "San Gabriel",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "San Guillermo",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "San Ildefonso",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "San Ildefonso",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "San Isidro",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "San Isidro",
+    "province_code": "prov_064"
+  },
+  {
+    "city_name": "San Isidro",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "San Isidro",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "San Isidro",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "San Isidro",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "San Isidro",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "San Isidro",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "San Isidro",
+    "province_code": "prov_066"
+  },
+  {
+    "city_name": "San Jacinto",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "San Jacinto",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "San Joaquin",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "San Jorge",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "San Jose",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "San Jose",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "San Jose",
+    "province_code": "prov_094"
+  },
+  {
+    "city_name": "San Jose",
+    "province_code": "prov_068"
+  },
+  {
+    "city_name": "San Jose",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "San Jose",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "San Jose",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "San Jose",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "San Jose",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "San Jose City",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "San Jose De Buan",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "San Juan",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "San Juan",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "San Juan",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "San Juan",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "San Juan",
+    "province_code": "prov_109"
+  },
+  {
+    "city_name": "San Juan",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "San Julian",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "San Leonardo",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "San Lorenzo",
+    "province_code": "prov_070"
+  },
+  {
+    "city_name": "San Lorenzo Ruiz",
+    "province_code": "prov_019"
+  },
+  {
+    "city_name": "San Luis",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "San Luis",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "San Luis",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "San Luis",
+    "province_code": "prov_008"
+  },
+  {
+    "city_name": "San Manuel",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "San Manuel",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "San Manuel",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "San Marcelino",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "San Mariano",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "San Mateo",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "San Mateo",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "San Miguel",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "San Miguel",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "San Miguel",
+    "province_code": "prov_023"
+  },
+  {
+    "city_name": "San Miguel",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "San Miguel",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "San Miguel",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "San Miguel",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "San Narciso",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "San Narciso",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "San Nicolas",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "San Nicolas",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "San Nicolas",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "San Pablo",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "San Pablo",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "San Pascual",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "San Pascual",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "San Policarpo",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "San Quintin",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "San Quintin",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "San Rafael",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "San Rafael",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "San Remigio",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "San Remigio",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "San Ricardo",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "San Roque",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "San Sebastian",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "San Simon",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "San Teodoro",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "San Vicente",
+    "province_code": "prov_019"
+  },
+  {
+    "city_name": "San Vicente",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "San Vicente",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "San Vicente",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Sanchez-Mira",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Santa",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Santa Ana",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Santa Ana",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Santa Barbara",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Santa Barbara",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Santa Catalina",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Santa Catalina",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Santa Cruz",
+    "province_code": "prov_067"
+  },
+  {
+    "city_name": "Santa Cruz",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "Santa Cruz",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Santa Cruz",
+    "province_code": "prov_094"
+  },
+  {
+    "city_name": "Santa Cruz",
+    "province_code": "prov_084"
+  },
+  {
+    "city_name": "Santa Cruz",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Santa Elena",
+    "province_code": "prov_019"
+  },
+  {
+    "city_name": "Santa Fe",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Santa Fe",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Santa Fe",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Santa Fe",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Santa Ignacia",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Santa Josefa",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "Santa Lucia",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Santa Magdalena",
+    "province_code": "prov_110"
+  },
+  {
+    "city_name": "Santa Marcela",
+    "province_code": "prov_007"
+  },
+  {
+    "city_name": "Santa Margarita",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Santa Maria",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Santa Maria",
+    "province_code": "prov_106"
+  },
+  {
+    "city_name": "Santa Maria",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Santa Maria",
+    "province_code": "prov_063"
+  },
+  {
+    "city_name": "Santa Maria",
+    "province_code": "prov_017"
+  },
+  {
+    "city_name": "Santa Maria",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Santa Maria",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Santa Monica",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Santa Praxedes",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Santa Rita",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Santa Rita",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Santa Rosa",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Santa Teresita",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Santa Teresita",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Santander",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Santiago",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Santiago",
+    "province_code": "prov_002"
+  },
+  {
+    "city_name": "Santo Domingo",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Santo Domingo",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Santo Domingo",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Santo Niño",
+    "province_code": "prov_111"
+  },
+  {
+    "city_name": "Santo Niño",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Santo Niño",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Santo Tomas",
+    "province_code": "prov_066"
+  },
+  {
+    "city_name": "Santo Tomas",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Santo Tomas",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Santo Tomas",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Santol",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Sapa-Sapa",
+    "province_code": "prov_119"
+  },
+  {
+    "city_name": "Sapad",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Sapang Dalaga",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Sapi-An",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Sara",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Sarangani",
+    "province_code": "prov_063"
+  },
+  {
+    "city_name": "Sariaya",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Sarrat",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Sasmuan",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Science City of Muñoz",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Sebaste",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Sen. Ninoy Aquino",
+    "province_code": "prov_114"
+  },
+  {
+    "city_name": "Sergio Osmeña Sr.",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Sevilla",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Shariff Aguak",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Shariff Saydona Mustapha",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Siasi",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Siaton",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Siay",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Siayan",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Sibagat",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "Sibalom",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Sibonga",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Sibuco",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Sibulan",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Sibunag",
+    "province_code": "prov_070"
+  },
+  {
+    "city_name": "Sibutad",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Sibutu",
+    "province_code": "prov_119"
+  },
+  {
+    "city_name": "Sierra Bullones",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Sigay",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Sigma",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Sikatuna",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Silago",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Silang",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Silvino Lobos",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Simunul",
+    "province_code": "prov_119"
+  },
+  {
+    "city_name": "Sinacaban",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Sinait",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Sindangan",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Siniloan",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Siocon",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Sipocot",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Siquijor",
+    "province_code": "prov_109"
+  },
+  {
+    "city_name": "Sirawai",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Siruma",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Sison",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Sison",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Sitangkai",
+    "province_code": "prov_119"
+  },
+  {
+    "city_name": "Socorro",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Socorro",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Sofronio Española",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Sogod",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Sogod",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Solana",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Solano",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Solsona",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Sominot",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "South Ubian",
+    "province_code": "prov_119"
+  },
+  {
+    "city_name": "South Upi",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Sto. Tomas",
+    "province_code": "prov_098"
+  },
+  {
+    "city_name": "Sual",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Subic",
+    "province_code": "prov_120"
+  },
+  {
+    "city_name": "Sudipen",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Sugbongcogon",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Sugpon",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Sulat",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Sulop",
+    "province_code": "prov_067"
+  },
+  {
+    "city_name": "Sultan Dumalondong",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Sultan Kudarat",
+    "province_code": "prov_082"
+  },
+  {
+    "city_name": "Sultan Mastura",
+    "province_code": "prov_082"
+  },
+  {
+    "city_name": "Sultan Naga Dimaporo",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Sultan Sa Barongis",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Sumilao",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Sumisip",
+    "province_code": "prov_009"
+  },
+  {
+    "city_name": "Surallah",
+    "province_code": "prov_111"
+  },
+  {
+    "city_name": "Suyo",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "T'Boli",
+    "province_code": "prov_111"
+  },
+  {
+    "city_name": "Taal",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Tabango",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Tabina",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Tabogon",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Tabontabon",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Tabuan-Lasa",
+    "province_code": "prov_009"
+  },
+  {
+    "city_name": "Tabuelan",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Tadian",
+    "province_code": "prov_088"
+  },
+  {
+    "city_name": "Taft",
+    "province_code": "prov_069"
+  },
+  {
+    "city_name": "Tagana-An",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Tagapul-An",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Tagbina",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Tagkawayan",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Tago",
+    "province_code": "prov_117"
+  },
+  {
+    "city_name": "Tagoloan",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Tagoloan",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Tagoloan Ii",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Tagudin",
+    "province_code": "prov_073"
+  },
+  {
+    "city_name": "Talacogon",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "Talaingod",
+    "province_code": "prov_066"
+  },
+  {
+    "city_name": "Talakag",
+    "province_code": "prov_016"
+  },
+  {
+    "city_name": "Talalora",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Talavera",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Talayan",
+    "province_code": "prov_083"
+  },
+  {
+    "city_name": "Talibon",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Talipao",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Talisay",
+    "province_code": "prov_019"
+  },
+  {
+    "city_name": "Talisay",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Talisayan",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Talitay",
+    "province_code": "prov_082"
+  },
+  {
+    "city_name": "Talugtug",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Talusan",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Tambulig",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Tampakan",
+    "province_code": "prov_111"
+  },
+  {
+    "city_name": "Tamparan",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Tampilisan",
+    "province_code": "prov_122"
+  },
+  {
+    "city_name": "Tanauan",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Tanay",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "Tandubas",
+    "province_code": "prov_119"
+  },
+  {
+    "city_name": "Tangalan",
+    "province_code": "prov_004"
+  },
+  {
+    "city_name": "Tangcal",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Tantangan",
+    "province_code": "prov_111"
+  },
+  {
+    "city_name": "Tanudan",
+    "province_code": "prov_076"
+  },
+  {
+    "city_name": "Tanza",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Tapaz",
+    "province_code": "prov_022"
+  },
+  {
+    "city_name": "Tapul",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Taraka",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Tarangnan",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Tarragona",
+    "province_code": "prov_064"
+  },
+  {
+    "city_name": "Tayasan",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Taysan",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Taytay",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "Taytay",
+    "province_code": "prov_097"
+  },
+  {
+    "city_name": "Tayug",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Tayum",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Teresa",
+    "province_code": "prov_105"
+  },
+  {
+    "city_name": "Ternate",
+    "province_code": "prov_024"
+  },
+  {
+    "city_name": "Tiaong",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Tibiao",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Tigaon",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Tigbao",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Tigbauan",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Tinambac",
+    "province_code": "prov_020"
+  },
+  {
+    "city_name": "Tineg",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Tinglayan",
+    "province_code": "prov_076"
+  },
+  {
+    "city_name": "Tingloy",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Tinoc",
+    "province_code": "prov_071"
+  },
+  {
+    "city_name": "Tipo-Tipo",
+    "province_code": "prov_009"
+  },
+  {
+    "city_name": "Titay",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Tiwi",
+    "province_code": "prov_005"
+  },
+  {
+    "city_name": "Tobias Fornier",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Toboso",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Tolosa",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Tomas Oppus",
+    "province_code": "prov_112"
+  },
+  {
+    "city_name": "Tongkil",
+    "province_code": "prov_115"
+  },
+  {
+    "city_name": "Torrijos",
+    "province_code": "prov_084"
+  },
+  {
+    "city_name": "Trento",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "Trinidad",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Tuao",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Tuba",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Tubajon",
+    "province_code": "prov_068"
+  },
+  {
+    "city_name": "Tubao",
+    "province_code": "prov_077"
+  },
+  {
+    "city_name": "Tubaran",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Tubay",
+    "province_code": "prov_002"
+  },
+  {
+    "city_name": "Tubigon",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Tublay",
+    "province_code": "prov_013"
+  },
+  {
+    "city_name": "Tubo",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Tubod",
+    "province_code": "prov_079"
+  },
+  {
+    "city_name": "Tubod",
+    "province_code": "prov_116"
+  },
+  {
+    "city_name": "Tubungan",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Tuburan",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Tuburan",
+    "province_code": "prov_009"
+  },
+  {
+    "city_name": "Tudela",
+    "province_code": "prov_025"
+  },
+  {
+    "city_name": "Tudela",
+    "province_code": "prov_086"
+  },
+  {
+    "city_name": "Tugaya",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Tuguegarao City",
+    "province_code": "prov_018"
+  },
+  {
+    "city_name": "Tugunan",
+    "province_code": "prov_113"
+  },
+  {
+    "city_name": "Tukuran",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Tulunan",
+    "province_code": "prov_062"
+  },
+  {
+    "city_name": "Tumauini",
+    "province_code": "prov_075"
+  },
+  {
+    "city_name": "Tunga",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Tungawan",
+    "province_code": "prov_121"
+  },
+  {
+    "city_name": "Tupi",
+    "province_code": "prov_111"
+  },
+  {
+    "city_name": "Turtle Islands",
+    "province_code": "prov_119"
+  },
+  {
+    "city_name": "Tuy",
+    "province_code": "prov_012"
+  },
+  {
+    "city_name": "Ubay",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Umingan",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Ungkaya Pukan",
+    "province_code": "prov_009"
+  },
+  {
+    "city_name": "Unisan",
+    "province_code": "prov_102"
+  },
+  {
+    "city_name": "Upi",
+    "province_code": "prov_082"
+  },
+  {
+    "city_name": "Urbiztondo",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Uson",
+    "province_code": "prov_085"
+  },
+  {
+    "city_name": "Uyugan",
+    "province_code": "prov_011"
+  },
+  {
+    "city_name": "Valderrama",
+    "province_code": "prov_006"
+  },
+  {
+    "city_name": "Valencia",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Valencia",
+    "province_code": "prov_015"
+  },
+  {
+    "city_name": "Valladolid",
+    "province_code": "prov_089"
+  },
+  {
+    "city_name": "Vallehermoso",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Veruela",
+    "province_code": "prov_003"
+  },
+  {
+    "city_name": "Victoria",
+    "province_code": "prov_091"
+  },
+  {
+    "city_name": "Victoria",
+    "province_code": "prov_078"
+  },
+  {
+    "city_name": "Victoria",
+    "province_code": "prov_118"
+  },
+  {
+    "city_name": "Victoria",
+    "province_code": "prov_095"
+  },
+  {
+    "city_name": "Viga",
+    "province_code": "prov_023"
+  },
+  {
+    "city_name": "Villaba",
+    "province_code": "prov_081"
+  },
+  {
+    "city_name": "Villanueva",
+    "province_code": "prov_087"
+  },
+  {
+    "city_name": "Villareal",
+    "province_code": "prov_107"
+  },
+  {
+    "city_name": "Villasis",
+    "province_code": "prov_099"
+  },
+  {
+    "city_name": "Villaverde",
+    "province_code": "prov_093"
+  },
+  {
+    "city_name": "Villaviciosa",
+    "province_code": "prov_001"
+  },
+  {
+    "city_name": "Vincenzo A. Sagun",
+    "province_code": "prov_123"
+  },
+  {
+    "city_name": "Vintar",
+    "province_code": "prov_072"
+  },
+  {
+    "city_name": "Vinzons",
+    "province_code": "prov_019"
+  },
+  {
+    "city_name": "Virac",
+    "province_code": "prov_023"
+  },
+  {
+    "city_name": "Wao",
+    "province_code": "prov_080"
+  },
+  {
+    "city_name": "Zamboanguita",
+    "province_code": "prov_090"
+  },
+  {
+    "city_name": "Zaragoza",
+    "province_code": "prov_092"
+  },
+  {
+    "city_name": "Zarraga",
+    "province_code": "prov_074"
+  },
+  {
+    "city_name": "Zumarraga",
+    "province_code": "prov_107"
+  }
+]

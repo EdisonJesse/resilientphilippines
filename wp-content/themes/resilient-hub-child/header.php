@@ -1,0 +1,94 @@
+<?php
+/**
+ * Modern site header.
+ *
+ * @package ResilientHub
+ */
+?><!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+	<meta charset="<?php bloginfo( 'charset' ); ?>">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<?php wp_head(); ?>
+</head>
+<body <?php body_class(); ?>>
+<?php wp_body_open(); ?>
+<a class="screen-reader-text" href="#primary"><?php esc_html_e( 'Skip to content', 'resilient-hub' ); ?></a>
+<div id="container-boxed">
+<div id="container-boxed-inner">
+<header class="rp-site-header" role="banner">
+	<div class="rp-header-inner">
+		<a class="rp-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+			<div class="rp-brand-logo-wrap">
+				<img src="<?php echo esc_url( rp_child_upload_url( '2017/08/logo.png' ) ); ?>" alt="<?php esc_attr_e( 'ACCORD Logo', 'resilient-hub' ); ?>" class="rp-brand-logo">
+				<div class="rp-brand-text">
+					<?php bloginfo( 'name' ); ?>
+				</div>
+			</div>
+		</a>
+
+		<button class="rp-menu-toggle" type="button" aria-controls="rp-primary-navigation" aria-expanded="false">
+			<span class="rp-menu-toggle-bars" aria-hidden="true"></span>
+			<span class="screen-reader-text"><?php esc_html_e( 'Toggle navigation', 'resilient-hub' ); ?></span>
+		</button>
+
+		<nav id="rp-primary-navigation" class="rp-nav" aria-label="<?php esc_attr_e( 'Primary navigation', 'resilient-hub' ); ?>">
+			<?php
+			if ( has_nav_menu( 'main-navigation' ) ) {
+				wp_nav_menu(
+					array(
+						'theme_location' => 'main-navigation',
+						'container'      => false,
+						'menu_id'        => 'rp-primary-menu',
+						'fallback_cb'    => false,
+					)
+				);
+			} else {
+				?>
+				<ul id="rp-primary-menu">
+					<li><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'resilient-hub' ); ?></a></li>
+					<li><a href="<?php echo esc_url( home_url( '/resource-hub/' ) ); ?>"><?php esc_html_e( 'Resources', 'resilient-hub' ); ?></a></li>
+					<li><a href="<?php echo esc_url( home_url( '/sitrep-dashboard/' ) ); ?>"><?php esc_html_e( 'Situation Reports', 'resilient-hub' ); ?></a></li>
+					<li><a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>"><?php esc_html_e( 'Submit', 'resilient-hub' ); ?></a></li>
+				</ul>
+				<?php
+			}
+			?>
+			<a class="rp-button rp-button-donate" href="<?php echo esc_url( home_url( '/donate/' ) ); ?>"><?php esc_html_e( 'Donate', 'resilient-hub' ); ?></a>
+			<?php if ( is_user_logged_in() ) : 
+				$current_user = wp_get_current_user();
+				$first_name   = $current_user->first_name ? $current_user->first_name : $current_user->display_name;
+				?>
+				<div class="rp-user-menu-container">
+					<ul class="rp-user-nav">
+						<li class="menu-item-has-children">
+							<a href="#" class="rp-user-welcome" onclick="event.preventDefault();">
+								<?php printf( esc_html__( 'Welcome, %s', 'resilient-hub' ), esc_html( $first_name ) ); ?>
+								<span class="rp-chevron" aria-hidden="true"></span>
+							</a>
+							<ul class="sub-menu">
+							<li><a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>"><?php esc_html_e( 'Submit a Resource', 'resilient-hub' ); ?></a></li>
+							<li><a href="<?php echo esc_url( home_url( '/submit-sitrep/' ) ); ?>"><?php esc_html_e( 'Submit a SitRep', 'resilient-hub' ); ?></a></li>
+							<?php 
+							$can_moderate = current_user_can( 'manage_options' ) || current_user_can( 'publish_posts' ) || current_user_can( 'publish_partner_resources' ) || current_user_can( 'publish_rp_sitreps' );
+							if ( $can_moderate ) : ?>
+								<li class="rp-dropdown-divider" aria-hidden="true"></li>
+								<li class="rp-dropdown-section-label"><?php esc_html_e( 'Admin', 'resilient-hub' ); ?></li>
+								<li><a href="<?php echo esc_url( home_url( '/moderation-dashboard/' ) ); ?>"><?php esc_html_e( 'Moderation Dashboard', 'resilient-hub' ); ?></a></li>
+								<?php if ( current_user_can( 'manage_options' ) ) : ?>
+									<li><a href="<?php echo esc_url( home_url( '/user-management/' ) ); ?>"><?php esc_html_e( 'User Management', 'resilient-hub' ); ?></a></li>
+									<li><a href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'resilient-hub' ); ?></a></li>
+								<?php endif; ?>
+							<?php endif; ?>
+							<li class="rp-dropdown-divider" aria-hidden="true"></li>
+							<li><a href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Logout', 'resilient-hub' ); ?></a></li>
+						</ul>
+						</li>
+					</ul>
+				</div>
+			<?php else : ?>
+				<a class="rp-button rp-button-login" href="<?php echo esc_url( home_url( '/portal-entry/' ) ); ?>"><?php esc_html_e( 'Login / Register', 'resilient-hub' ); ?></a>
+			<?php endif; ?>
+		</nav>
+	</div>
+</header>

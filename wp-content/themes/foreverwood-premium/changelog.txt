@@ -1,0 +1,96 @@
+Changelog Legend:
+
+[+] = Added
+[*] = Changed
+[^] = Moved
+[=] = No Changes
+[x] = Deleted
+[!] = Bugs
+
+----
+
+(24/06/2016) - Update - Version 2.0.3
+
+[+] Added option to set custom post excerpt length.
+[*] Updated the list of available Google fonts.
+[*] Improved styling of the Theme Options panel.
+
+----
+
+(11/05/2016) - Update - Version 2.0.2
+
+[*] Updated bundled plugin Cyclone Slider 2.
+[*] Changed Support link.
+[*] Updated browser-specific styling to form elements (-webkit-appearance and -moz-appearance values).
+[*] Fixed CSS conflict with All-in-One Event Calendar (floating of event details in single event view).
+[*] Improved styling of the "Header" panel in posts/pages editing screen.
+
+----
+
+(14/01/2016) - Update - Version 2.0.1
+
+[*] Updated bundled plugin Page Builder by SiteOrigin (fixed Page Builder tab name for WordPress 4.4).
+[*] Updated indirect access to variables to make it compatible with PHP7.
+[*] Removed platform specific styling to form elements by setting -webkit-appearance and -moz-appearance to "none".
+[*] Set font-family for elements that use the ElegantIcons font to avoid CSS conflicts when a custom font is set for the body.
+
+----
+
+(25/11/2015) - Update - Version 2.0.0
+
+[*] Moved Font and Color settings to the Customizer API.
+[*] Updated the TGM Plugin Activation to the version 2.5.2.
+[!] Updated wp-display-header.php to fix a conflict with bbPress and other plugins that allow to edit user profiles in the front-end view.
+[!] Fixed problem with floating of the Reply form in the Comments section.
+
+----
+
+(11/09/2015) - Update - Version 1.1.3
+
+[+] Added ability to set a custom width of the ForeverWood Facebook Like Box Widget.
+[+] Added ability to select Character Set in Theme Options > Fonts.
+[+] Added ability to use the "nextpage" tag on pages.
+[+] Added Turkish translation.
+[*] Specified a recommended height of the Header Image.
+[*] Updated deprecated constructor method of all custom widgets.
+
+----
+
+(20/05/2015) - Update - Version 1.1.2
+
+[+] Added Dutch translation.
+[+] Added support for the "pingback" link in <head> section.
+[+] Added ability to disable the Fixed menu.
+[*] Updated the TGM Plugin Activation to the version 2.4.2.
+[*] Updated the list of available Google fonts (corrected nonfunctional fonts).
+[*] Updated displaying of the Fixed menu box to enable smoother transition.
+[*] Enabled using of HTML elements in the ForeverWood Box-Info and ForeverWood Box-Presentation widgets.
+[!] Fixed conflict with WP Tab Widget plugin.
+
+----
+
+(28/02/2015) - Update - Version 1.1.1
+
+[+] Added Italian translation.
+[*] Updated including of the TGM_Plugin_Activation class (only the users who are allowed to install plugins can see it now).
+
+----
+
+(18/01/2015) - Update - Version 1.1.0
+
+[+] Added language switcher for the Facebook Like and Share buttons (accessible through Theme Options > Social Networking).
+[+] Mentioned Text Domain in style.css.
+[+] Added support for the Title Tag feature.
+[*] Updated paginate_links() arguments (added "add_args"). 
+[*] Updated the "viewport" meta tag.
+[*] Edited URL addresses of the social networks scripts (removed http to avoid errors when https is used).
+[*] Added conditions for including the Masonry.js script.
+[*] Set the priority of excerpt_length filter from 999 to 20.
+[*] Updated bundled plugin Page Builder by SiteOrigin.
+[*] Changed the source of the Breadcrumb NavXT recommended plugin from the private repository to the WordPress.org repository.
+[x] Removed deprecated function "screen_icon()" from class-tgm-plugin-activation.php.
+[!] Fixed Uncaught JavaScript TypeError which occurred on the Landing Page template (because there is no Main Header Menu in this template).
+
+----
+
+(09/09/2014) - The initial public release - Version 1.0.0
