@@ -765,9 +765,12 @@ function rp_resource_hub_term_options( $taxonomy, $selected = array() ) {
 		return;
 	}
 
+	$type = ( 'resource_visibility' === $taxonomy ) ? 'radio' : 'checkbox';
+
 	foreach ( $terms as $term ) {
 		printf(
-			'<label><input type="checkbox" name="rp_terms[%1$s][]" value="%2$d" %3$s> %4$s</label>',
+			'<label><input type="%1$s" name="rp_terms[%2$s][]" value="%3$d" %4$s> %5$s</label>',
+			esc_attr( $type ),
 			esc_attr( $taxonomy ),
 			absint( $term->term_id ),
 			checked( in_array( (int) $term->term_id, array_map( 'intval', $selected ), true ), true, false ),
