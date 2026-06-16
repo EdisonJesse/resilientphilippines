@@ -20,10 +20,7 @@
 	<div class="rp-header-inner">
 		<a class="rp-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>">
 			<div class="rp-brand-logo-wrap">
-				<img src="<?php echo esc_url( rp_child_upload_url( '2017/08/logo.png' ) ); ?>" alt="<?php esc_attr_e( 'ACCORD Logo', 'resilient-hub' ); ?>" class="rp-brand-logo">
-				<div class="rp-brand-text">
-					<?php bloginfo( 'name' ); ?>
-				</div>
+				<img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/images/accord-logo.png' ); ?>" alt="<?php esc_attr_e( 'ACCORD Resilience Hub Logo', 'resilient-hub' ); ?>" class="rp-brand-logo">
 			</div>
 		</a>
 
