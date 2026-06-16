@@ -6,32 +6,41 @@
  */
 ?>
 <footer class="rp-site-footer" role="contentinfo">
-	<div class="rp-footer-inner">
-		<div>
-			<h2><?php bloginfo( 'name' ); ?></h2>
-			<p><?php esc_html_e( 'A collaborative space for humanitarian learning, disaster risk reduction resources, and partner knowledge products across the Philippines.', 'resilient-hub' ); ?></p>
-		</div>
-		<div>
-			<h3><?php esc_html_e( 'Hub', 'resilient-hub' ); ?></h3>
-			<ul class="rp-footer-list">
-				<li><a href="<?php echo esc_url( home_url( '/resource-hub/' ) ); ?>"><?php esc_html_e( 'Resource Hub', 'resilient-hub' ); ?></a></li>
-				<li><a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>"><?php esc_html_e( 'Submit Resource', 'resilient-hub' ); ?></a></li>
-			</ul>
-		</div>
-		<div>
-			<h3><?php esc_html_e( 'Connect', 'resilient-hub' ); ?></h3>
-			<?php
-			if ( has_nav_menu( 'rp-footer' ) ) {
-				wp_nav_menu(
-					array(
-						'theme_location' => 'rp-footer',
-						'container'      => false,
-						'menu_class'     => 'rp-footer-list',
-						'fallback_cb'    => false,
-					)
-				);
-			}
-			?>
+	<div class="rp-page-shell" style="margin-bottom: 32px;">
+		<div class="rp-footer-inner">
+			<div>
+				<h2><?php bloginfo( 'name' ); ?></h2>
+				<p><?php esc_html_e( 'A collaborative space for humanitarian learning, disaster risk reduction resources, and partner knowledge products across the Philippines.', 'resilient-hub' ); ?></p>
+			</div>
+			<div>
+				<h3><?php esc_html_e( 'Hub', 'resilient-hub' ); ?></h3>
+				<ul class="rp-footer-list">
+					<li><a href="<?php echo esc_url( home_url( '/resource-hub/' ) ); ?>"><?php esc_html_e( 'Resource Hub', 'resilient-hub' ); ?></a></li>
+					<li><a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>"><?php esc_html_e( 'Submit Resource', 'resilient-hub' ); ?></a></li>
+				</ul>
+			</div>
+			<div>
+				<h3><?php esc_html_e( 'Connect', 'resilient-hub' ); ?></h3>
+				<?php
+				if ( has_nav_menu( 'rp-footer' ) ) {
+					wp_nav_menu(
+						array(
+							'theme_location' => 'rp-footer',
+							'container'      => false,
+							'menu_class'     => 'rp-footer-list',
+							'fallback_cb'    => false,
+						)
+					);
+				} else {
+					?>
+					<ul class="rp-footer-list">
+						<li><a href="<?php echo esc_url( home_url( '/contact-us/' ) ); ?>"><?php esc_html_e( 'Contact Us', 'resilient-hub' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/donate/' ) ); ?>"><?php esc_html_e( 'Donate', 'resilient-hub' ); ?></a></li>
+					</ul>
+					<?php
+				}
+				?>
+			</div>
 		</div>
 	</div>
 	
