@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Resource Hub
  * Description: Custom post types, taxonomies, roles, upload workflow, and catalog shortcodes for the humanitarian resource hub.
- * Version: 1.9.0
+ * Version: 1.9.1
  * Author: ACCORD
  * Text Domain: rp-resource-hub
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_RESOURCE_HUB_VERSION', '1.9.0' );
+define( 'RP_RESOURCE_HUB_VERSION', '1.9.1' );
 define( 'RP_RESOURCE_HUB_FILE', __FILE__ );
 define( 'RP_RESOURCE_HUB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_URL', plugin_dir_url( __FILE__ ) );
@@ -364,6 +364,12 @@ function rp_resource_hub_create_analytics_tables() {
 }
 
 function rp_resource_hub_maybe_upgrade() {
+	// Fallback: Ensure the contributions page is created if missing
+	if ( ! get_page_by_path( 'my-contributions' ) ) {
+		rp_resource_hub_create_pages();
+		flush_rewrite_rules();
+	}
+
 	if ( RP_RESOURCE_HUB_VERSION === get_option( 'rp_resource_hub_version' ) ) {
 		return;
 	}
