@@ -555,7 +555,10 @@ img {
 
 .rp-page-content .entry-content img {
   border-radius: 4px;
+  display: block;
   height: auto;
+  margin-left: auto;
+  margin-right: auto;
   max-width: 100%;
 }
 
@@ -563,6 +566,7 @@ img {
 .rp-page-content .entry-content .wp-caption {
   margin: 1.75rem auto;
   max-width: 100%;
+  text-align: center;
 }
 
 .rp-page-content .entry-content figcaption,
@@ -769,17 +773,23 @@ img {
   border-radius: 4px;
   display: block;
   height: auto;
+  margin-left: auto;
+  margin-right: auto;
   max-width: 100%;
 }
 
 .rp-single-content figure {
   margin: 2rem auto;
   max-width: 100%;
+  text-align: center;
 }
 
 .rp-single-content .wp-block-image,
 .rp-single-content .wp-caption {
+  margin-left: auto;
+  margin-right: auto;
   max-width: 100%;
+  text-align: center;
 }
 
 .rp-single-content .aligncenter,
