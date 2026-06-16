@@ -10,7 +10,7 @@ get_header();
 <main id="primary">
 	<section class="rp-page-hero">
 		<div class="rp-page-shell">
-			<p class="rp-eyebrow"><?php esc_html_e( 'Humanitarian Resource Hub', 'resilient-hub' ); ?></p>
+			<p class="rp-eyebrow"><?php esc_html_e( 'Resilience Hub', 'resilient-hub' ); ?></p>
 			<h1 class="rp-page-title"><?php the_title(); ?></h1>
 		</div>
 	</section>

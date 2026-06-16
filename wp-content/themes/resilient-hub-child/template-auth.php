@@ -123,7 +123,7 @@ get_header();
 			<div class="rp-auth-left-overlay"></div>
 			<div class="rp-auth-left-content">
 				<span class="rp-auth-eyebrow"><?php esc_html_e( 'Resilient Philippines', 'resilient-hub' ); ?></span>
-				<h2 class="rp-auth-heading"><?php esc_html_e( 'Humanitarian Collaborative Hub', 'resilient-hub' ); ?></h2>
+				<h2 class="rp-auth-heading"><?php esc_html_e( 'Resilience Hub', 'resilient-hub' ); ?></h2>
 				<p class="rp-auth-description"><?php esc_html_e( 'Access scientific knowledge products, partner guidelines, anticipatory actions, and coordinate local disaster risk reduction efforts.', 'resilient-hub' ); ?></p>
 				<div class="rp-auth-left-footer">
 					<p>© <?php echo esc_html( date( 'Y' ) ); ?> ACCORD. All rights reserved.</p>
@@ -180,7 +180,7 @@ get_header();
 				<?php if ( get_option( 'users_can_register' ) ) : ?>
 					<div id="register-tab" class="rp-auth-tab-content<?php echo 'register' === $active_tab ? ' active' : ''; ?>">
 						<div class="rp-auth-intro">
-							<h3><?php esc_html_e( 'Join the Collaborative Hub', 'resilient-hub' ); ?></h3>
+							<h3><?php esc_html_e( 'Join the Resilience Hub', 'resilient-hub' ); ?></h3>
 							<p><?php esc_html_e( 'Register to access member-only materials and contribute knowledge.', 'resilient-hub' ); ?></p>
 						</div>
 

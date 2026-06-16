@@ -14,7 +14,7 @@ $hero_url = rp_child_upload_url( '2020/07/A2C-Cagsao-mangroves-Jes-Aznar-6.jpg' 
 		<div class="rp-section-inner rp-hero-content">
 			<div class="rp-hero-copy">
 				<p class="rp-eyebrow"><?php esc_html_e( 'Knowledge. Coordination. Community resilience.', 'resilient-hub' ); ?></p>
-				<h1><?php esc_html_e( 'National Collaborative Humanitarian Hub', 'resilient-hub' ); ?></h1>
+				<h1><?php esc_html_e( 'Resilience Hub', 'resilient-hub' ); ?></h1>
 				<p><?php esc_html_e( 'A shared platform for ACCORD knowledge products, partner resources, practical tools, and learning materials for disaster risk reduction and humanitarian action.', 'resilient-hub' ); ?></p>
 				<div class="rp-hero-actions">
 					<a class="rp-button" href="<?php echo esc_url( home_url( '/resource-hub/' ) ); ?>"><?php esc_html_e( 'Explore Resources', 'resilient-hub' ); ?></a>

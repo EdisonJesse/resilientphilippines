@@ -388,7 +388,7 @@ function rp_child_create_compliance_pages() {
 		),
 		'terms-of-service' => array(
 			'title'   => __( 'Terms of Service', 'resilient-hub' ),
-			'content' => '<h2>1. Agreement & Account Rules</h2><p>By creating a Collaborative Hub account, you agree to safeguard your credentials and refrain from uploading malicious files. All materials submitted must correspond to humanitarian learning, disaster risk reduction resources, and partner knowledge products.</p><h2>2. Acceptable Use Policy</h2><p>User submissions containing copyright infringement, promotional advertisements, or non-DRR information will be immediately deleted, and the offending account terminated without notice.</p><h2>3. Disclaimers</h2><p>ACCORD provides this platform as a collaborative resource. We do not warrant the accuracy of user-submitted materials and exclude all liability to the maximum extent permitted under law.</p>',
+			'content' => '<h2>1. Agreement & Account Rules</h2><p>By creating a Resilience Hub account, you agree to safeguard your credentials and refrain from uploading malicious files. All materials submitted must correspond to humanitarian learning, disaster risk reduction resources, and partner knowledge products.</p><h2>2. Acceptable Use Policy</h2><p>User submissions containing copyright infringement, promotional advertisements, or non-DRR information will be immediately deleted, and the offending account terminated without notice.</p><h2>3. Disclaimers</h2><p>ACCORD provides this platform as a collaborative resource. We do not warrant the accuracy of user-submitted materials and exclude all liability to the maximum extent permitted under law.</p>',
 		),
 		'cookie-policy' => array(
 			'title'   => __( 'Cookie Policy', 'resilient-hub' ),

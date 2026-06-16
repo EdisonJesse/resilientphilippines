@@ -9,7 +9,7 @@
 	<div class="rp-page-shell" style="margin-bottom: 32px;">
 		<div class="rp-footer-inner">
 			<div>
-				<h2><?php bloginfo( 'name' ); ?></h2>
+				<h2><?php esc_html_e( 'ACCORD Resilience Hub', 'resilient-hub' ); ?></h2>
 				<p><?php esc_html_e( 'A collaborative space for humanitarian learning, disaster risk reduction resources, and partner knowledge products across the Philippines.', 'resilient-hub' ); ?></p>
 			</div>
 			<div>
