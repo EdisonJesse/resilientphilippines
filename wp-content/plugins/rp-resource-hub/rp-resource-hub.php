@@ -1218,7 +1218,7 @@ function rp_resource_hub_render_grid_items( $resources ) {
 			$resources->the_post();
 			$post_id      = get_the_ID();
 			$file_id      = absint( get_post_meta( $post_id, '_rp_resource_file_id', true ) );
-			$is_web_app   = get_post_meta( $post_id, '_rp_is_web_app', true );
+			$is_web_app   = get_post_meta( $post_id, '_rp_is_web_app', true ) || has_term( 'Web Application', 'resource_format', $post_id );
 			$download_url = $file_id ? rp_resource_hub_download_url( $post_id ) : '';
 			$is_member    = rp_resource_hub_is_member_only( $post_id );
 			$can_download = ! $is_member || current_user_can( 'read_member_resources' );
@@ -1231,9 +1231,13 @@ function rp_resource_hub_render_grid_items( $resources ) {
 				<a class="rp-resource-readmore" href="<?php the_permalink(); ?>"><?php esc_html_e( 'Read more', 'rp-resource-hub' ); ?></a>
 				<div class="rp-card-spacer"></div>
 				<?php if ( $is_web_app && $can_download ) : ?>
-					<?php $web_app_url = rp_resource_hub_get_web_app_url( $post_id ); ?>
-					<?php if ( $web_app_url ) : ?>
-						<a class="rp-button rp-resource-download" href="<?php echo esc_url( $web_app_url ); ?>" target="_blank"><?php esc_html_e( 'Launch', 'rp-resource-hub' ); ?></a>
+					<?php 
+					$web_app_url = rp_resource_hub_get_web_app_url( $post_id ); 
+					$btn_url = $web_app_url ? $web_app_url : $download_url;
+					$target = $web_app_url ? ' target="_blank"' : '';
+					if ( $btn_url ) :
+					?>
+						<a class="rp-button rp-resource-download" href="<?php echo esc_url( $btn_url ); ?>"<?php echo $target; ?>><?php esc_html_e( 'Launch', 'rp-resource-hub' ); ?></a>
 					<?php endif; ?>
 				<?php elseif ( $download_url && $can_download ) : ?>
 					<a class="rp-button rp-resource-download" href="<?php echo esc_url( $download_url ); ?>"><?php esc_html_e( 'Download', 'rp-resource-hub' ); ?></a>
@@ -1474,7 +1478,7 @@ add_action( 'trash_post', 'rp_resource_hub_cleanup_web_app' );
  * Get the direct URL to the extracted web app's index.html.
  */
 function rp_resource_hub_get_web_app_url( $post_id ) {
-	$is_web_app = get_post_meta( $post_id, '_rp_is_web_app', true );
+	$is_web_app = get_post_meta( $post_id, '_rp_is_web_app', true ) || has_term( 'Web Application', 'resource_format', $post_id );
 	if ( ! $is_web_app ) {
 		return false;
 	}
