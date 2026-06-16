@@ -75,6 +75,7 @@
 								<li class="rp-dropdown-divider" aria-hidden="true"></li>
 								<li class="rp-dropdown-section-label"><?php esc_html_e( 'Admin', 'resilient-hub' ); ?></li>
 								<li><a href="<?php echo esc_url( home_url( '/moderation-dashboard/' ) ); ?>"><?php esc_html_e( 'Moderation Dashboard', 'resilient-hub' ); ?></a></li>
+								<li><a href="<?php echo esc_url( home_url( '/analytics-dashboard/' ) ); ?>"><?php esc_html_e( 'Analytics Dashboard', 'resilient-hub' ); ?></a></li>
 								<?php if ( current_user_can( 'manage_options' ) ) : ?>
 									<li><a href="<?php echo esc_url( home_url( '/user-management/' ) ); ?>"><?php esc_html_e( 'User Management', 'resilient-hub' ); ?></a></li>
 									<li><a href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'resilient-hub' ); ?></a></li>

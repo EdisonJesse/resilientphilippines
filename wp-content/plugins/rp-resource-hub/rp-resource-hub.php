@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Resource Hub
  * Description: Custom post types, taxonomies, roles, upload workflow, and catalog shortcodes for the humanitarian resource hub.
- * Version: 1.8.1
+ * Version: 1.9.0
  * Author: ACCORD
  * Text Domain: rp-resource-hub
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_RESOURCE_HUB_VERSION', '1.8.1' );
+define( 'RP_RESOURCE_HUB_VERSION', '1.9.0' );
 define( 'RP_RESOURCE_HUB_FILE', __FILE__ );
 define( 'RP_RESOURCE_HUB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_URL', plugin_dir_url( __FILE__ ) );
@@ -324,12 +324,52 @@ function rp_resource_hub_create_db_table() {
 	dbDelta( $sql );
 }
 
+function rp_resource_hub_create_analytics_tables() {
+	global $wpdb;
+	$charset_collate = $wpdb->get_charset_collate();
+
+	// 1. Views Table
+	$views_table = $wpdb->prefix . 'rp_analytics_views';
+	$sql_views = "CREATE TABLE $views_table (
+		id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+		post_id BIGINT(20) UNSIGNED DEFAULT NULL,
+		user_id BIGINT(20) UNSIGNED DEFAULT NULL,
+		ip_address VARCHAR(45) NOT NULL,
+		user_agent TEXT DEFAULT NULL,
+		created_at DATETIME NOT NULL,
+		PRIMARY KEY (id),
+		KEY post_id (post_id),
+		KEY user_id (user_id),
+		KEY created_at (created_at)
+	) $charset_collate;";
+
+	// 2. Downloads Table
+	$downloads_table = $wpdb->prefix . 'rp_analytics_downloads';
+	$sql_downloads = "CREATE TABLE $downloads_table (
+		id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+		post_id BIGINT(20) UNSIGNED NOT NULL,
+		user_id BIGINT(20) UNSIGNED DEFAULT NULL,
+		ip_address VARCHAR(45) NOT NULL,
+		user_agent TEXT DEFAULT NULL,
+		created_at DATETIME NOT NULL,
+		PRIMARY KEY (id),
+		KEY post_id (post_id),
+		KEY user_id (user_id),
+		KEY created_at (created_at)
+	) $charset_collate;";
+
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+	dbDelta( $sql_views );
+	dbDelta( $sql_downloads );
+}
+
 function rp_resource_hub_maybe_upgrade() {
 	if ( RP_RESOURCE_HUB_VERSION === get_option( 'rp_resource_hub_version' ) ) {
 		return;
 	}
 
 	rp_resource_hub_create_db_table();
+	rp_resource_hub_create_analytics_tables();
 	rp_resource_hub_apply_roles_and_caps();
 	rp_resource_hub_seed_terms();
 	rp_resource_hub_create_pages();
@@ -342,6 +382,7 @@ function rp_resource_hub_activate() {
 	rp_resource_hub_register_post_types();
 	rp_resource_hub_register_taxonomies();
 	rp_resource_hub_create_db_table();
+	rp_resource_hub_create_analytics_tables();
 	rp_resource_hub_apply_roles_and_caps();
 	rp_resource_hub_seed_terms();
 	rp_resource_hub_create_pages();
@@ -349,6 +390,88 @@ function rp_resource_hub_activate() {
 	update_option( 'rp_resource_hub_version', RP_RESOURCE_HUB_VERSION );
 }
 register_activation_hook( __FILE__, 'rp_resource_hub_activate' );
+
+function rp_resource_hub_get_ip() {
+	$ip = '0.0.0.0';
+	if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+		$ip = $_SERVER['HTTP_CLIENT_IP'];
+	} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
+		$ip = $_SERVER['REMOTE_ADDR'];
+	}
+	if ( strpos( $ip, ',' ) !== false ) {
+		$ips = explode( ',', $ip );
+		$ip = trim( $ips[0] );
+	}
+	return sanitize_text_field( $ip );
+}
+
+function rp_resource_hub_track_page_view() {
+	if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+		return;
+	}
+
+	if ( current_user_can( 'publish_posts' ) ) {
+		return;
+	}
+
+	global $post;
+	$post_id = 0;
+
+	if ( is_front_page() || is_home() ) {
+		$post_id = 0;
+	} elseif ( is_singular() && isset( $post->ID ) ) {
+		$allowed_types = array( 'page', 'post', 'partner_resources', 'accord_library', 'rp_sitrep', 'rp_incident' );
+		if ( ! in_array( $post->post_type, $allowed_types, true ) ) {
+			return;
+		}
+		$post_id = $post->ID;
+	} elseif ( is_post_type_archive( array( 'partner_resources', 'accord_library', 'rp_sitrep' ) ) ) {
+		$post_id = -1;
+	} else {
+		return;
+	}
+
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'rp_analytics_views';
+	$ip_address = rp_resource_hub_get_ip();
+	$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+	$user_id    = get_current_user_id() ? get_current_user_id() : null;
+
+	$wpdb->insert(
+		$table_name,
+		array(
+			'post_id'    => $post_id ? $post_id : null,
+			'user_id'    => $user_id,
+			'ip_address' => $ip_address,
+			'user_agent' => $user_agent,
+			'created_at' => current_time( 'mysql' ),
+		),
+		array( '%d', '%d', '%s', '%s', '%s' )
+	);
+}
+add_action( 'template_redirect', 'rp_resource_hub_track_page_view' );
+
+function rp_resource_hub_log_download( $post_id ) {
+	global $wpdb;
+	$downloads_table = $wpdb->prefix . 'rp_analytics_downloads';
+	$ip_address = rp_resource_hub_get_ip();
+	$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+	$user_id    = get_current_user_id() ? get_current_user_id() : null;
+
+	$wpdb->insert(
+		$downloads_table,
+		array(
+			'post_id'    => $post_id,
+			'user_id'    => $user_id,
+			'ip_address' => $ip_address,
+			'user_agent' => $user_agent,
+			'created_at' => current_time( 'mysql' ),
+		),
+		array( '%d', '%d', '%s', '%s', '%s' )
+	);
+}
 
 function rp_resource_hub_deactivate() {
 	flush_rewrite_rules();
@@ -913,6 +1036,9 @@ function rp_resource_hub_handle_download() {
 	$filename    = str_replace( array( "\r", "\n", '"' ), '', basename( $real_path ) );
 	$disposition = ( 'text/html' === $mime_type ) ? 'inline' : 'attachment';
 
+	// Log the download event
+	rp_resource_hub_log_download( $post_id );
+
 	nocache_headers();
 	header( 'Content-Type: ' . ( $mime_type ? $mime_type : 'application/octet-stream' ) );
 	header( 'Content-Disposition: ' . $disposition . '; filename="' . $filename . '"' );
@@ -979,6 +1105,9 @@ function rp_secure_download_handler() {
 	// Serve the file safely
 	$mime_type   = get_post_mime_type( $attachment_id );
 	$disposition = ( 'text/html' === $mime_type ) ? 'inline' : 'attachment';
+
+	// Log the download event
+	rp_resource_hub_log_download( $parent_post_id );
 
 	nocache_headers();
 	header( 'Content-Type: ' . ( $mime_type ? $mime_type : 'application/octet-stream' ) );

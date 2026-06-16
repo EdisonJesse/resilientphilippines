@@ -356,6 +356,28 @@ function rp_child_create_user_management_page() {
 add_action( 'init', 'rp_child_create_user_management_page' );
 
 /**
+ * Auto-create the Analytics Dashboard page if it doesn't exist.
+ */
+function rp_child_create_analytics_page() {
+	if ( get_page_by_path( 'analytics-dashboard' ) ) {
+		return;
+	}
+
+	$post_id = wp_insert_post( array(
+		'post_type'    => 'page',
+		'post_status'  => 'publish',
+		'post_name'    => 'analytics-dashboard',
+		'post_title'   => __( 'Analytics Dashboard', 'resilient-hub' ),
+		'post_content' => '',
+	) );
+
+	if ( $post_id && ! is_wp_error( $post_id ) ) {
+		update_post_meta( $post_id, '_wp_page_template', 'template-analytics.php' );
+	}
+}
+add_action( 'init', 'rp_child_create_analytics_page' );
+
+/**
  * One-time migration: Rebuild the primary navigation menu to consolidate
  * overlapping items (Posts, Stories, Library, Resource Hub) into a single
  * "Resources" parent with sub-items.
