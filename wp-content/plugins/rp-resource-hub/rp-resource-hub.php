@@ -789,6 +789,10 @@ function rp_resource_hub_process_upload() {
 		return new WP_Error( 'rp_nonce', __( 'Security check failed. Please refresh and try again.', 'rp-resource-hub' ) );
 	}
 
+	if ( ! isset( $_POST['rp_authorized_consent'] ) || '1' !== $_POST['rp_authorized_consent'] ) {
+		return new WP_Error( 'rp_unauthorized', __( 'You must confirm that you are authorized to share this resource.', 'rp-resource-hub' ) );
+	}
+
 	$title       = isset( $_POST['rp_title'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_title'] ) ) : '';
 	$description = isset( $_POST['rp_description'] ) ? wp_kses_post( wp_unslash( $_POST['rp_description'] ) ) : '';
 
@@ -969,6 +973,12 @@ function rp_resource_hub_upload_shortcode() {
 				: rp_resource_hub_format_bytes( RP_RESOURCE_HUB_MAX_UPLOAD_BYTES );
 			?>
 			<p class="rp-field-help"><?php echo esc_html( sprintf( __( 'Accepted file types: PDF, DOC, DOCX, XLS, XLSX, HTML, ZIP (for Web Apps). Maximum size: %s.', 'rp-resource-hub' ), $max_size_text ) ); ?></p>
+		</div>
+		<div class="rp-field rp-field-consent">
+			<label style="display: flex; align-items: flex-start; gap: 8px; font-weight: normal; cursor: pointer;">
+				<input id="rp_authorized_consent" name="rp_authorized_consent" type="checkbox" value="1" required style="margin-top: 4px; width: auto; height: auto;">
+				<span><?php esc_html_e( 'I confirm that I am authorized to share this resource publicly or on this website.', 'rp-resource-hub' ); ?></span>
+			</label>
 		</div>
 		<button type="submit"><?php esc_html_e( 'Submit for Review', 'rp-resource-hub' ); ?></button>
 	</form>

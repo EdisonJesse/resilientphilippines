@@ -1,16 +1,16 @@
 <?php
 /**
- * Template Name: Privacy & Data Rights
+ * Template Name: My Profile & Privacy
  *
- * A self-service portal page for logged-in subscribers to manage their
- * data consent preferences, download user data exports (JSON), and submit
- * erasure/profile deletion requests.
+ * A unified front-end user portal page for logged-in subscribers to edit
+ * their profile information (pronouns, affiliation), download user data
+ * exports (JSON), manage consent, and request account erasure.
  *
  * @package ResilientHub
  */
 
 if ( ! is_user_logged_in() ) {
-	wp_safe_redirect( add_query_arg( 'redirect_to', esc_url( home_url( '/privacy-rights/' ) ), home_url( '/portal-entry/' ) ) );
+	wp_safe_redirect( add_query_arg( 'redirect_to', esc_url( home_url( '/profile/' ) ), home_url( '/portal-entry/' ) ) );
 	exit;
 }
 
@@ -166,43 +166,49 @@ input:checked + .rp-slider:before {
 	<section class="rp-dashboard-hero">
 		<div class="rp-page-shell">
 			<p class="rp-eyebrow"><?php esc_html_e( 'Settings', 'resilient-hub' ); ?></p>
-			<h1 class="rp-page-title"><?php esc_html_e( 'Privacy & Data Rights', 'resilient-hub' ); ?></h1>
+			<h1 class="rp-page-title"><?php esc_html_e( 'My Profile & Privacy', 'resilient-hub' ); ?></h1>
 		</div>
 	</section>
 	
 	<div class="rp-dashboard-body">
 		<div class="rp-page-shell">
 			<header class="rp-dashboard-header">
-				<p class="rp-dashboard-subtitle"><?php esc_html_e( 'Manage your data portability rights, privacy consent preferences, and account deletion requests.', 'resilient-hub' ); ?></p>
+				<p class="rp-dashboard-subtitle"><?php esc_html_e( 'Configure your display parameters, download your information, and manage your cookie settings.', 'resilient-hub' ); ?></p>
 			</header>
 
 			<div class="rp-privacy-grid">
-				<!-- 1. Profile Data Summary -->
+				<!-- 1. Profile Information Form -->
 				<div class="rp-privacy-section-card">
 					<h3 class="rp-privacy-section-title">
 						<span class="dashicons dashicons-admin-users"></span>
-						<?php esc_html_e( 'Your Profile Information', 'resilient-hub' ); ?>
+						<?php esc_html_e( 'Profile Settings', 'resilient-hub' ); ?>
 					</h3>
-					<p class="rp-privacy-description"><?php esc_html_e( 'Below is a summary of the personal details stored on your Collaborative Hub profile.', 'resilient-hub' ); ?></p>
+					<p class="rp-privacy-description"><?php esc_html_e( 'Configure your public display name, pronouns, and organization affiliation.', 'resilient-hub' ); ?></p>
 					
-					<div class="rp-profile-meta-grid">
-						<div class="rp-profile-meta-item">
-							<span class="rp-profile-meta-label"><?php esc_html_e( 'Name', 'resilient-hub' ); ?></span>
-							<span class="rp-profile-meta-val"><?php echo esc_html( $current_user->display_name ); ?></span>
+					<form id="rp-profile-form" style="max-width: 600px;">
+						<?php wp_nonce_field( 'rp_save_profile_' . $current_user->ID, 'rp_profile_nonce' ); ?>
+						
+						<div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+							<div style="display: flex; flex-direction: column; gap: 6px;">
+								<label for="rp_display_name" style="font-size: 14px; font-weight: 700; color: var(--rp-color-navy, #12324a);"><?php esc_html_e( 'Display Name', 'resilient-hub' ); ?></label>
+								<input id="rp_display_name" name="rp_display_name" type="text" value="<?php echo esc_attr( $current_user->display_name ); ?>" required style="padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 15px; width: 100%;">
+							</div>
+							
+							<div style="display: flex; flex-direction: column; gap: 6px;">
+								<label for="rp_pronouns" style="font-size: 14px; font-weight: 700; color: var(--rp-color-navy, #12324a);"><?php esc_html_e( 'Pronouns', 'resilient-hub' ); ?></label>
+								<input id="rp_pronouns" name="rp_pronouns" type="text" value="<?php echo esc_attr( get_user_meta( $current_user->ID, '_rp_pronouns', true ) ); ?>" placeholder="<?php esc_attr_e( 'e.g. He/Him, She/Her, They/Them', 'resilient-hub' ); ?>" style="padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 15px; width: 100%;">
+							</div>
+							
+							<div style="display: flex; flex-direction: column; gap: 6px;">
+								<label for="rp_affiliation" style="font-size: 14px; font-weight: 700; color: var(--rp-color-navy, #12324a);"><?php esc_html_e( 'Affiliation / Organization', 'resilient-hub' ); ?></label>
+								<input id="rp_affiliation" name="rp_affiliation" type="text" value="<?php echo esc_attr( get_user_meta( $current_user->ID, '_rp_affiliation', true ) ); ?>" placeholder="<?php esc_attr_e( 'e.g. ACCORD, LGU Malabon, CARE', 'resilient-hub' ); ?>" style="padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 15px; width: 100%;">
+							</div>
 						</div>
-						<div class="rp-profile-meta-item">
-							<span class="rp-profile-meta-label"><?php esc_html_e( 'Email Address', 'resilient-hub' ); ?></span>
-							<span class="rp-profile-meta-val"><?php echo esc_html( $current_user->user_email ); ?></span>
-						</div>
-						<div class="rp-profile-meta-item">
-							<span class="rp-profile-meta-label"><?php esc_html_e( 'Username', 'resilient-hub' ); ?></span>
-							<span class="rp-profile-meta-val">@<?php echo esc_html( $current_user->user_login ); ?></span>
-						</div>
-						<div class="rp-profile-meta-item">
-							<span class="rp-profile-meta-label"><?php esc_html_e( 'Registered Date', 'resilient-hub' ); ?></span>
-							<span class="rp-profile-meta-val"><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $current_user->user_registered ) ) ); ?></span>
-						</div>
-					</div>
+						
+						<button type="submit" id="rp-btn-save-profile" class="rp-button">
+							<?php esc_html_e( 'Save Profile Details', 'resilient-hub' ); ?>
+						</button>
+					</form>
 				</div>
 
 				<!-- 2. Data Portability (JSON Export) -->
@@ -213,7 +219,7 @@ input:checked + .rp-slider:before {
 					</h3>
 					<p class="rp-privacy-description"><?php esc_html_e( 'Under the GDPR, you have the right to request a copy of all information logged on your profile. Clicking the button below downloads a machine-readable JSON file containing your user details, page view history, and resource download logs.', 'resilient-hub' ); ?></p>
 					
-					<a href="<?php echo esc_url( add_query_arg( 'rp_download_user_data', '1', home_url( '/privacy-rights/' ) ) ); ?>" class="rp-button">
+					<a href="<?php echo esc_url( add_query_arg( 'rp_download_user_data', '1', home_url( '/profile/' ) ) ); ?>" class="rp-button">
 						<?php esc_html_e( 'Download My Data (JSON)', 'resilient-hub' ); ?>
 					</a>
 				</div>
@@ -267,7 +273,58 @@ input:checked + .rp-slider:before {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-	// 1. Manage Consent toggle state
+	// 1. Save Profile Details AJAX
+	var profileForm = document.getElementById('rp-profile-form');
+	var saveBtn = document.getElementById('rp-btn-save-profile');
+	
+	if (profileForm) {
+		profileForm.addEventListener('submit', function(e) {
+			e.preventDefault();
+			
+			saveBtn.disabled = true;
+			saveBtn.textContent = '<?php echo esc_js( __( 'Saving...', 'resilient-hub' ) ); ?>';
+			
+			var formData = new FormData(profileForm);
+			formData.append('action', 'rp_save_user_profile');
+			
+			fetch('<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>', {
+				method: 'POST',
+				credentials: 'same-origin',
+				body: formData
+			})
+			.then(r => r.json())
+			.then(data => {
+				saveBtn.disabled = false;
+				saveBtn.textContent = '<?php echo esc_js( __( 'Save Profile Details', 'resilient-hub' ) ); ?>';
+				
+				// Show feedback notification
+				var status = document.createElement('div');
+				status.style.position = 'fixed';
+				status.style.bottom = '24px';
+				status.style.right = '24px';
+				status.style.background = data.success ? '#065f46' : '#dc2626';
+				status.style.color = '#fff';
+				status.style.padding = '12px 20px';
+				status.style.borderRadius = '8px';
+				status.style.fontSize = '14px';
+				status.style.fontWeight = 'bold';
+				status.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+				status.style.zIndex = '999999';
+				status.textContent = data.data.message || 'Saved successfully.';
+				
+				document.body.appendChild(status);
+				setTimeout(function() { status.remove(); }, 3000);
+			})
+			.catch(err => {
+				console.error(err);
+				saveBtn.disabled = false;
+				saveBtn.textContent = '<?php echo esc_js( __( 'Save Profile Details', 'resilient-hub' ) ); ?>';
+				alert('An error occurred. Please try again.');
+			});
+		});
+	}
+
+	// 2. Manage Consent toggle state
 	var consentToggle = document.getElementById('rp-analytics-toggle');
 	if (consentToggle) {
 		var consentCookie = getCookie('rp_cookie_consent');
@@ -303,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 
-	// 2. Submit Erasure Request AJAX
+	// 3. Submit Erasure Request AJAX
 	var erasureBtn = document.getElementById('rp-btn-request-erasure');
 	if (erasureBtn) {
 		erasureBtn.addEventListener('click', function(e) {
@@ -357,7 +414,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			date.setTime(date.getTime() + (days*24*60*60*1000));
 			expires = "; expires=" + date.toUTCString();
 		}
-		document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Lax; Secure";
+		var secure = window.location.protocol === 'https:' ? '; Secure' : '';
+		document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Lax" + secure;
 	}
 	
 	function getCookie(name) {

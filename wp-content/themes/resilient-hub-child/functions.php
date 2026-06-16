@@ -394,8 +394,8 @@ function rp_child_create_compliance_pages() {
 			'title'   => __( 'Cookie Policy', 'resilient-hub' ),
 			'content' => '<h2>1. Strictly Necessary Cookies</h2><p>We deploy session and security cookies (`wordpress_logged_in_*`, `wp-settings-*`, and security tokens) to authenticate your profile and secure form submissions. These do not track cross-site behavior and are strictly necessary for platform operation.</p><h2>2. Optional Analytics Cookies</h2><p>If you consent to optional analytics, we use a custom self-hosted tracker cookie to monitor aggregate page views and file download events to identify popular materials. You can modify these choices at any time in the Privacy Portal.</p>',
 		),
-		'privacy-rights' => array(
-			'title'   => __( 'Privacy & Data Rights', 'resilient-hub' ),
+		'profile' => array(
+			'title'   => __( 'My Profile & Privacy', 'resilient-hub' ),
 			'content' => '',
 		),
 	);
@@ -413,8 +413,8 @@ function rp_child_create_compliance_pages() {
 			'post_content' => $data['content'],
 		) );
 
-		if ( $post_id && ! is_wp_error( $post_id ) && 'privacy-rights' === $slug ) {
-			update_post_meta( $post_id, '_wp_page_template', 'template-privacy-rights.php' );
+		if ( $post_id && ! is_wp_error( $post_id ) && 'profile' === $slug ) {
+			update_post_meta( $post_id, '_wp_page_template', 'template-profile.php' );
 		}
 	}
 }
@@ -806,6 +806,8 @@ function rp_handle_user_data_export() {
 				'display_name' => $user->display_name,
 				'first_name'   => $user->first_name,
 				'last_name'    => $user->last_name,
+				'pronouns'     => get_user_meta( $user_id, '_rp_pronouns', true ),
+				'affiliation'  => get_user_meta( $user_id, '_rp_affiliation', true ),
 				'registered'   => $user->user_registered,
 				'roles'        => $user->roles,
 			),
@@ -893,3 +895,45 @@ function rp_ajax_delete_user_handler() {
 	}
 }
 add_action( 'wp_ajax_rp_delete_user', 'rp_ajax_delete_user_handler' );
+
+/**
+ * AJAX Handler: Save User Profile Details
+ */
+function rp_ajax_save_user_profile_handler() {
+	if ( ! is_user_logged_in() ) {
+		wp_send_json_error( array( 'message' => __( 'You must be logged in.', 'resilient-hub' ) ) );
+	}
+	
+	$user_id = get_current_user_id();
+	
+	$nonce = isset( $_POST['rp_profile_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_profile_nonce'] ) ) : '';
+	if ( ! wp_verify_nonce( $nonce, 'rp_save_profile_' . $user_id ) ) {
+		wp_send_json_error( array( 'message' => __( 'Security check failed. Please refresh the page and try again.', 'resilient-hub' ) ) );
+	}
+	
+	$display_name = isset( $_POST['rp_display_name'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_display_name'] ) ) : '';
+	$pronouns     = isset( $_POST['rp_pronouns'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_pronouns'] ) ) : '';
+	$affiliation  = isset( $_POST['rp_affiliation'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_affiliation'] ) ) : '';
+	
+	if ( empty( $display_name ) ) {
+		wp_send_json_error( array( 'message' => __( 'Display Name is required.', 'resilient-hub' ) ) );
+	}
+	
+	// Update user standard fields
+	require_once ABSPATH . 'wp-admin/includes/user.php';
+	$update_result = wp_update_user( array(
+		'ID'           => $user_id,
+		'display_name' => $display_name,
+	) );
+	
+	if ( is_wp_error( $update_result ) ) {
+		wp_send_json_error( array( 'message' => $update_result->get_error_message() ) );
+	}
+	
+	// Update custom user meta fields
+	update_user_meta( $user_id, '_rp_pronouns', $pronouns );
+	update_user_meta( $user_id, '_rp_affiliation', $affiliation );
+	
+	wp_send_json_success( array( 'message' => __( 'Profile details saved successfully.', 'resilient-hub' ) ) );
+}
+add_action( 'wp_ajax_rp_save_user_profile', 'rp_ajax_save_user_profile_handler' );
