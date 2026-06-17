@@ -3638,7 +3638,10 @@ input[type="submit"].give-submit:focus {
 }
 
 .rp-tinig-dashboard .rp-user-mgmt-controls .rp-button {
+  box-sizing: border-box;
   min-height: 46px;
+  width: 118px;
+  white-space: nowrap;
 }
 
 .rp-tinig-table td,
