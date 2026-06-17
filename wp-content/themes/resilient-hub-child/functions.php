@@ -101,7 +101,7 @@ function rp_child_pwa_head_tags() {
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-title" content="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
 	<meta name="apple-mobile-web-app-status-bar-style" content="default">
-	<link rel="apple-touch-icon" href="<?php echo esc_url( $theme_url . 'assets/images/pwa-apple-touch-icon.png' ); ?>">
+	<link rel="apple-touch-icon" href="<?php echo esc_url( $theme_url . 'assets/images/pwa-accord-correct-apple-touch-icon.png' ); ?>">
 	<?php
 }
 add_action( 'wp_head', 'rp_child_pwa_head_tags', 5 );
@@ -131,17 +131,17 @@ function rp_child_serve_pwa_endpoints() {
 			'categories'       => array( 'education', 'productivity', 'news' ),
 			'icons'            => array(
 				array(
-					'src'   => $theme_url . 'assets/images/pwa-icon-192.png',
+					'src'   => $theme_url . 'assets/images/pwa-accord-correct-192.png',
 					'sizes' => '192x192',
 					'type'  => 'image/png',
 				),
 				array(
-					'src'   => $theme_url . 'assets/images/pwa-icon-512.png',
+					'src'   => $theme_url . 'assets/images/pwa-accord-correct-512.png',
 					'sizes' => '512x512',
 					'type'  => 'image/png',
 				),
 				array(
-					'src'     => $theme_url . 'assets/images/pwa-maskable-512.png',
+					'src'     => $theme_url . 'assets/images/pwa-accord-correct-maskable-512.png',
 					'sizes'   => '512x512',
 					'type'    => 'image/png',
 					'purpose' => 'maskable',
@@ -183,8 +183,8 @@ function rp_child_serve_pwa_endpoints() {
 				$theme_url . 'style.css',
 				$theme_url . 'assets/js/navigation.js',
 				$theme_url . 'assets/images/accord-logo.png',
-				$theme_url . 'assets/images/pwa-icon-192.png',
-				$theme_url . 'assets/images/pwa-icon-512.png',
+				$theme_url . 'assets/images/pwa-accord-correct-192.png',
+				$theme_url . 'assets/images/pwa-accord-correct-512.png',
 			),
 		);
 
