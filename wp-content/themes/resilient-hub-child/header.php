@@ -46,6 +46,7 @@
 					<li><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/resource-hub/' ) ); ?>"><?php esc_html_e( 'Resources', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/sitrep-dashboard/' ) ); ?>"><?php esc_html_e( 'Situation Reports', 'resilient-hub' ); ?></a></li>
+					<li><a href="<?php echo esc_url( home_url( '/tinig/' ) ); ?>"><?php esc_html_e( 'Tinig', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>"><?php esc_html_e( 'Submit', 'resilient-hub' ); ?></a></li>
 				</ul>
 				<?php

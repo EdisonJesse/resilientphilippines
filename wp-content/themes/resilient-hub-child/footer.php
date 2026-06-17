@@ -17,6 +17,7 @@
 				<ul class="rp-footer-list">
 					<li><a href="<?php echo esc_url( home_url( '/resource-hub/' ) ); ?>"><?php esc_html_e( 'Resource Hub', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>"><?php esc_html_e( 'Submit Resource', 'resilient-hub' ); ?></a></li>
+					<li><a href="<?php echo esc_url( home_url( '/tinig/' ) ); ?>"><?php esc_html_e( 'Tinig Feedback', 'resilient-hub' ); ?></a></li>
 				</ul>
 			</div>
 			<div>
@@ -35,6 +36,7 @@
 					?>
 					<ul class="rp-footer-list">
 						<li><a href="<?php echo esc_url( home_url( '/contact-us/' ) ); ?>"><?php esc_html_e( 'Contact Us', 'resilient-hub' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/tinig/' ) ); ?>"><?php esc_html_e( 'Tinig Feedback', 'resilient-hub' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/donate/' ) ); ?>"><?php esc_html_e( 'Donate', 'resilient-hub' ); ?></a></li>
 					</ul>
 					<?php

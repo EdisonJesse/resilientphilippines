@@ -976,6 +976,62 @@ function rp_child_consolidate_navigation_menu() {
 }
 add_action( 'admin_init', 'rp_child_consolidate_navigation_menu' );
 
+function rp_child_menu_has_tinig_link( $menu_id ) {
+	$items = wp_get_nav_menu_items( $menu_id );
+	if ( ! $items ) {
+		return false;
+	}
+
+	foreach ( $items as $item ) {
+		$item_url = untrailingslashit( (string) $item->url );
+		if ( false !== strpos( $item_url, '/tinig' ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+function rp_child_add_tinig_to_menu( $menu_id, $title ) {
+	if ( ! $menu_id || rp_child_menu_has_tinig_link( $menu_id ) ) {
+		return;
+	}
+
+	wp_update_nav_menu_item(
+		$menu_id,
+		0,
+		array(
+			'menu-item-title'  => $title,
+			'menu-item-url'    => home_url( '/tinig/' ),
+			'menu-item-type'   => 'custom',
+			'menu-item-status' => 'publish',
+		)
+	);
+}
+
+function rp_child_add_tinig_nav_links() {
+	if ( get_option( 'rp_tinig_nav_links_v1' ) ) {
+		return;
+	}
+
+	if ( ! get_page_by_path( 'tinig' ) ) {
+		return;
+	}
+
+	$locations = get_nav_menu_locations();
+
+	if ( ! empty( $locations['main-navigation'] ) ) {
+		rp_child_add_tinig_to_menu( $locations['main-navigation'], __( 'Tinig', 'resilient-hub' ) );
+	}
+
+	if ( ! empty( $locations['rp-footer'] ) ) {
+		rp_child_add_tinig_to_menu( $locations['rp-footer'], __( 'Tinig Feedback', 'resilient-hub' ) );
+	}
+
+	update_option( 'rp_tinig_nav_links_v1', true );
+}
+add_action( 'init', 'rp_child_add_tinig_nav_links', 30 );
+
 /**
  * Filter the primary navigation menu to hide the Moderation Dashboard for users without moderation permissions.
  */
