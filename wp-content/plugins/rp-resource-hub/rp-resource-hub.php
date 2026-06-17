@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Resource Hub
  * Description: Custom post types, taxonomies, roles, upload workflow, and catalog shortcodes for the humanitarian resource hub.
- * Version: 1.9.5
+ * Version: 1.9.6
  * Author: ACCORD
  * Text Domain: rp-resource-hub
  */
@@ -11,12 +11,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_RESOURCE_HUB_VERSION', '1.9.5' );
+define( 'RP_RESOURCE_HUB_VERSION', '1.9.6' );
 define( 'RP_RESOURCE_HUB_FILE', __FILE__ );
 define( 'RP_RESOURCE_HUB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_URL', plugin_dir_url( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_MAX_UPLOAD_BYTES', 25 * 1024 * 1024 );
 define( 'RP_TINIG_NOTIFICATION_EMAIL', 'tinig@accord.org.ph' );
+define( 'RP_CONTACT_NOTIFICATION_EMAIL', 'info@accord.org.ph' );
 define( 'RP_TINIG_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_TINIG_MAX_ATTACHMENTS', 5 );
 if ( ! defined( 'RP_GRAPH_MAIL_TENANT_ID' ) ) {
@@ -1394,9 +1395,13 @@ function rp_tinig_graph_get_access_token() {
 	return $data['access_token'];
 }
 
-function rp_tinig_graph_send_mail( $subject, $message ) {
+function rp_tinig_graph_send_mail( $subject, $message, $recipient = RP_TINIG_NOTIFICATION_EMAIL, $reply_to = '' ) {
 	if ( ! rp_tinig_graph_mail_is_configured() ) {
 		return new WP_Error( 'rp_tinig_graph_not_configured', __( 'Microsoft Graph mailer is not fully configured.', 'rp-resource-hub' ) );
+	}
+
+	if ( ! is_email( $recipient ) ) {
+		return new WP_Error( 'rp_graph_invalid_recipient', __( 'Microsoft Graph mail recipient is invalid.', 'rp-resource-hub' ) );
 	}
 
 	$token = rp_tinig_graph_get_access_token();
@@ -1404,6 +1409,7 @@ function rp_tinig_graph_send_mail( $subject, $message ) {
 		return $token;
 	}
 
+	$reply_to = $reply_to && is_email( $reply_to ) ? $reply_to : $recipient;
 	$payload = array(
 		'message'         => array(
 			'subject'      => $subject,
@@ -1414,14 +1420,14 @@ function rp_tinig_graph_send_mail( $subject, $message ) {
 			'toRecipients' => array(
 				array(
 					'emailAddress' => array(
-						'address' => RP_TINIG_NOTIFICATION_EMAIL,
+						'address' => $recipient,
 					),
 				),
 			),
 			'replyTo'      => array(
 				array(
 					'emailAddress' => array(
-						'address' => RP_TINIG_NOTIFICATION_EMAIL,
+						'address' => $reply_to,
 					),
 				),
 			),
@@ -1465,6 +1471,70 @@ function rp_tinig_wp_mail_send( $subject, $message ) {
 
 	return true;
 }
+
+function rp_contact_graph_form_id() {
+	return 814;
+}
+
+function rp_contact_graph_last_result_key() {
+	return 'rp_contact_graph_mail_result_' . get_current_blog_id();
+}
+
+function rp_contact_send_graph_mail( $contact_form, &$abort, $submission ) {
+	if ( ! $contact_form || (int) $contact_form->id() !== rp_contact_graph_form_id() || ! $submission ) {
+		return;
+	}
+
+	$name    = sanitize_text_field( $submission->get_posted_string( 'your-name' ) );
+	$email   = sanitize_email( $submission->get_posted_string( 'your-email' ) );
+	$subject = sanitize_text_field( $submission->get_posted_string( 'your-subject' ) );
+	$message = sanitize_textarea_field( $submission->get_posted_string( 'your-message' ) );
+
+	if ( ! is_email( RP_CONTACT_NOTIFICATION_EMAIL ) ) {
+		update_option( rp_contact_graph_last_result_key(), 'invalid_recipient', false );
+		$abort = true;
+		return;
+	}
+
+	if ( ! rp_tinig_graph_mail_is_configured() ) {
+		update_option( rp_contact_graph_last_result_key(), 'graph_not_configured', false );
+		return;
+	}
+
+	$mail_subject = sprintf(
+		/* translators: %s: contact form subject */
+		__( 'Contact Us: %s', 'rp-resource-hub' ),
+		$subject ? $subject : __( 'Website inquiry', 'rp-resource-hub' )
+	);
+
+	$mail_message = sprintf(
+		/* translators: 1: sender name, 2: sender email, 3: message subject, 4: message body, 5: source URL */
+		__( "A new Contact Us message has been submitted through the ACCORD website.\n\nName: %1\$s\nEmail: %2\$s\nSubject: %3\$s\n\nMessage:\n%4\$s\n\nSource: %5\$s", 'rp-resource-hub' ),
+		$name ? $name : __( 'Not provided', 'rp-resource-hub' ),
+		$email ? $email : __( 'Not provided', 'rp-resource-hub' ),
+		$subject ? $subject : __( 'No subject provided', 'rp-resource-hub' ),
+		$message ? $message : __( 'No message provided', 'rp-resource-hub' ),
+		home_url( '/contact-us/' )
+	);
+
+	$result = rp_tinig_graph_send_mail( $mail_subject, $mail_message, RP_CONTACT_NOTIFICATION_EMAIL, $email );
+	if ( is_wp_error( $result ) ) {
+		update_option( rp_contact_graph_last_result_key(), 'failed: ' . $result->get_error_message(), false );
+		return;
+	}
+
+	update_option( rp_contact_graph_last_result_key(), 'sent', false );
+}
+add_action( 'wpcf7_before_send_mail', 'rp_contact_send_graph_mail', 10, 3 );
+
+function rp_contact_skip_cf7_mail_after_graph_success( $skip_mail, $contact_form ) {
+	if ( ! $contact_form || (int) $contact_form->id() !== rp_contact_graph_form_id() ) {
+		return $skip_mail;
+	}
+
+	return 'sent' === get_option( rp_contact_graph_last_result_key() ) ? true : $skip_mail;
+}
+add_filter( 'wpcf7_skip_mail', 'rp_contact_skip_cf7_mail_after_graph_success', 10, 2 );
 
 function rp_tinig_notify_new_case( $case_id ) {
 	$case = rp_tinig_get_case( $case_id );
