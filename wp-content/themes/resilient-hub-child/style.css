@@ -3,7 +3,7 @@ Theme Name: Resilient Humanitarian Hub
 Template: foreverwood-premium
 Author: ACCORD
 Description: Modern child theme for the Resilient Philippines humanitarian knowledge hub.
-Version: 1.1.6
+Version: 1.1.7
 Text Domain: resilient-hub
 */
 
@@ -3164,4 +3164,400 @@ input[type="submit"].give-submit:focus {
   text-align: center !important;
   line-height: normal !important;
   box-sizing: border-box !important;
+}
+
+/* ==========================================================================
+   Mobile and tablet layout hardening
+   ========================================================================== */
+@media (max-width: 1080px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .rp-header-inner,
+  .rp-footer-inner,
+  .rp-section-inner,
+  .rp-page-shell,
+  .rp-page-content .entry-content,
+  .entry-content {
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+
+  .rp-header-inner {
+    gap: 16px;
+    min-height: 68px;
+  }
+
+  .rp-brand-logo {
+    max-width: min(240px, calc(100vw - 112px));
+  }
+
+  .rp-nav.is-open {
+    border: 1px solid var(--rp-color-border);
+    border-radius: var(--rp-radius);
+    box-shadow: 0 12px 30px rgba(16, 32, 39, 0.08);
+    box-sizing: border-box;
+    margin-top: 2px;
+    max-height: calc(100vh - 112px);
+    overflow-y: auto;
+    padding: 12px;
+  }
+
+  .rp-nav a,
+  .rp-nav-hub-link,
+  .rp-button,
+  .rp-catalog-submit,
+  .rp-upload-form button {
+    box-sizing: border-box;
+  }
+
+  .rp-nav a,
+  .rp-nav-hub-link {
+    white-space: normal;
+    width: 100%;
+  }
+
+  .rp-nav .rp-button,
+  .rp-user-welcome {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .rp-nav .sub-menu {
+    background: var(--rp-color-soft);
+    border-radius: 6px;
+    box-sizing: border-box;
+    margin-left: 0;
+    padding: 6px;
+  }
+
+  .rp-section-header > .rp-button {
+    margin-top: 18px;
+  }
+
+  .rp-page-content .entry-content,
+  .entry-content {
+    width: 100%;
+  }
+
+  .rp-catalog,
+  .rp-news-catalog {
+    min-width: 0;
+  }
+
+  .rp-catalog-filters,
+  .rp-news-filters,
+  .rp-upload-form {
+    position: static;
+  }
+
+  .rp-card,
+  .rp-resource-card,
+  .rp-archive-card,
+  .rp-metadata-card,
+  .rp-moderation-container,
+  .rp-analytics-card,
+  .rp-analytics-table-card,
+  .rp-chart-container {
+    box-sizing: border-box;
+    min-width: 0;
+  }
+
+  .rp-footer-bottom .rp-page-shell {
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+
+  .rp-sitrep-dashboard-main .rp-page-content {
+    box-sizing: border-box;
+    max-width: 100% !important;
+    padding: 0 20px 56px !important;
+  }
+
+  .rp-sitrep-dashboard-main .rp-page-content > .rp-page-shell {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+
+  .rp-header-inner,
+  .rp-footer-inner,
+  .rp-section-inner,
+  .rp-page-shell {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .rp-hero,
+  .rp-hero-content {
+    min-height: 520px;
+  }
+
+  .rp-hero-copy {
+    padding-bottom: 56px;
+    padding-top: 72px;
+  }
+
+  .rp-hero p {
+    font-size: 1.05rem;
+  }
+
+  .rp-page-hero {
+    padding: 56px 0 36px;
+  }
+
+  .rp-page-content {
+    padding: 42px 0 60px;
+  }
+
+  .rp-section {
+    padding: 54px 0;
+  }
+
+  .rp-card-grid,
+  .rp-resource-grid,
+  .rp-archive-grid {
+    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .rp-card,
+  .rp-resource-card {
+    min-height: 0;
+    padding: 22px;
+  }
+
+  .rp-card-image {
+    margin: -22px -22px 16px;
+  }
+
+  .rp-footer-bottom .rp-page-shell {
+    flex-direction: column !important;
+    justify-content: center !important;
+    text-align: center;
+  }
+
+  .rp-footer-legal-links {
+    width: 100%;
+  }
+
+  .rp-cookie-banner-actions,
+  .rp-cookie-banner-actions button {
+    width: 100%;
+  }
+
+  .rp-cookie-banner {
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+  }
+
+  .rp-cookie-banner-text {
+    flex: 0 1 auto;
+  }
+
+  .rp-dashboard-body {
+    padding-top: 36px;
+  }
+
+  .rp-dashboard-row-split,
+  .rp-dashboard-grid,
+  .rp-analytics-grid,
+  .rp-analytics-tables-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .rp-sitrep-dashboard-main .rp-page-title,
+  .rp-dashboard-hero .rp-page-title {
+    font-size: clamp(2rem, 8vw, 2.6rem) !important;
+  }
+
+  .rp-sitrep-dashboard-main [data-html2canvas-ignore] {
+    align-items: stretch !important;
+    width: 100%;
+  }
+
+  .rp-sitrep-dashboard-main [data-html2canvas-ignore] > div,
+  .rp-analytics-controls-bar > div,
+  .rp-analytics-controls-bar form {
+    width: 100%;
+  }
+
+  .rp-sitrep-dashboard-main [data-html2canvas-ignore] .rp-button,
+  .rp-analytics-controls-bar .rp-button,
+  .rp-analytics-controls-bar select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .rp-header-inner,
+  .rp-footer-inner,
+  .rp-section-inner,
+  .rp-page-shell {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .rp-menu-toggle {
+    min-width: 44px;
+  }
+
+  .rp-hero,
+  .rp-hero-content {
+    min-height: 480px;
+  }
+
+  .rp-hero::before {
+    background: linear-gradient(180deg, rgba(18, 50, 74, 0.9), rgba(18, 50, 74, 0.72));
+  }
+
+  .rp-hero-actions,
+  .rp-cookie-banner-actions,
+  .rp-analytics-search-form {
+    flex-direction: column;
+  }
+
+  .rp-hero-actions .rp-button,
+  .rp-button-download-large,
+  .rp-page-content .rp-upload-form button[type="submit"],
+  .entry-content .rp-upload-form button[type="submit"] {
+    width: 100%;
+  }
+
+  .rp-card-grid,
+  .rp-resource-grid,
+  .rp-archive-grid,
+  .rp-related-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rp-catalog-filters,
+  .rp-news-filters,
+  .rp-page-content .rp-upload-form,
+  .entry-content .rp-upload-form,
+  .rp-resource-col-main,
+  .rp-moderation-container,
+  .rp-analytics-card,
+  .rp-analytics-table-card,
+  .rp-chart-container {
+    padding: 18px;
+  }
+
+  .rp-single-content {
+    padding: 24px 20px;
+  }
+
+  .rp-post-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .rp-button-download-large {
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .rp-footer-legal-links {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .rp-header-inner,
+  .rp-footer-inner,
+  .rp-section-inner,
+  .rp-page-shell {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .rp-header-inner {
+    padding-bottom: 12px;
+    padding-top: 12px;
+  }
+
+  .rp-brand-logo {
+    height: 38px;
+    max-width: calc(100vw - 100px);
+  }
+
+  .rp-nav.is-open {
+    max-height: calc(100vh - 92px);
+    padding: 10px;
+  }
+
+  .rp-hero-copy {
+    padding-bottom: 44px;
+    padding-top: 56px;
+  }
+
+  .rp-page-content .entry-content {
+    font-size: 1rem;
+  }
+
+  .rp-card,
+  .rp-resource-card {
+    padding: 20px;
+  }
+
+  .rp-card h3,
+  .rp-resource-card h3 {
+    min-height: 0;
+  }
+
+  .rp-card p,
+  .rp-resource-card p {
+    min-height: 0;
+  }
+
+  .rp-card-image {
+    margin: -20px -20px 16px;
+  }
+
+  .rp-cookie-banner {
+    left: 10px;
+    right: 10px;
+  }
+
+  .rp-sitrep-dashboard-main .rp-page-content {
+    padding: 0 16px 48px !important;
+  }
+
+  .rp-dashboard-row-split > div,
+  .rp-sitrep-dashboard-main .rp-incident-card,
+  .rp-sitrep-dashboard-main .rp-stat-card {
+    padding: 18px !important;
+  }
+
+  .rp-dashboard-row-split article {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+
+  .rp-dashboard-row-split article > div:first-child,
+  .rp-dashboard-row-split article > div:last-child {
+    min-width: 0 !important;
+    text-align: left !important;
+    width: 100%;
+  }
+
+  .rp-dashboard-row-split article h4,
+  .rp-dashboard-row-split article a,
+  .rp-dashboard-row-split article span,
+  .rp-meta-value,
+  .rp-resource-title {
+    overflow-wrap: anywhere;
+  }
+
+  .rp-dashboard-row-split article div[style*="display: flex"] {
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+  }
 }
