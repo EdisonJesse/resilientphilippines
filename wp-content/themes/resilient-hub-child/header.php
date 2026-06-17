@@ -74,15 +74,23 @@
 							<li><a href="<?php echo esc_url( home_url( '/submit-sitrep/' ) ); ?>"><?php esc_html_e( 'Submit a SitRep', 'resilient-hub' ); ?></a></li>
 							<?php 
 							$can_moderate = current_user_can( 'manage_options' ) || current_user_can( 'publish_posts' ) || current_user_can( 'publish_partner_resources' ) || current_user_can( 'publish_rp_sitreps' );
+							$can_manage_tinig = current_user_can( 'manage_options' ) || current_user_can( 'manage_tinig_cases' );
 							if ( $can_moderate ) : ?>
 								<li class="rp-dropdown-divider" aria-hidden="true"></li>
 								<li class="rp-dropdown-section-label"><?php esc_html_e( 'Admin', 'resilient-hub' ); ?></li>
 								<li><a href="<?php echo esc_url( home_url( '/moderation-dashboard/' ) ); ?>"><?php esc_html_e( 'Moderation Dashboard', 'resilient-hub' ); ?></a></li>
 								<li><a href="<?php echo esc_url( home_url( '/analytics-dashboard/' ) ); ?>"><?php esc_html_e( 'Analytics Dashboard', 'resilient-hub' ); ?></a></li>
+								<?php if ( $can_manage_tinig ) : ?>
+									<li><a href="<?php echo esc_url( home_url( '/tinig-dashboard/' ) ); ?>"><?php esc_html_e( 'Tinig Dashboard', 'resilient-hub' ); ?></a></li>
+								<?php endif; ?>
 								<?php if ( current_user_can( 'manage_options' ) ) : ?>
 									<li><a href="<?php echo esc_url( home_url( '/user-management/' ) ); ?>"><?php esc_html_e( 'User Management', 'resilient-hub' ); ?></a></li>
 									<li><a href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'resilient-hub' ); ?></a></li>
 								<?php endif; ?>
+							<?php elseif ( $can_manage_tinig ) : ?>
+								<li class="rp-dropdown-divider" aria-hidden="true"></li>
+								<li class="rp-dropdown-section-label"><?php esc_html_e( 'Admin', 'resilient-hub' ); ?></li>
+								<li><a href="<?php echo esc_url( home_url( '/tinig-dashboard/' ) ); ?>"><?php esc_html_e( 'Tinig Dashboard', 'resilient-hub' ); ?></a></li>
 							<?php endif; ?>
 							<li class="rp-dropdown-divider" aria-hidden="true"></li>
 							<li><a href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Logout', 'resilient-hub' ); ?></a></li>
