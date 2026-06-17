@@ -3,7 +3,7 @@ Theme Name: Resilient Humanitarian Hub
 Template: foreverwood-premium
 Author: ACCORD
 Description: Modern child theme for the Resilient Philippines humanitarian knowledge hub.
-Version: 1.1.10
+Version: 1.1.11
 Text Domain: resilient-hub
 */
 
@@ -3559,5 +3559,174 @@ input[type="submit"].give-submit:focus {
   .rp-dashboard-row-split article div[style*="display: flex"] {
     align-items: flex-start !important;
     flex-wrap: wrap !important;
+  }
+}
+
+/* Tinig feedback and accountability mechanism */
+.rp-tinig-shell {
+  margin: 0 auto;
+  max-width: 920px;
+}
+
+.rp-tinig-intro {
+  margin-bottom: 24px;
+}
+
+.rp-tinig-intro h2 {
+  color: var(--rp-color-navy);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+  margin: 0 0 12px;
+}
+
+.rp-tinig-intro p:last-child {
+  color: var(--rp-color-muted);
+  margin-bottom: 0;
+}
+
+.rp-tinig-form {
+  gap: 18px;
+}
+
+.rp-tinig-form .rp-field label,
+.rp-tinig-update-form .rp-field label {
+  color: var(--rp-color-ink);
+  font-weight: 700;
+}
+
+.rp-tinig-form input[type="checkbox"] {
+  accent-color: var(--rp-color-green);
+  margin-right: 8px;
+}
+
+.rp-tinig-form input[type="file"] {
+  background: var(--rp-color-soft);
+  border: 1px dashed var(--rp-color-border);
+  border-radius: var(--rp-radius);
+  cursor: pointer;
+  padding: 14px;
+  width: 100%;
+}
+
+.rp-tinig-honeypot {
+  height: 1px;
+  left: -9999px;
+  overflow: hidden;
+  position: absolute;
+  top: auto;
+  width: 1px;
+}
+
+.rp-tinig-privacy {
+  background: #eef7f2;
+  border: 1px solid #c9e4d5;
+  border-left: 5px solid var(--rp-color-green);
+  border-radius: var(--rp-radius);
+  color: var(--rp-color-ink);
+  padding: 18px 20px;
+}
+
+.rp-tinig-privacy p {
+  margin-bottom: 0;
+}
+
+.rp-tinig-dashboard .rp-user-mgmt-controls {
+  align-items: flex-end;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(180px, 1fr) minmax(220px, 1.4fr) auto auto;
+}
+
+.rp-tinig-dashboard .rp-user-mgmt-controls .rp-button {
+  min-height: 46px;
+}
+
+.rp-tinig-table td,
+.rp-tinig-table th {
+  vertical-align: top;
+}
+
+.rp-tinig-table td span {
+  color: var(--rp-color-muted);
+  display: inline-block;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  margin-top: 4px;
+}
+
+.rp-tinig-detail-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1.65fr) minmax(260px, 0.85fr);
+}
+
+.rp-tinig-detail-grid section,
+.rp-tinig-detail-grid aside,
+.rp-tinig-case-detail section {
+  min-width: 0;
+}
+
+.rp-tinig-message {
+  background: var(--rp-color-soft);
+  border: 1px solid var(--rp-color-border);
+  border-radius: var(--rp-radius);
+  margin-top: 16px;
+  padding: 18px;
+}
+
+.rp-tinig-attachments,
+.rp-tinig-notes {
+  margin-left: 0;
+  padding-left: 20px;
+}
+
+.rp-tinig-attachments li,
+.rp-tinig-notes li {
+  margin-bottom: 12px;
+}
+
+.rp-tinig-notes li {
+  border-bottom: 1px solid var(--rp-color-border);
+  padding-bottom: 12px;
+}
+
+.rp-tinig-notes li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.rp-tinig-update-form {
+  background: var(--rp-color-soft);
+  border: 1px solid var(--rp-color-border);
+  border-radius: var(--rp-radius);
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+@media (max-width: 900px) {
+  .rp-tinig-dashboard .rp-user-mgmt-controls,
+  .rp-tinig-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rp-tinig-dashboard .rp-user-mgmt-controls .rp-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .rp-tinig-intro h2 {
+    font-size: clamp(1.8rem, 9vw, 2.35rem);
+  }
+
+  .rp-tinig-privacy,
+  .rp-tinig-message,
+  .rp-tinig-update-form {
+    padding: 16px;
+  }
+
+  .rp-tinig-form input[type="file"] {
+    font-size: 0.92rem;
   }
 }

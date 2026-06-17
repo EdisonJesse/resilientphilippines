@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Resource Hub
  * Description: Custom post types, taxonomies, roles, upload workflow, and catalog shortcodes for the humanitarian resource hub.
- * Version: 1.9.1
+ * Version: 1.9.3
  * Author: ACCORD
  * Text Domain: rp-resource-hub
  */
@@ -11,11 +11,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_RESOURCE_HUB_VERSION', '1.9.1' );
+define( 'RP_RESOURCE_HUB_VERSION', '1.9.3' );
 define( 'RP_RESOURCE_HUB_FILE', __FILE__ );
 define( 'RP_RESOURCE_HUB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_URL', plugin_dir_url( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_MAX_UPLOAD_BYTES', 25 * 1024 * 1024 );
+define( 'RP_TINIG_NOTIFICATION_EMAIL', 'tinig@accord.org.ph' );
+define( 'RP_TINIG_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
+define( 'RP_TINIG_MAX_ATTACHMENTS', 5 );
 
 function rp_resource_hub_register_post_types() {
 	$shared_args = array(
@@ -223,6 +226,7 @@ function rp_resource_hub_admin_caps() {
 		'delete_others_rp_sitreps',
 		'edit_private_rp_sitreps',
 		'edit_published_rp_sitreps',
+		'manage_tinig_cases',
 	);
 }
 
@@ -363,9 +367,70 @@ function rp_resource_hub_create_analytics_tables() {
 	dbDelta( $sql_downloads );
 }
 
+function rp_resource_hub_create_tinig_tables() {
+	global $wpdb;
+	$charset_collate = $wpdb->get_charset_collate();
+	$cases_table     = $wpdb->prefix . 'rp_tinig_cases';
+	$notes_table     = $wpdb->prefix . 'rp_tinig_case_notes';
+
+	$sql_cases = "CREATE TABLE $cases_table (
+		id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+		reference_code VARCHAR(32) NOT NULL DEFAULT '',
+		submitted_at DATETIME NOT NULL,
+		updated_at DATETIME NOT NULL,
+		status VARCHAR(30) NOT NULL DEFAULT 'new',
+		feedback_type VARCHAR(60) NOT NULL DEFAULT '',
+		urgency VARCHAR(30) NOT NULL DEFAULT 'normal',
+		is_sensitive TINYINT(1) NOT NULL DEFAULT 0,
+		is_anonymous TINYINT(1) NOT NULL DEFAULT 0,
+		safe_to_contact TINYINT(1) NOT NULL DEFAULT 0,
+		contact_name VARCHAR(190) DEFAULT '',
+		contact_email VARCHAR(190) DEFAULT '',
+		contact_phone VARCHAR(80) DEFAULT '',
+		preferred_contact VARCHAR(30) DEFAULT '',
+		location VARCHAR(190) DEFAULT '',
+		program VARCHAR(190) DEFAULT '',
+		subject VARCHAR(190) DEFAULT '',
+		message LONGTEXT NOT NULL,
+		attachment_ids TEXT DEFAULT NULL,
+		consent TINYINT(1) NOT NULL DEFAULT 0,
+		ip_address VARCHAR(45) DEFAULT '',
+		user_agent TEXT DEFAULT NULL,
+		last_updated_by BIGINT(20) UNSIGNED DEFAULT NULL,
+		resolution_summary TEXT DEFAULT NULL,
+		PRIMARY KEY (id),
+		UNIQUE KEY reference_code (reference_code),
+		KEY status (status),
+		KEY feedback_type (feedback_type),
+		KEY submitted_at (submitted_at)
+	) $charset_collate;";
+
+	$sql_notes = "CREATE TABLE $notes_table (
+		id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+		case_id BIGINT(20) UNSIGNED NOT NULL,
+		user_id BIGINT(20) UNSIGNED DEFAULT NULL,
+		note_type VARCHAR(30) NOT NULL DEFAULT 'internal',
+		old_status VARCHAR(30) DEFAULT '',
+		new_status VARCHAR(30) DEFAULT '',
+		note LONGTEXT NOT NULL,
+		created_at DATETIME NOT NULL,
+		PRIMARY KEY (id),
+		KEY case_id (case_id),
+		KEY user_id (user_id),
+		KEY created_at (created_at)
+	) $charset_collate;";
+
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+	dbDelta( $sql_cases );
+	dbDelta( $sql_notes );
+}
+
 function rp_resource_hub_maybe_upgrade() {
+	$tinig_page           = get_page_by_path( 'tinig' );
+	$tinig_dashboard_page = get_page_by_path( 'tinig-dashboard' );
+
 	// Fallback: Ensure required pages are created if missing
-	if ( ! get_page_by_path( 'my-contributions' ) || ! get_page_by_path( 'news-stories' ) || ! get_page_by_path( 'submit-post' ) ) {
+	if ( ! get_page_by_path( 'my-contributions' ) || ! get_page_by_path( 'news-stories' ) || ! get_page_by_path( 'submit-post' ) || ! $tinig_page || false === strpos( $tinig_page->post_content, '[rp_tinig_form]' ) || ! $tinig_dashboard_page || false === strpos( $tinig_dashboard_page->post_content, '[rp_tinig_dashboard]' ) ) {
 		rp_resource_hub_create_pages();
 		flush_rewrite_rules();
 	}
@@ -376,6 +441,7 @@ function rp_resource_hub_maybe_upgrade() {
 
 	rp_resource_hub_create_db_table();
 	rp_resource_hub_create_analytics_tables();
+	rp_resource_hub_create_tinig_tables();
 	rp_resource_hub_apply_roles_and_caps();
 	rp_resource_hub_seed_terms();
 	rp_resource_hub_create_pages();
@@ -389,6 +455,7 @@ function rp_resource_hub_activate() {
 	rp_resource_hub_register_taxonomies();
 	rp_resource_hub_create_db_table();
 	rp_resource_hub_create_analytics_tables();
+	rp_resource_hub_create_tinig_tables();
 	rp_resource_hub_apply_roles_and_caps();
 	rp_resource_hub_seed_terms();
 	rp_resource_hub_create_pages();
@@ -600,10 +667,27 @@ function rp_resource_hub_create_pages() {
 			'title'   => __( 'Submit Post or Story', 'rp-resource-hub' ),
 			'content' => '[rp_submit_post_form]',
 		),
+		'tinig' => array(
+			'title'   => __( 'Tinig', 'rp-resource-hub' ),
+			'content' => '[rp_tinig_form]',
+		),
+		'tinig-dashboard' => array(
+			'title'   => __( 'Tinig Dashboard', 'rp-resource-hub' ),
+			'content' => '[rp_tinig_dashboard]',
+		),
 	);
 
 	foreach ( $pages as $slug => $page ) {
 		if ( get_page_by_path( $slug ) ) {
+			$existing_page = get_page_by_path( $slug );
+			if ( in_array( $slug, array( 'tinig', 'tinig-dashboard' ), true ) && false === strpos( $existing_page->post_content, $page['content'] ) ) {
+				wp_update_post(
+					array(
+						'ID'           => $existing_page->ID,
+						'post_content' => $page['content'],
+					)
+				);
+			}
 			continue;
 		}
 
@@ -1034,6 +1118,863 @@ function rp_resource_hub_secure_upload_dir( $uploads ) {
 	$uploads['path']   = $uploads['basedir'] . $subdir;
 	$uploads['url']    = $uploads['baseurl'] . $subdir;
 	return $uploads;
+}
+
+function rp_tinig_user_can_manage() {
+	return is_user_logged_in() && ( current_user_can( 'manage_tinig_cases' ) || current_user_can( 'manage_options' ) );
+}
+
+function rp_tinig_feedback_type_options() {
+	return array(
+		'general_feedback' => __( 'General feedback', 'rp-resource-hub' ),
+		'complaint'        => __( 'Complaint', 'rp-resource-hub' ),
+		'suggestion'       => __( 'Suggestion', 'rp-resource-hub' ),
+		'information'      => __( 'Request for information', 'rp-resource-hub' ),
+		'safeguarding'     => __( 'Safeguarding/protection concern', 'rp-resource-hub' ),
+		'fraud_corruption' => __( 'Corruption/fraud concern', 'rp-resource-hub' ),
+		'data_privacy'     => __( 'Data privacy concern', 'rp-resource-hub' ),
+	);
+}
+
+function rp_tinig_status_options() {
+	return array(
+		'new'          => __( 'New', 'rp-resource-hub' ),
+		'triaged'      => __( 'Triaged', 'rp-resource-hub' ),
+		'in_review'    => __( 'In Review', 'rp-resource-hub' ),
+		'referred'     => __( 'Referred', 'rp-resource-hub' ),
+		'action_taken' => __( 'Action Taken', 'rp-resource-hub' ),
+		'resolved'     => __( 'Resolved', 'rp-resource-hub' ),
+		'closed'       => __( 'Closed', 'rp-resource-hub' ),
+	);
+}
+
+function rp_tinig_urgency_options() {
+	return array(
+		'normal' => __( 'Normal', 'rp-resource-hub' ),
+		'high'   => __( 'High', 'rp-resource-hub' ),
+		'urgent' => __( 'Urgent / sensitive', 'rp-resource-hub' ),
+	);
+}
+
+function rp_tinig_allowed_mimes() {
+	return array(
+		'jpg'  => 'image/jpeg',
+		'jpeg' => 'image/jpeg',
+		'png'  => 'image/png',
+		'gif'  => 'image/gif',
+		'webp' => 'image/webp',
+		'pdf'  => 'application/pdf',
+		'doc'  => 'application/msword',
+		'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		'xls'  => 'application/vnd.ms-excel',
+		'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		'txt'  => 'text/plain',
+		'zip'  => 'application/zip',
+	);
+}
+
+function rp_tinig_upload_dir( $uploads ) {
+	$subdir = '/rp-secure/tinig';
+	$uploads['subdir'] = $subdir;
+	$uploads['path']   = $uploads['basedir'] . $subdir;
+	$uploads['url']    = $uploads['baseurl'] . $subdir;
+	return $uploads;
+}
+
+function rp_tinig_protect_upload_dir() {
+	$uploads = wp_get_upload_dir();
+	$dirs    = array(
+		$uploads['basedir'] . '/rp-secure',
+		$uploads['basedir'] . '/rp-secure/tinig',
+	);
+
+	foreach ( $dirs as $dir ) {
+		if ( ! wp_mkdir_p( $dir ) || ! wp_is_writable( $dir ) ) {
+			continue;
+		}
+
+		$index_file = trailingslashit( $dir ) . 'index.php';
+		if ( ! file_exists( $index_file ) ) {
+			file_put_contents( $index_file, "<?php\n// Silence is golden.\n" );
+		}
+
+		$htaccess_file = trailingslashit( $dir ) . '.htaccess';
+		if ( ! file_exists( $htaccess_file ) ) {
+			file_put_contents(
+				$htaccess_file,
+				"Options -Indexes\n<IfModule mod_authz_core.c>\nRequire all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\nDeny from all\n</IfModule>\n"
+			);
+		}
+	}
+}
+
+function rp_tinig_normalize_files( $field ) {
+	if ( empty( $_FILES[ $field ] ) || empty( $_FILES[ $field ]['name'] ) ) {
+		return array();
+	}
+
+	$files = $_FILES[ $field ];
+	if ( ! is_array( $files['name'] ) ) {
+		return array( $files );
+	}
+
+	$normalized = array();
+	foreach ( $files['name'] as $index => $name ) {
+		if ( '' === $name ) {
+			continue;
+		}
+
+		$normalized[] = array(
+			'name'     => $files['name'][ $index ],
+			'type'     => $files['type'][ $index ],
+			'tmp_name' => $files['tmp_name'][ $index ],
+			'error'    => $files['error'][ $index ],
+			'size'     => $files['size'][ $index ],
+		);
+	}
+
+	return $normalized;
+}
+
+function rp_tinig_validate_files( $files ) {
+	if ( count( $files ) > RP_TINIG_MAX_ATTACHMENTS ) {
+		return new WP_Error(
+			'rp_tinig_too_many_files',
+			sprintf(
+				/* translators: %d: maximum number of attachments */
+				__( 'Please upload no more than %d evidence files.', 'rp-resource-hub' ),
+				RP_TINIG_MAX_ATTACHMENTS
+			)
+		);
+	}
+
+	foreach ( $files as $file ) {
+		if ( ! empty( $file['error'] ) ) {
+			return new WP_Error( 'rp_tinig_upload_error', __( 'One of the evidence files could not be uploaded. Please try again.', 'rp-resource-hub' ) );
+		}
+
+		if ( empty( $file['size'] ) || RP_TINIG_MAX_ATTACHMENT_BYTES < (int) $file['size'] ) {
+			return new WP_Error(
+				'rp_tinig_file_size',
+				sprintf(
+					/* translators: %s: maximum upload size */
+					__( 'Each evidence file must be %s or smaller.', 'rp-resource-hub' ),
+					rp_resource_hub_format_bytes( RP_TINIG_MAX_ATTACHMENT_BYTES )
+				)
+			);
+		}
+
+		$file_type = wp_check_filetype_and_ext( $file['tmp_name'], $file['name'], rp_tinig_allowed_mimes() );
+		if ( empty( $file_type['ext'] ) || empty( $file_type['type'] ) ) {
+			return new WP_Error( 'rp_tinig_file_type', __( 'Evidence files may be images, PDF, Word, Excel, text, or ZIP files only.', 'rp-resource-hub' ) );
+		}
+	}
+
+	return true;
+}
+
+function rp_tinig_get_case( $case_id ) {
+	global $wpdb;
+	$table = $wpdb->prefix . 'rp_tinig_cases';
+	return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE id = %d", absint( $case_id ) ) );
+}
+
+function rp_tinig_notify_new_case( $case_id ) {
+	$case = rp_tinig_get_case( $case_id );
+	if ( ! $case || ! is_email( RP_TINIG_NOTIFICATION_EMAIL ) ) {
+		return false;
+	}
+
+	$type_options = rp_tinig_feedback_type_options();
+	$dashboard    = add_query_arg( 'case', absint( $case_id ), home_url( '/tinig-dashboard/' ) );
+	$subject      = sprintf( __( 'New Tinig case received: %s', 'rp-resource-hub' ), $case->reference_code );
+	$attachments  = json_decode( (string) $case->attachment_ids, true );
+	$count        = is_array( $attachments ) ? count( $attachments ) : 0;
+	$message      = sprintf(
+		/* translators: 1: reference code, 2: feedback type, 3: urgency, 4: submitted date, 5: contact status, 6: attachment count, 7: dashboard URL */
+		__( "A new Tinig feedback/accountability case has been submitted.\n\nReference: %1\$s\nType: %2\$s\nUrgency: %3\$s\nSubmitted: %4\$s\nContact available: %5\$s\nEvidence files: %6\$d\n\nFor privacy and safety, full details are not included in this email. Log in to review the case:\n%7\$s", 'rp-resource-hub' ),
+		$case->reference_code,
+		isset( $type_options[ $case->feedback_type ] ) ? $type_options[ $case->feedback_type ] : $case->feedback_type,
+		$case->urgency,
+		$case->submitted_at,
+		$case->safe_to_contact ? __( 'Yes', 'rp-resource-hub' ) : __( 'No/anonymous', 'rp-resource-hub' ),
+		$count,
+		$dashboard
+	);
+
+	return wp_mail( RP_TINIG_NOTIFICATION_EMAIL, $subject, $message );
+}
+
+function rp_tinig_process_submission() {
+	if ( 'POST' !== $_SERVER['REQUEST_METHOD'] || empty( $_POST['rp_tinig_nonce'] ) ) {
+		return null;
+	}
+
+	if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['rp_tinig_nonce'] ) ), 'rp_tinig_submit' ) ) {
+		return new WP_Error( 'rp_tinig_nonce', __( 'Security check failed. Please refresh and try again.', 'rp-resource-hub' ) );
+	}
+
+	if ( ! empty( $_POST['rp_tinig_website'] ) ) {
+		return new WP_Error( 'rp_tinig_spam', __( 'Submission could not be accepted.', 'rp-resource-hub' ) );
+	}
+
+	if ( empty( $_POST['rp_tinig_consent'] ) || '1' !== $_POST['rp_tinig_consent'] ) {
+		return new WP_Error( 'rp_tinig_consent', __( 'Please confirm the privacy notice before submitting.', 'rp-resource-hub' ) );
+	}
+
+	$type_options    = rp_tinig_feedback_type_options();
+	$urgency_options = rp_tinig_urgency_options();
+	$feedback_type   = isset( $_POST['rp_tinig_type'] ) ? sanitize_key( wp_unslash( $_POST['rp_tinig_type'] ) ) : '';
+	$urgency         = isset( $_POST['rp_tinig_urgency'] ) ? sanitize_key( wp_unslash( $_POST['rp_tinig_urgency'] ) ) : 'normal';
+	$is_anonymous    = ! empty( $_POST['rp_tinig_anonymous'] ) ? 1 : 0;
+	$safe_to_contact = ! empty( $_POST['rp_tinig_safe_contact'] ) ? 1 : 0;
+	$message         = isset( $_POST['rp_tinig_message'] ) ? wp_kses_post( wp_unslash( $_POST['rp_tinig_message'] ) ) : '';
+
+	if ( ! isset( $type_options[ $feedback_type ] ) ) {
+		return new WP_Error( 'rp_tinig_type', __( 'Please choose a feedback type.', 'rp-resource-hub' ) );
+	}
+
+	if ( ! isset( $urgency_options[ $urgency ] ) ) {
+		$urgency = 'normal';
+	}
+
+	if ( '' === trim( wp_strip_all_tags( $message ) ) ) {
+		return new WP_Error( 'rp_tinig_message', __( 'Please describe your feedback, concern, or complaint.', 'rp-resource-hub' ) );
+	}
+
+	$files = rp_tinig_normalize_files( 'rp_tinig_files' );
+	$file_validation = rp_tinig_validate_files( $files );
+	if ( is_wp_error( $file_validation ) ) {
+		return $file_validation;
+	}
+
+	$contact_name      = $is_anonymous ? '' : ( isset( $_POST['rp_tinig_name'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_tinig_name'] ) ) : '' );
+	$contact_email     = $is_anonymous ? '' : ( isset( $_POST['rp_tinig_email'] ) ? sanitize_email( wp_unslash( $_POST['rp_tinig_email'] ) ) : '' );
+	$contact_phone     = $is_anonymous ? '' : ( isset( $_POST['rp_tinig_phone'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_tinig_phone'] ) ) : '' );
+	$preferred_contact = $is_anonymous ? '' : ( isset( $_POST['rp_tinig_preferred_contact'] ) ? sanitize_key( wp_unslash( $_POST['rp_tinig_preferred_contact'] ) ) : '' );
+	$location          = isset( $_POST['rp_tinig_location'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_tinig_location'] ) ) : '';
+	$program           = isset( $_POST['rp_tinig_program'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_tinig_program'] ) ) : '';
+	$subject           = isset( $_POST['rp_tinig_subject'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_tinig_subject'] ) ) : '';
+	$is_sensitive      = in_array( $feedback_type, array( 'safeguarding', 'fraud_corruption', 'data_privacy' ), true ) || 'urgent' === $urgency ? 1 : 0;
+
+	if ( $contact_email && ! is_email( $contact_email ) ) {
+		return new WP_Error( 'rp_tinig_email', __( 'Please enter a valid email address or leave it blank.', 'rp-resource-hub' ) );
+	}
+
+	global $wpdb;
+	$table = $wpdb->prefix . 'rp_tinig_cases';
+	$now   = current_time( 'mysql' );
+
+	$inserted = $wpdb->insert(
+		$table,
+		array(
+			'submitted_at'      => $now,
+			'updated_at'        => $now,
+			'status'            => 'new',
+			'feedback_type'     => $feedback_type,
+			'urgency'           => $urgency,
+			'is_sensitive'      => $is_sensitive,
+			'is_anonymous'      => $is_anonymous,
+			'safe_to_contact'   => $safe_to_contact,
+			'contact_name'      => $contact_name,
+			'contact_email'     => $contact_email,
+			'contact_phone'     => $contact_phone,
+			'preferred_contact' => $preferred_contact,
+			'location'          => $location,
+			'program'           => $program,
+			'subject'           => $subject,
+			'message'           => $message,
+			'attachment_ids'    => wp_json_encode( array() ),
+			'consent'           => 1,
+			'ip_address'        => rp_resource_hub_get_ip(),
+			'user_agent'        => isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '',
+		),
+		array( '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s' )
+	);
+
+	if ( ! $inserted ) {
+		return new WP_Error( 'rp_tinig_db', __( 'The case could not be saved. Please try again.', 'rp-resource-hub' ) );
+	}
+
+	$case_id        = absint( $wpdb->insert_id );
+	$reference_code = 'TINIG-' . gmdate( 'Y' ) . '-' . str_pad( (string) $case_id, 5, '0', STR_PAD_LEFT );
+	$attachment_ids = array();
+
+	$wpdb->update(
+		$table,
+		array( 'reference_code' => $reference_code ),
+		array( 'id' => $case_id ),
+		array( '%s' ),
+		array( '%d' )
+	);
+
+	if ( ! empty( $files ) ) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		rp_tinig_protect_upload_dir();
+
+		foreach ( $files as $index => $file ) {
+			$key = 'rp_tinig_file_' . $index;
+			$_FILES[ $key ] = $file;
+			$_FILES[ $key ]['name'] = sanitize_file_name( $file['name'] );
+
+			add_filter( 'upload_dir', 'rp_tinig_upload_dir' );
+			$attachment_id = media_handle_upload( $key, 0 );
+			remove_filter( 'upload_dir', 'rp_tinig_upload_dir' );
+
+			unset( $_FILES[ $key ] );
+
+			if ( is_wp_error( $attachment_id ) ) {
+				rp_tinig_add_case_note( $case_id, 0, 'system', '', '', sprintf( 'Attachment upload failed: %s', $file['name'] ) );
+				continue;
+			}
+
+			update_post_meta( $attachment_id, '_rp_tinig_case_id', $case_id );
+			$attachment_ids[] = absint( $attachment_id );
+		}
+
+		$wpdb->update(
+			$table,
+			array( 'attachment_ids' => wp_json_encode( $attachment_ids ) ),
+			array( 'id' => $case_id ),
+			array( '%s' ),
+			array( '%d' )
+		);
+	}
+
+	rp_tinig_add_case_note( $case_id, 0, 'system', '', 'new', __( 'Case submitted through the public Tinig form.', 'rp-resource-hub' ) );
+	rp_tinig_notify_new_case( $case_id );
+
+	return array(
+		'case_id'        => $case_id,
+		'reference_code' => $reference_code,
+	);
+}
+
+function rp_tinig_add_case_note( $case_id, $user_id, $note_type, $old_status, $new_status, $note ) {
+	global $wpdb;
+	$table = $wpdb->prefix . 'rp_tinig_case_notes';
+	return $wpdb->insert(
+		$table,
+		array(
+			'case_id'    => absint( $case_id ),
+			'user_id'    => absint( $user_id ),
+			'note_type'  => sanitize_key( $note_type ),
+			'old_status' => sanitize_key( $old_status ),
+			'new_status' => sanitize_key( $new_status ),
+			'note'       => wp_kses_post( $note ),
+			'created_at' => current_time( 'mysql' ),
+		),
+		array( '%d', '%d', '%s', '%s', '%s', '%s', '%s' )
+	);
+}
+
+function rp_tinig_handle_submit() {
+	$result = rp_tinig_process_submission();
+	$redirect = wp_get_referer() ? wp_get_referer() : home_url( '/tinig/' );
+
+	if ( is_wp_error( $result ) ) {
+		$notice_key = rp_resource_hub_store_upload_notice( 'error', $result->get_error_message() );
+		wp_safe_redirect( add_query_arg( 'rp_tinig_notice', $notice_key, $redirect ) );
+		exit;
+	}
+
+	if ( empty( $result['reference_code'] ) ) {
+		$notice_key = rp_resource_hub_store_upload_notice( 'error', __( 'Submission could not be processed. Please try again.', 'rp-resource-hub' ) );
+		wp_safe_redirect( add_query_arg( 'rp_tinig_notice', $notice_key, $redirect ) );
+		exit;
+	}
+
+	wp_safe_redirect( add_query_arg( 'tinig_ref', rawurlencode( $result['reference_code'] ), home_url( '/tinig/' ) ) );
+	exit;
+}
+add_action( 'admin_post_rp_tinig_submit', 'rp_tinig_handle_submit' );
+add_action( 'admin_post_nopriv_rp_tinig_submit', 'rp_tinig_handle_submit' );
+
+function rp_tinig_form_shortcode() {
+	$notice = null;
+	if ( ! empty( $_GET['rp_tinig_notice'] ) ) {
+		$key = sanitize_text_field( wp_unslash( $_GET['rp_tinig_notice'] ) );
+		$notice = get_transient( 'rp_resource_upload_notice_' . $key );
+		delete_transient( 'rp_resource_upload_notice_' . $key );
+	}
+
+	$submitted_ref = isset( $_GET['tinig_ref'] ) ? sanitize_text_field( wp_unslash( $_GET['tinig_ref'] ) ) : '';
+	$type_options  = rp_tinig_feedback_type_options();
+	$urgencies     = rp_tinig_urgency_options();
+
+	ob_start();
+	?>
+	<div class="rp-tinig-shell">
+		<div class="rp-tinig-intro">
+			<p class="rp-eyebrow"><?php esc_html_e( 'Feedback and Accountability Mechanism', 'rp-resource-hub' ); ?></p>
+			<h2><?php esc_html_e( 'Tinig: Your voice matters', 'rp-resource-hub' ); ?></h2>
+			<p><?php esc_html_e( 'Use this channel to share feedback, complaints, suggestions, requests for information, or accountability concerns related to ACCORD programs and services.', 'rp-resource-hub' ); ?></p>
+		</div>
+
+		<?php if ( $submitted_ref ) : ?>
+			<div class="rp-notice rp-notice-success">
+				<strong><?php esc_html_e( 'Thank you. Your Tinig submission has been received.', 'rp-resource-hub' ); ?></strong>
+				<p><?php echo esc_html( sprintf( __( 'Your reference code is %s. Please keep this code for follow-up.', 'rp-resource-hub' ), $submitted_ref ) ); ?></p>
+			</div>
+		<?php endif; ?>
+
+		<?php if ( is_array( $notice ) && ! empty( $notice['message'] ) ) : ?>
+			<div class="rp-notice rp-notice-<?php echo esc_attr( $notice['type'] ); ?>"><?php echo esc_html( $notice['message'] ); ?></div>
+		<?php endif; ?>
+
+		<form class="rp-upload-form rp-tinig-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" enctype="multipart/form-data">
+			<input type="hidden" name="action" value="rp_tinig_submit">
+			<?php wp_nonce_field( 'rp_tinig_submit', 'rp_tinig_nonce' ); ?>
+			<div class="rp-tinig-honeypot" aria-hidden="true">
+				<label for="rp_tinig_website"><?php esc_html_e( 'Website', 'rp-resource-hub' ); ?></label>
+				<input type="text" id="rp_tinig_website" name="rp_tinig_website" tabindex="-1" autocomplete="off">
+			</div>
+
+			<div class="rp-tinig-privacy">
+				<strong><?php esc_html_e( 'Privacy and safety notice', 'rp-resource-hub' ); ?></strong>
+				<p><?php esc_html_e( 'You may submit anonymously. If you provide contact details, ACCORD will use them only to acknowledge, verify, or follow up on your concern. Sensitive reports are reviewed through restricted staff access.', 'rp-resource-hub' ); ?></p>
+			</div>
+
+			<div class="rp-field">
+				<label for="rp_tinig_type"><?php esc_html_e( 'Feedback type', 'rp-resource-hub' ); ?> <span aria-hidden="true">*</span></label>
+				<select id="rp_tinig_type" name="rp_tinig_type" required>
+					<option value=""><?php esc_html_e( 'Choose one', 'rp-resource-hub' ); ?></option>
+					<?php foreach ( $type_options as $value => $label ) : ?>
+						<option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+
+			<div class="rp-field">
+				<label for="rp_tinig_urgency"><?php esc_html_e( 'Urgency', 'rp-resource-hub' ); ?></label>
+				<select id="rp_tinig_urgency" name="rp_tinig_urgency">
+					<?php foreach ( $urgencies as $value => $label ) : ?>
+						<option value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+
+			<div class="rp-field">
+				<label for="rp_tinig_subject"><?php esc_html_e( 'Short subject', 'rp-resource-hub' ); ?></label>
+				<input type="text" id="rp_tinig_subject" name="rp_tinig_subject" maxlength="190">
+			</div>
+
+			<div class="rp-field">
+				<label for="rp_tinig_message"><?php esc_html_e( 'Details', 'rp-resource-hub' ); ?> <span aria-hidden="true">*</span></label>
+				<textarea id="rp_tinig_message" name="rp_tinig_message" rows="8" required></textarea>
+			</div>
+
+			<div class="rp-auth-row">
+				<div class="rp-field">
+					<label for="rp_tinig_location"><?php esc_html_e( 'Location/community', 'rp-resource-hub' ); ?></label>
+					<input type="text" id="rp_tinig_location" name="rp_tinig_location" maxlength="190">
+				</div>
+				<div class="rp-field">
+					<label for="rp_tinig_program"><?php esc_html_e( 'Related project/program', 'rp-resource-hub' ); ?></label>
+					<input type="text" id="rp_tinig_program" name="rp_tinig_program" maxlength="190">
+				</div>
+			</div>
+
+			<div class="rp-field">
+				<label><input type="checkbox" name="rp_tinig_anonymous" value="1"> <?php esc_html_e( 'Submit anonymously', 'rp-resource-hub' ); ?></label>
+			</div>
+
+			<div class="rp-auth-row">
+				<div class="rp-field">
+					<label for="rp_tinig_name"><?php esc_html_e( 'Name', 'rp-resource-hub' ); ?></label>
+					<input type="text" id="rp_tinig_name" name="rp_tinig_name" maxlength="190">
+				</div>
+				<div class="rp-field">
+					<label for="rp_tinig_email"><?php esc_html_e( 'Email', 'rp-resource-hub' ); ?></label>
+					<input type="email" id="rp_tinig_email" name="rp_tinig_email" maxlength="190">
+				</div>
+			</div>
+
+			<div class="rp-auth-row">
+				<div class="rp-field">
+					<label for="rp_tinig_phone"><?php esc_html_e( 'Phone', 'rp-resource-hub' ); ?></label>
+					<input type="text" id="rp_tinig_phone" name="rp_tinig_phone" maxlength="80">
+				</div>
+				<div class="rp-field">
+					<label for="rp_tinig_preferred_contact"><?php esc_html_e( 'Preferred contact method', 'rp-resource-hub' ); ?></label>
+					<select id="rp_tinig_preferred_contact" name="rp_tinig_preferred_contact">
+						<option value=""><?php esc_html_e( 'No preference', 'rp-resource-hub' ); ?></option>
+						<option value="email"><?php esc_html_e( 'Email', 'rp-resource-hub' ); ?></option>
+						<option value="phone"><?php esc_html_e( 'Phone', 'rp-resource-hub' ); ?></option>
+					</select>
+				</div>
+			</div>
+
+			<div class="rp-field">
+				<label><input type="checkbox" name="rp_tinig_safe_contact" value="1"> <?php esc_html_e( 'It is safe for ACCORD to contact me using the details I provided.', 'rp-resource-hub' ); ?></label>
+			</div>
+
+			<div class="rp-field">
+				<label for="rp_tinig_files"><?php esc_html_e( 'Evidence/proof attachments', 'rp-resource-hub' ); ?></label>
+				<input type="file" id="rp_tinig_files" name="rp_tinig_files[]" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip">
+				<p class="rp-field-help"><?php echo esc_html( sprintf( __( 'Optional. You may upload up to %1$d files. Each file must be %2$s or smaller.', 'rp-resource-hub' ), RP_TINIG_MAX_ATTACHMENTS, rp_resource_hub_format_bytes( RP_TINIG_MAX_ATTACHMENT_BYTES ) ) ); ?></p>
+			</div>
+
+			<div class="rp-field">
+				<label><input type="checkbox" name="rp_tinig_consent" value="1" required> <?php esc_html_e( 'I understand and agree that ACCORD may process this submission for feedback, accountability, safeguarding, and follow-up purposes.', 'rp-resource-hub' ); ?></label>
+			</div>
+
+			<button type="submit"><?php esc_html_e( 'Submit to Tinig', 'rp-resource-hub' ); ?></button>
+		</form>
+	</div>
+	<?php
+	return ob_get_clean();
+}
+add_shortcode( 'rp_tinig_form', 'rp_tinig_form_shortcode' );
+
+function rp_tinig_handle_case_update() {
+	if ( ! rp_tinig_user_can_manage() ) {
+		auth_redirect();
+	}
+
+	$case_id = isset( $_POST['case_id'] ) ? absint( $_POST['case_id'] ) : 0;
+	if ( ! $case_id || empty( $_POST['rp_tinig_case_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['rp_tinig_case_nonce'] ) ), 'rp_tinig_update_case_' . $case_id ) ) {
+		wp_die( esc_html__( 'Security check failed.', 'rp-resource-hub' ), '', array( 'response' => 403 ) );
+	}
+
+	$case = rp_tinig_get_case( $case_id );
+	if ( ! $case ) {
+		wp_die( esc_html__( 'Case not found.', 'rp-resource-hub' ), '', array( 'response' => 404 ) );
+	}
+
+	$statuses = rp_tinig_status_options();
+	$new_status = isset( $_POST['rp_tinig_status'] ) ? sanitize_key( wp_unslash( $_POST['rp_tinig_status'] ) ) : $case->status;
+	if ( ! isset( $statuses[ $new_status ] ) ) {
+		$new_status = $case->status;
+	}
+
+	$resolution = isset( $_POST['rp_tinig_resolution'] ) ? wp_kses_post( wp_unslash( $_POST['rp_tinig_resolution'] ) ) : '';
+	$note       = isset( $_POST['rp_tinig_note'] ) ? wp_kses_post( wp_unslash( $_POST['rp_tinig_note'] ) ) : '';
+
+	global $wpdb;
+	$table = $wpdb->prefix . 'rp_tinig_cases';
+	$wpdb->update(
+		$table,
+		array(
+			'status'             => $new_status,
+			'updated_at'         => current_time( 'mysql' ),
+			'last_updated_by'    => get_current_user_id(),
+			'resolution_summary' => $resolution,
+		),
+		array( 'id' => $case_id ),
+		array( '%s', '%s', '%d', '%s' ),
+		array( '%d' )
+	);
+
+	if ( $new_status !== $case->status || '' !== trim( wp_strip_all_tags( $note ) ) ) {
+		rp_tinig_add_case_note( $case_id, get_current_user_id(), 'internal', $case->status, $new_status, $note ? $note : __( 'Status updated.', 'rp-resource-hub' ) );
+	}
+
+	wp_safe_redirect( add_query_arg( array( 'case' => $case_id, 'updated' => '1' ), home_url( '/tinig-dashboard/' ) ) );
+	exit;
+}
+add_action( 'admin_post_rp_tinig_update_case', 'rp_tinig_handle_case_update' );
+
+function rp_tinig_handle_attachment_download() {
+	if ( ! rp_tinig_user_can_manage() ) {
+		auth_redirect();
+	}
+
+	$attachment_id = isset( $_GET['attachment_id'] ) ? absint( $_GET['attachment_id'] ) : 0;
+	$case_id       = isset( $_GET['case_id'] ) ? absint( $_GET['case_id'] ) : 0;
+	$nonce         = isset( $_GET['_wpnonce'] ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+
+	if ( ! $attachment_id || ! $case_id || ! wp_verify_nonce( $nonce, 'rp_tinig_download_' . $case_id . '_' . $attachment_id ) ) {
+		wp_die( esc_html__( 'Invalid attachment link.', 'rp-resource-hub' ), '', array( 'response' => 403 ) );
+	}
+
+	if ( absint( get_post_meta( $attachment_id, '_rp_tinig_case_id', true ) ) !== $case_id ) {
+		wp_die( esc_html__( 'Attachment does not belong to this case.', 'rp-resource-hub' ), '', array( 'response' => 403 ) );
+	}
+
+	$path = get_attached_file( $attachment_id );
+	if ( ! $path || ! is_readable( $path ) ) {
+		wp_die( esc_html__( 'Attachment not found.', 'rp-resource-hub' ), '', array( 'response' => 404 ) );
+	}
+
+	$real_path = realpath( $path );
+	$uploads   = wp_get_upload_dir();
+	$base_path = realpath( $uploads['basedir'] );
+	if ( ! $real_path || ! $base_path || 0 !== strpos( $real_path, $base_path ) ) {
+		wp_die( esc_html__( 'Invalid attachment path.', 'rp-resource-hub' ), '', array( 'response' => 403 ) );
+	}
+
+	$mime_type = get_post_mime_type( $attachment_id );
+	$filename  = str_replace( array( "\r", "\n", '"' ), '', basename( $real_path ) );
+
+	nocache_headers();
+	header( 'Content-Type: ' . ( $mime_type ? $mime_type : 'application/octet-stream' ) );
+	header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+	header( 'Content-Length: ' . filesize( $real_path ) );
+	readfile( $real_path );
+	exit;
+}
+add_action( 'admin_post_rp_tinig_download_attachment', 'rp_tinig_handle_attachment_download' );
+
+function rp_tinig_handle_export() {
+	if ( ! rp_tinig_user_can_manage() ) {
+		auth_redirect();
+	}
+
+	check_admin_referer( 'rp_tinig_export' );
+
+	global $wpdb;
+	$table = $wpdb->prefix . 'rp_tinig_cases';
+	$cases = $wpdb->get_results( "SELECT id, reference_code, submitted_at, updated_at, status, feedback_type, urgency, is_sensitive, is_anonymous, safe_to_contact, location, program, subject FROM $table ORDER BY submitted_at DESC LIMIT 1000" );
+
+	nocache_headers();
+	header( 'Content-Type: text/csv; charset=utf-8' );
+	header( 'Content-Disposition: attachment; filename="tinig-cases-' . gmdate( 'Y-m-d' ) . '.csv"' );
+
+	$out = fopen( 'php://output', 'w' );
+	fputcsv( $out, array( 'ID', 'Reference', 'Submitted', 'Updated', 'Status', 'Type', 'Urgency', 'Sensitive', 'Anonymous', 'Safe to Contact', 'Location', 'Program', 'Subject' ) );
+	foreach ( $cases as $case ) {
+		fputcsv( $out, array(
+			$case->id,
+			$case->reference_code,
+			$case->submitted_at,
+			$case->updated_at,
+			$case->status,
+			$case->feedback_type,
+			$case->urgency,
+			$case->is_sensitive ? 'yes' : 'no',
+			$case->is_anonymous ? 'yes' : 'no',
+			$case->safe_to_contact ? 'yes' : 'no',
+			$case->location,
+			$case->program,
+			$case->subject,
+		) );
+	}
+	fclose( $out );
+	exit;
+}
+add_action( 'admin_post_rp_tinig_export_cases', 'rp_tinig_handle_export' );
+
+function rp_tinig_dashboard_shortcode() {
+	if ( ! rp_tinig_user_can_manage() ) {
+		return '<div class="rp-empty-state"><p>' . esc_html__( 'You must be authorized to view Tinig cases.', 'rp-resource-hub' ) . '</p><p><a class="rp-button" href="' . esc_url( wp_login_url( home_url( '/tinig-dashboard/' ) ) ) . '">' . esc_html__( 'Log in', 'rp-resource-hub' ) . '</a></p></div>';
+	}
+
+	$case_id = isset( $_GET['case'] ) ? absint( $_GET['case'] ) : 0;
+	return $case_id ? rp_tinig_render_case_detail( $case_id ) : rp_tinig_render_case_list();
+}
+add_shortcode( 'rp_tinig_dashboard', 'rp_tinig_dashboard_shortcode' );
+
+function rp_tinig_render_case_list() {
+	global $wpdb;
+	$table = $wpdb->prefix . 'rp_tinig_cases';
+	$status = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : '';
+	$type   = isset( $_GET['type'] ) ? sanitize_key( wp_unslash( $_GET['type'] ) ) : '';
+	$where  = 'WHERE 1=1';
+	$args   = array();
+
+	if ( $status && isset( rp_tinig_status_options()[ $status ] ) ) {
+		$where .= ' AND status = %s';
+		$args[] = $status;
+	}
+
+	if ( $type && isset( rp_tinig_feedback_type_options()[ $type ] ) ) {
+		$where .= ' AND feedback_type = %s';
+		$args[] = $type;
+	}
+
+	$sql = "SELECT * FROM $table $where ORDER BY submitted_at DESC LIMIT 200";
+	$cases = $args ? $wpdb->get_results( $wpdb->prepare( $sql, $args ) ) : $wpdb->get_results( $sql );
+	$statuses = rp_tinig_status_options();
+	$types = rp_tinig_feedback_type_options();
+	$export_url = wp_nonce_url( admin_url( 'admin-post.php?action=rp_tinig_export_cases' ), 'rp_tinig_export' );
+
+	ob_start();
+	?>
+	<div class="rp-tinig-dashboard">
+		<div class="rp-dashboard-header">
+			<h2 class="rp-dashboard-title"><?php esc_html_e( 'Tinig Dashboard', 'rp-resource-hub' ); ?></h2>
+			<p class="rp-dashboard-subtitle"><?php esc_html_e( 'Restricted case-management view for ACCORD feedback and accountability submissions.', 'rp-resource-hub' ); ?></p>
+		</div>
+		<form class="rp-user-mgmt-controls" method="get">
+			<div class="rp-field">
+				<label for="status"><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></label>
+				<select id="status" name="status">
+					<option value=""><?php esc_html_e( 'All statuses', 'rp-resource-hub' ); ?></option>
+					<?php foreach ( $statuses as $value => $label ) : ?>
+						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $status, $value ); ?>><?php echo esc_html( $label ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+			<div class="rp-field">
+				<label for="type"><?php esc_html_e( 'Type', 'rp-resource-hub' ); ?></label>
+				<select id="type" name="type">
+					<option value=""><?php esc_html_e( 'All types', 'rp-resource-hub' ); ?></option>
+					<?php foreach ( $types as $value => $label ) : ?>
+						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $type, $value ); ?>><?php echo esc_html( $label ); ?></option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+			<button class="rp-button" type="submit"><?php esc_html_e( 'Filter', 'rp-resource-hub' ); ?></button>
+			<a class="rp-button rp-button-secondary" href="<?php echo esc_url( $export_url ); ?>"><?php esc_html_e( 'Export CSV', 'rp-resource-hub' ); ?></a>
+		</form>
+		<div class="rp-moderation-container">
+			<div class="rp-table-responsive">
+				<table class="rp-moderation-table rp-tinig-table">
+					<thead>
+						<tr>
+							<th><?php esc_html_e( 'Reference', 'rp-resource-hub' ); ?></th>
+							<th><?php esc_html_e( 'Type', 'rp-resource-hub' ); ?></th>
+							<th><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></th>
+							<th><?php esc_html_e( 'Submitted', 'rp-resource-hub' ); ?></th>
+							<th><?php esc_html_e( 'Flags', 'rp-resource-hub' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php if ( $cases ) : ?>
+							<?php foreach ( $cases as $case ) : ?>
+								<tr>
+									<td><strong><a href="<?php echo esc_url( add_query_arg( 'case', absint( $case->id ), home_url( '/tinig-dashboard/' ) ) ); ?>"><?php echo esc_html( $case->reference_code ); ?></a></strong><br><span><?php echo esc_html( $case->subject ? $case->subject : wp_trim_words( wp_strip_all_tags( $case->message ), 8 ) ); ?></span></td>
+									<td><?php echo esc_html( isset( $types[ $case->feedback_type ] ) ? $types[ $case->feedback_type ] : $case->feedback_type ); ?></td>
+									<td><span class="rp-status-badge rp-tinig-status-<?php echo esc_attr( $case->status ); ?>"><?php echo esc_html( isset( $statuses[ $case->status ] ) ? $statuses[ $case->status ] : $case->status ); ?></span></td>
+									<td><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $case->submitted_at ) ) ); ?></td>
+									<td>
+										<?php if ( $case->is_sensitive ) : ?><span class="rp-role-badge rp-role-badge-editor"><?php esc_html_e( 'Sensitive', 'rp-resource-hub' ); ?></span><?php endif; ?>
+										<?php if ( $case->is_anonymous ) : ?><span class="rp-role-badge rp-role-badge-subscriber"><?php esc_html_e( 'Anonymous', 'rp-resource-hub' ); ?></span><?php endif; ?>
+									</td>
+								</tr>
+							<?php endforeach; ?>
+						<?php else : ?>
+							<tr><td colspan="5"><?php esc_html_e( 'No Tinig cases found.', 'rp-resource-hub' ); ?></td></tr>
+						<?php endif; ?>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<?php
+	return ob_get_clean();
+}
+
+function rp_tinig_render_case_detail( $case_id ) {
+	global $wpdb;
+	$case = rp_tinig_get_case( $case_id );
+	if ( ! $case ) {
+		return '<div class="rp-empty-state"><p>' . esc_html__( 'Tinig case not found.', 'rp-resource-hub' ) . '</p></div>';
+	}
+
+	$notes_table = $wpdb->prefix . 'rp_tinig_case_notes';
+	$notes = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $notes_table WHERE case_id = %d ORDER BY created_at DESC", $case_id ) );
+	$statuses = rp_tinig_status_options();
+	$types = rp_tinig_feedback_type_options();
+	$attachments = json_decode( (string) $case->attachment_ids, true );
+	$attachments = is_array( $attachments ) ? array_map( 'absint', $attachments ) : array();
+
+	ob_start();
+	?>
+	<div class="rp-tinig-case-detail">
+		<p><a href="<?php echo esc_url( home_url( '/tinig-dashboard/' ) ); ?>">&larr; <?php esc_html_e( 'Back to Tinig Dashboard', 'rp-resource-hub' ); ?></a></p>
+		<div class="rp-moderation-container">
+			<div class="rp-dashboard-header">
+				<h2 class="rp-dashboard-title"><?php echo esc_html( $case->reference_code ); ?></h2>
+				<p class="rp-dashboard-subtitle"><?php echo esc_html( isset( $types[ $case->feedback_type ] ) ? $types[ $case->feedback_type ] : $case->feedback_type ); ?> &middot; <?php echo esc_html( $case->submitted_at ); ?></p>
+			</div>
+			<div class="rp-tinig-detail-grid">
+				<section>
+					<h3><?php esc_html_e( 'Case Details', 'rp-resource-hub' ); ?></h3>
+					<p><strong><?php esc_html_e( 'Subject:', 'rp-resource-hub' ); ?></strong> <?php echo esc_html( $case->subject ? $case->subject : __( 'No subject provided', 'rp-resource-hub' ) ); ?></p>
+					<p><strong><?php esc_html_e( 'Location:', 'rp-resource-hub' ); ?></strong> <?php echo esc_html( $case->location ? $case->location : __( 'Not provided', 'rp-resource-hub' ) ); ?></p>
+					<p><strong><?php esc_html_e( 'Program:', 'rp-resource-hub' ); ?></strong> <?php echo esc_html( $case->program ? $case->program : __( 'Not provided', 'rp-resource-hub' ) ); ?></p>
+					<div class="rp-tinig-message"><?php echo wpautop( wp_kses_post( $case->message ) ); ?></div>
+				</section>
+				<aside>
+					<h3><?php esc_html_e( 'Contact & Flags', 'rp-resource-hub' ); ?></h3>
+					<p><strong><?php esc_html_e( 'Anonymous:', 'rp-resource-hub' ); ?></strong> <?php echo esc_html( $case->is_anonymous ? __( 'Yes', 'rp-resource-hub' ) : __( 'No', 'rp-resource-hub' ) ); ?></p>
+					<p><strong><?php esc_html_e( 'Safe to contact:', 'rp-resource-hub' ); ?></strong> <?php echo esc_html( $case->safe_to_contact ? __( 'Yes', 'rp-resource-hub' ) : __( 'No', 'rp-resource-hub' ) ); ?></p>
+					<?php if ( ! $case->is_anonymous ) : ?>
+						<p><strong><?php esc_html_e( 'Name:', 'rp-resource-hub' ); ?></strong> <?php echo esc_html( $case->contact_name ? $case->contact_name : __( 'Not provided', 'rp-resource-hub' ) ); ?></p>
+						<p><strong><?php esc_html_e( 'Email:', 'rp-resource-hub' ); ?></strong> <?php echo esc_html( $case->contact_email ? $case->contact_email : __( 'Not provided', 'rp-resource-hub' ) ); ?></p>
+						<p><strong><?php esc_html_e( 'Phone:', 'rp-resource-hub' ); ?></strong> <?php echo esc_html( $case->contact_phone ? $case->contact_phone : __( 'Not provided', 'rp-resource-hub' ) ); ?></p>
+					<?php endif; ?>
+					<p><strong><?php esc_html_e( 'Urgency:', 'rp-resource-hub' ); ?></strong> <?php echo esc_html( $case->urgency ); ?></p>
+					<p><strong><?php esc_html_e( 'Sensitive:', 'rp-resource-hub' ); ?></strong> <?php echo esc_html( $case->is_sensitive ? __( 'Yes', 'rp-resource-hub' ) : __( 'No', 'rp-resource-hub' ) ); ?></p>
+				</aside>
+			</div>
+			<section>
+				<h3><?php esc_html_e( 'Evidence Files', 'rp-resource-hub' ); ?></h3>
+				<?php if ( $attachments ) : ?>
+					<ul class="rp-tinig-attachments">
+						<?php foreach ( $attachments as $attachment_id ) : ?>
+							<?php
+							$url = wp_nonce_url(
+								add_query_arg(
+									array(
+										'action'        => 'rp_tinig_download_attachment',
+										'case_id'       => $case_id,
+										'attachment_id' => $attachment_id,
+									),
+									admin_url( 'admin-post.php' )
+								),
+								'rp_tinig_download_' . $case_id . '_' . $attachment_id
+							);
+							?>
+							<li><a href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( get_the_title( $attachment_id ) ? get_the_title( $attachment_id ) : basename( get_attached_file( $attachment_id ) ) ); ?></a></li>
+						<?php endforeach; ?>
+					</ul>
+				<?php else : ?>
+					<p><?php esc_html_e( 'No evidence files were attached.', 'rp-resource-hub' ); ?></p>
+				<?php endif; ?>
+			</section>
+			<section>
+				<h3><?php esc_html_e( 'Update Case', 'rp-resource-hub' ); ?></h3>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="rp-tinig-update-form">
+					<input type="hidden" name="action" value="rp_tinig_update_case">
+					<input type="hidden" name="case_id" value="<?php echo esc_attr( $case_id ); ?>">
+					<?php wp_nonce_field( 'rp_tinig_update_case_' . $case_id, 'rp_tinig_case_nonce' ); ?>
+					<div class="rp-field">
+						<label for="rp_tinig_status"><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></label>
+						<select id="rp_tinig_status" name="rp_tinig_status">
+							<?php foreach ( $statuses as $value => $label ) : ?>
+								<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $case->status, $value ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+					<div class="rp-field">
+						<label for="rp_tinig_note"><?php esc_html_e( 'Internal note', 'rp-resource-hub' ); ?></label>
+						<textarea id="rp_tinig_note" name="rp_tinig_note" rows="4"></textarea>
+					</div>
+					<div class="rp-field">
+						<label for="rp_tinig_resolution"><?php esc_html_e( 'Resolution summary', 'rp-resource-hub' ); ?></label>
+						<textarea id="rp_tinig_resolution" name="rp_tinig_resolution" rows="4"><?php echo esc_textarea( $case->resolution_summary ); ?></textarea>
+					</div>
+					<button class="rp-button" type="submit"><?php esc_html_e( 'Save Case Update', 'rp-resource-hub' ); ?></button>
+				</form>
+			</section>
+			<section>
+				<h3><?php esc_html_e( 'Case Notes', 'rp-resource-hub' ); ?></h3>
+				<?php if ( $notes ) : ?>
+					<ol class="rp-tinig-notes">
+						<?php foreach ( $notes as $note ) : ?>
+							<li>
+								<strong><?php echo esc_html( $note->created_at ); ?></strong>
+								<?php if ( $note->old_status !== $note->new_status && $note->new_status ) : ?>
+									<span><?php echo esc_html( sprintf( __( 'Status: %1$s to %2$s', 'rp-resource-hub' ), $note->old_status ? $note->old_status : __( 'none', 'rp-resource-hub' ), $note->new_status ) ); ?></span>
+								<?php endif; ?>
+								<div><?php echo wpautop( wp_kses_post( $note->note ) ); ?></div>
+							</li>
+						<?php endforeach; ?>
+					</ol>
+				<?php else : ?>
+					<p><?php esc_html_e( 'No notes yet.', 'rp-resource-hub' ); ?></p>
+				<?php endif; ?>
+			</section>
+		</div>
+	</div>
+	<?php
+	return ob_get_clean();
 }
 
 function rp_resource_hub_add_query_vars( $vars ) {
@@ -3131,4 +4072,3 @@ function rp_resource_hub_handle_post_upload() {
 	exit;
 }
 add_action( 'admin_post_rp_post_upload', 'rp_resource_hub_handle_post_upload' );
-
