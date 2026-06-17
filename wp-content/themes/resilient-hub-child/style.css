@@ -468,6 +468,9 @@ img {
   flex-direction: column;
   padding: 24px;
   transition: box-shadow 160ms ease, transform 160ms ease;
+  max-width: 380px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .rp-card:hover,
