@@ -42,6 +42,22 @@ function rp_child_enqueue_assets() {
 	);
 
 	wp_enqueue_script(
+		'rp-pwa',
+		get_stylesheet_directory_uri() . '/assets/js/pwa.js',
+		array(),
+		wp_get_theme()->get( 'Version' ),
+		true
+	);
+
+	wp_localize_script(
+		'rp-pwa',
+		'rpPwa',
+		array(
+			'serviceWorkerUrl' => home_url( '/rp-service-worker.js' ),
+		)
+	);
+
+	wp_enqueue_script(
 		'rp-catalog-ajax',
 		get_stylesheet_directory_uri() . '/assets/js/catalog-ajax.js',
 		array(),
@@ -75,6 +91,195 @@ function rp_child_enqueue_assets() {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'rp_child_enqueue_assets', 20 );
+
+function rp_child_pwa_head_tags() {
+	$theme_url = trailingslashit( get_stylesheet_directory_uri() );
+	?>
+	<link rel="manifest" href="<?php echo esc_url( home_url( '/rp-manifest.webmanifest' ) ); ?>">
+	<meta name="theme-color" content="#176b52">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-title" content="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+	<meta name="apple-mobile-web-app-status-bar-style" content="default">
+	<link rel="apple-touch-icon" href="<?php echo esc_url( $theme_url . 'assets/images/pwa-apple-touch-icon.png' ); ?>">
+	<?php
+}
+add_action( 'wp_head', 'rp_child_pwa_head_tags', 5 );
+
+function rp_child_is_pwa_endpoint( $filename ) {
+	$request_path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH ) : '';
+	$target_path  = wp_parse_url( home_url( '/' . ltrim( $filename, '/' ) ), PHP_URL_PATH );
+
+	return untrailingslashit( (string) $request_path ) === untrailingslashit( (string) $target_path );
+}
+
+function rp_child_serve_pwa_endpoints() {
+	if ( rp_child_is_pwa_endpoint( 'rp-manifest.webmanifest' ) ) {
+		$theme_url = trailingslashit( get_stylesheet_directory_uri() );
+		$manifest  = array(
+			'id'               => home_url( '/' ),
+			'name'             => __( 'ACCORD Resilience Hub', 'resilient-hub' ),
+			'short_name'       => __( 'ACCORD Hub', 'resilient-hub' ),
+			'description'      => __( 'Installable mobile access to ACCORD resources, stories, and situation reports.', 'resilient-hub' ),
+			'start_url'        => home_url( '/' ),
+			'scope'            => home_url( '/' ),
+			'display'          => 'standalone',
+			'display_override' => array( 'standalone', 'minimal-ui', 'browser' ),
+			'background_color' => '#ffffff',
+			'theme_color'      => '#176b52',
+			'orientation'      => 'portrait-primary',
+			'categories'       => array( 'education', 'productivity', 'news' ),
+			'icons'            => array(
+				array(
+					'src'   => $theme_url . 'assets/images/pwa-icon-192.png',
+					'sizes' => '192x192',
+					'type'  => 'image/png',
+				),
+				array(
+					'src'   => $theme_url . 'assets/images/pwa-icon-512.png',
+					'sizes' => '512x512',
+					'type'  => 'image/png',
+				),
+				array(
+					'src'     => $theme_url . 'assets/images/pwa-maskable-512.png',
+					'sizes'   => '512x512',
+					'type'    => 'image/png',
+					'purpose' => 'maskable',
+				),
+			),
+			'shortcuts'        => array(
+				array(
+					'name' => __( 'Resource Hub', 'resilient-hub' ),
+					'url'  => home_url( '/resource-hub/' ),
+				),
+				array(
+					'name' => __( 'Situation Reports', 'resilient-hub' ),
+					'url'  => home_url( '/sitrep-dashboard/' ),
+				),
+				array(
+					'name' => __( 'News & Stories', 'resilient-hub' ),
+					'url'  => home_url( '/news-stories/' ),
+				),
+			),
+		);
+
+		status_header( 200 );
+		header( 'Content-Type: application/manifest+json; charset=utf-8' );
+		header( 'Cache-Control: no-cache, no-store, must-revalidate' );
+		echo wp_json_encode( $manifest, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
+		exit;
+	}
+
+	if ( rp_child_is_pwa_endpoint( 'rp-service-worker.js' ) ) {
+		$theme_url = trailingslashit( get_stylesheet_directory_uri() );
+		$config    = array(
+			'cacheName' => 'rp-pwa-' . sanitize_key( wp_get_theme()->get( 'Version' ) ),
+			'homeUrl'   => home_url( '/' ),
+			'origin'    => home_url(),
+			'assets'    => array(
+				home_url( '/' ),
+				home_url( '/resource-hub/' ),
+				home_url( '/news-stories/' ),
+				$theme_url . 'style.css',
+				$theme_url . 'assets/js/navigation.js',
+				$theme_url . 'assets/images/accord-logo.png',
+				$theme_url . 'assets/images/pwa-icon-192.png',
+				$theme_url . 'assets/images/pwa-icon-512.png',
+			),
+		);
+
+		status_header( 200 );
+		header( 'Content-Type: application/javascript; charset=utf-8' );
+		header( 'Cache-Control: no-cache, no-store, must-revalidate' );
+		header( 'Service-Worker-Allowed: /' );
+		?>
+const RP_PWA_CONFIG = <?php echo wp_json_encode( $config, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ); ?>;
+
+self.addEventListener("install", function (event) {
+  event.waitUntil(
+    caches.open(RP_PWA_CONFIG.cacheName)
+      .then(function (cache) {
+        return cache.addAll(RP_PWA_CONFIG.assets);
+      })
+      .catch(function () {})
+      .then(function () {
+        return self.skipWaiting();
+      })
+  );
+});
+
+self.addEventListener("activate", function (event) {
+  event.waitUntil(
+    caches.keys()
+      .then(function (keys) {
+        return Promise.all(keys.map(function (key) {
+          if (key !== RP_PWA_CONFIG.cacheName && key.indexOf("rp-pwa-") === 0) {
+            return caches.delete(key);
+          }
+
+          return Promise.resolve();
+        }));
+      })
+      .then(function () {
+        return self.clients.claim();
+      })
+  );
+});
+
+self.addEventListener("fetch", function (event) {
+  const request = event.request;
+  const url = new URL(request.url);
+
+  if (request.method !== "GET" || url.origin !== self.location.origin) {
+    return;
+  }
+
+  if (url.pathname.indexOf("/wp-admin/") === 0 || url.pathname.indexOf("admin-ajax.php") !== -1) {
+    return;
+  }
+
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then(function (response) {
+          const copy = response.clone();
+          caches.open(RP_PWA_CONFIG.cacheName).then(function (cache) {
+            cache.put(request, copy);
+          });
+          return response;
+        })
+        .catch(function () {
+          return caches.match(request).then(function (cached) {
+            return cached || caches.match(RP_PWA_CONFIG.homeUrl);
+          });
+        })
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(request).then(function (cached) {
+      const network = fetch(request).then(function (response) {
+        if (response && response.ok) {
+          const copy = response.clone();
+          caches.open(RP_PWA_CONFIG.cacheName).then(function (cache) {
+            cache.put(request, copy);
+          });
+        }
+        return response;
+      }).catch(function () {
+        return cached;
+      });
+
+      return cached || network;
+    })
+  );
+});
+		<?php
+		exit;
+	}
+}
+add_action( 'template_redirect', 'rp_child_serve_pwa_endpoints', 0 );
 
 function rp_child_register_menus() {
 	add_theme_support( 'title-tag' );
@@ -961,4 +1166,3 @@ function rp_child_resource_excerpt_more( $more ) {
 	return $more;
 }
 add_filter( 'excerpt_more', 'rp_child_resource_excerpt_more', 100 );
-
