@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Resource Hub
  * Description: Custom post types, taxonomies, roles, upload workflow, and catalog shortcodes for the humanitarian resource hub.
- * Version: 1.9.4
+ * Version: 1.9.5
  * Author: ACCORD
  * Text Domain: rp-resource-hub
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_RESOURCE_HUB_VERSION', '1.9.4' );
+define( 'RP_RESOURCE_HUB_VERSION', '1.9.5' );
 define( 'RP_RESOURCE_HUB_FILE', __FILE__ );
 define( 'RP_RESOURCE_HUB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_URL', plugin_dir_url( __FILE__ ) );
@@ -19,6 +19,18 @@ define( 'RP_RESOURCE_HUB_MAX_UPLOAD_BYTES', 25 * 1024 * 1024 );
 define( 'RP_TINIG_NOTIFICATION_EMAIL', 'tinig@accord.org.ph' );
 define( 'RP_TINIG_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_TINIG_MAX_ATTACHMENTS', 5 );
+if ( ! defined( 'RP_GRAPH_MAIL_TENANT_ID' ) ) {
+	define( 'RP_GRAPH_MAIL_TENANT_ID', '' );
+}
+if ( ! defined( 'RP_GRAPH_MAIL_CLIENT_ID' ) ) {
+	define( 'RP_GRAPH_MAIL_CLIENT_ID', '' );
+}
+if ( ! defined( 'RP_GRAPH_MAIL_CLIENT_SECRET' ) ) {
+	define( 'RP_GRAPH_MAIL_CLIENT_SECRET', '' );
+}
+if ( ! defined( 'RP_GRAPH_MAIL_SENDER' ) ) {
+	define( 'RP_GRAPH_MAIL_SENDER', 'website.notifications@accord.org.ph' );
+}
 
 function rp_resource_hub_register_post_types() {
 	$shared_args = array(
@@ -1286,6 +1298,174 @@ function rp_tinig_capture_mail_error( $error ) {
 	}
 }
 
+function rp_tinig_graph_mail_is_configured() {
+	return RP_GRAPH_MAIL_TENANT_ID && RP_GRAPH_MAIL_CLIENT_ID && RP_GRAPH_MAIL_CLIENT_SECRET && RP_GRAPH_MAIL_SENDER;
+}
+
+function rp_tinig_graph_request( $url, $args ) {
+	$response = wp_remote_request(
+		$url,
+		array_merge(
+			array(
+				'timeout' => 20,
+			),
+			$args
+		)
+	);
+
+	if ( is_wp_error( $response ) ) {
+		return $response;
+	}
+
+	$code = wp_remote_retrieve_response_code( $response );
+	$body = wp_remote_retrieve_body( $response );
+	$data = json_decode( $body, true );
+
+	if ( 200 <= $code && 300 > $code ) {
+		return is_array( $data ) ? $data : array();
+	}
+
+	$message = '';
+	if ( is_array( $data ) && ! empty( $data['error']['message'] ) ) {
+		$message = $data['error']['message'];
+	} elseif ( is_array( $data ) && ! empty( $data['error_description'] ) ) {
+		$message = $data['error_description'];
+	} elseif ( $body ) {
+		$message = wp_strip_all_tags( $body );
+	}
+
+	return new WP_Error(
+		'rp_tinig_graph_request_failed',
+		sprintf(
+			/* translators: 1: HTTP status code, 2: Graph response message */
+			__( 'Microsoft Graph request failed with HTTP %1$d: %2$s', 'rp-resource-hub' ),
+			$code,
+			$message ? $message : __( 'No response body.', 'rp-resource-hub' )
+		)
+	);
+}
+
+function rp_tinig_graph_get_access_token() {
+	$token_url = sprintf(
+		'https://login.microsoftonline.com/%s/oauth2/v2.0/token',
+		rawurlencode( RP_GRAPH_MAIL_TENANT_ID )
+	);
+
+	$response = wp_remote_post(
+		$token_url,
+		array(
+			'timeout' => 20,
+			'body'    => array(
+				'client_id'     => RP_GRAPH_MAIL_CLIENT_ID,
+				'client_secret' => RP_GRAPH_MAIL_CLIENT_SECRET,
+				'scope'         => 'https://graph.microsoft.com/.default',
+				'grant_type'    => 'client_credentials',
+			),
+		)
+	);
+
+	if ( is_wp_error( $response ) ) {
+		return $response;
+	}
+
+	$code = wp_remote_retrieve_response_code( $response );
+	$body = wp_remote_retrieve_body( $response );
+	$data = json_decode( $body, true );
+
+	if ( 200 !== $code || empty( $data['access_token'] ) ) {
+		$message = '';
+		if ( is_array( $data ) && ! empty( $data['error_description'] ) ) {
+			$message = $data['error_description'];
+		} elseif ( $body ) {
+			$message = wp_strip_all_tags( $body );
+		}
+
+		return new WP_Error(
+			'rp_tinig_graph_token_failed',
+			sprintf(
+				/* translators: 1: HTTP status code, 2: token response message */
+				__( 'Microsoft Graph token request failed with HTTP %1$d: %2$s', 'rp-resource-hub' ),
+				$code,
+				$message ? $message : __( 'No access token returned.', 'rp-resource-hub' )
+			)
+		);
+	}
+
+	return $data['access_token'];
+}
+
+function rp_tinig_graph_send_mail( $subject, $message ) {
+	if ( ! rp_tinig_graph_mail_is_configured() ) {
+		return new WP_Error( 'rp_tinig_graph_not_configured', __( 'Microsoft Graph mailer is not fully configured.', 'rp-resource-hub' ) );
+	}
+
+	$token = rp_tinig_graph_get_access_token();
+	if ( is_wp_error( $token ) ) {
+		return $token;
+	}
+
+	$payload = array(
+		'message'         => array(
+			'subject'      => $subject,
+			'body'         => array(
+				'contentType' => 'Text',
+				'content'     => $message,
+			),
+			'toRecipients' => array(
+				array(
+					'emailAddress' => array(
+						'address' => RP_TINIG_NOTIFICATION_EMAIL,
+					),
+				),
+			),
+			'replyTo'      => array(
+				array(
+					'emailAddress' => array(
+						'address' => RP_TINIG_NOTIFICATION_EMAIL,
+					),
+				),
+			),
+		),
+		'saveToSentItems' => true,
+	);
+
+	$send_url = sprintf(
+		'https://graph.microsoft.com/v1.0/users/%s/sendMail',
+		rawurlencode( RP_GRAPH_MAIL_SENDER )
+	);
+
+	$result = rp_tinig_graph_request(
+		$send_url,
+		array(
+			'method'  => 'POST',
+			'headers' => array(
+				'Authorization' => 'Bearer ' . $token,
+				'Content-Type'  => 'application/json',
+			),
+			'body'    => wp_json_encode( $payload ),
+		)
+	);
+
+	return is_wp_error( $result ) ? $result : true;
+}
+
+function rp_tinig_wp_mail_send( $subject, $message ) {
+	global $rp_tinig_last_mail_error;
+	$rp_tinig_last_mail_error = '';
+	add_action( 'wp_mail_failed', 'rp_tinig_capture_mail_error' );
+	$sent = wp_mail( RP_TINIG_NOTIFICATION_EMAIL, $subject, $message );
+	remove_action( 'wp_mail_failed', 'rp_tinig_capture_mail_error' );
+
+	if ( ! $sent ) {
+		return new WP_Error(
+			'rp_tinig_mail_failed',
+			$rp_tinig_last_mail_error ? $rp_tinig_last_mail_error : __( 'WordPress could not hand off the Tinig notification email to the configured mailer.', 'rp-resource-hub' )
+		);
+	}
+
+	return true;
+}
+
 function rp_tinig_notify_new_case( $case_id ) {
 	$case = rp_tinig_get_case( $case_id );
 	if ( ! $case ) {
@@ -1313,20 +1493,29 @@ function rp_tinig_notify_new_case( $case_id ) {
 		$dashboard
 	);
 
-	global $rp_tinig_last_mail_error;
-	$rp_tinig_last_mail_error = '';
-	add_action( 'wp_mail_failed', 'rp_tinig_capture_mail_error' );
-	$sent = wp_mail( RP_TINIG_NOTIFICATION_EMAIL, $subject, $message );
-	remove_action( 'wp_mail_failed', 'rp_tinig_capture_mail_error' );
+	if ( rp_tinig_graph_mail_is_configured() ) {
+		$graph_result = rp_tinig_graph_send_mail( $subject, $message );
+		if ( ! is_wp_error( $graph_result ) ) {
+			return 'graph';
+		}
 
-	if ( ! $sent ) {
-		return new WP_Error(
-			'rp_tinig_mail_failed',
-			$rp_tinig_last_mail_error ? $rp_tinig_last_mail_error : __( 'WordPress could not hand off the Tinig notification email to the configured mailer.', 'rp-resource-hub' )
-		);
+		$wp_mail_result = rp_tinig_wp_mail_send( $subject, $message );
+		if ( is_wp_error( $wp_mail_result ) ) {
+			return new WP_Error(
+				'rp_tinig_all_mail_failed',
+				sprintf(
+					/* translators: 1: Graph error, 2: WordPress mail error */
+					__( 'Microsoft Graph failed: %1$s WordPress mail fallback also failed: %2$s', 'rp-resource-hub' ),
+					$graph_result->get_error_message(),
+					$wp_mail_result->get_error_message()
+				)
+			);
+		}
+
+		return 'wp_mail_fallback';
 	}
 
-	return true;
+	return rp_tinig_wp_mail_send( $subject, $message );
 }
 
 function rp_tinig_process_submission() {
@@ -1483,6 +1672,10 @@ function rp_tinig_process_submission() {
 				$notification_result->get_error_message()
 			)
 		);
+	} elseif ( 'graph' === $notification_result ) {
+		rp_tinig_add_case_note( $case_id, 0, 'system', '', '', __( 'Email notification was sent through Microsoft Graph to tinig@accord.org.ph.', 'rp-resource-hub' ) );
+	} elseif ( 'wp_mail_fallback' === $notification_result ) {
+		rp_tinig_add_case_note( $case_id, 0, 'system', '', '', __( 'Microsoft Graph mail failed, but WordPress mail fallback handed off the notification to tinig@accord.org.ph.', 'rp-resource-hub' ) );
 	} else {
 		rp_tinig_add_case_note( $case_id, 0, 'system', '', '', __( 'Email notification was handed off to WordPress mail for tinig@accord.org.ph.', 'rp-resource-hub' ) );
 	}
