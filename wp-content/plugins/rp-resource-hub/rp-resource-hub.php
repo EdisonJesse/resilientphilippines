@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Resource Hub
  * Description: Custom post types, taxonomies, roles, upload workflow, and catalog shortcodes for the humanitarian resource hub.
- * Version: 1.9.3
+ * Version: 1.9.4
  * Author: ACCORD
  * Text Domain: rp-resource-hub
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_RESOURCE_HUB_VERSION', '1.9.3' );
+define( 'RP_RESOURCE_HUB_VERSION', '1.9.4' );
 define( 'RP_RESOURCE_HUB_FILE', __FILE__ );
 define( 'RP_RESOURCE_HUB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_URL', plugin_dir_url( __FILE__ ) );
@@ -1279,10 +1279,21 @@ function rp_tinig_get_case( $case_id ) {
 	return $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $table WHERE id = %d", absint( $case_id ) ) );
 }
 
+function rp_tinig_capture_mail_error( $error ) {
+	global $rp_tinig_last_mail_error;
+	if ( is_wp_error( $error ) ) {
+		$rp_tinig_last_mail_error = $error->get_error_message();
+	}
+}
+
 function rp_tinig_notify_new_case( $case_id ) {
 	$case = rp_tinig_get_case( $case_id );
-	if ( ! $case || ! is_email( RP_TINIG_NOTIFICATION_EMAIL ) ) {
-		return false;
+	if ( ! $case ) {
+		return new WP_Error( 'rp_tinig_missing_case', __( 'Tinig notification skipped because the case could not be found.', 'rp-resource-hub' ) );
+	}
+
+	if ( ! is_email( RP_TINIG_NOTIFICATION_EMAIL ) ) {
+		return new WP_Error( 'rp_tinig_invalid_notification_email', __( 'Tinig notification email is invalid.', 'rp-resource-hub' ) );
 	}
 
 	$type_options = rp_tinig_feedback_type_options();
@@ -1302,7 +1313,20 @@ function rp_tinig_notify_new_case( $case_id ) {
 		$dashboard
 	);
 
-	return wp_mail( RP_TINIG_NOTIFICATION_EMAIL, $subject, $message );
+	global $rp_tinig_last_mail_error;
+	$rp_tinig_last_mail_error = '';
+	add_action( 'wp_mail_failed', 'rp_tinig_capture_mail_error' );
+	$sent = wp_mail( RP_TINIG_NOTIFICATION_EMAIL, $subject, $message );
+	remove_action( 'wp_mail_failed', 'rp_tinig_capture_mail_error' );
+
+	if ( ! $sent ) {
+		return new WP_Error(
+			'rp_tinig_mail_failed',
+			$rp_tinig_last_mail_error ? $rp_tinig_last_mail_error : __( 'WordPress could not hand off the Tinig notification email to the configured mailer.', 'rp-resource-hub' )
+		);
+	}
+
+	return true;
 }
 
 function rp_tinig_process_submission() {
@@ -1445,7 +1469,23 @@ function rp_tinig_process_submission() {
 	}
 
 	rp_tinig_add_case_note( $case_id, 0, 'system', '', 'new', __( 'Case submitted through the public Tinig form.', 'rp-resource-hub' ) );
-	rp_tinig_notify_new_case( $case_id );
+	$notification_result = rp_tinig_notify_new_case( $case_id );
+	if ( is_wp_error( $notification_result ) ) {
+		rp_tinig_add_case_note(
+			$case_id,
+			0,
+			'system',
+			'',
+			'',
+			sprintf(
+				/* translators: %s: mail error message */
+				__( 'Email notification to tinig@accord.org.ph failed: %s', 'rp-resource-hub' ),
+				$notification_result->get_error_message()
+			)
+		);
+	} else {
+		rp_tinig_add_case_note( $case_id, 0, 'system', '', '', __( 'Email notification was handed off to WordPress mail for tinig@accord.org.ph.', 'rp-resource-hub' ) );
+	}
 
 	return array(
 		'case_id'        => $case_id,
