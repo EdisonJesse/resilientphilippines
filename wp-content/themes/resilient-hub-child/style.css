@@ -3,7 +3,7 @@ Theme Name: Resilient Humanitarian Hub
 Template: foreverwood-premium
 Author: ACCORD
 Description: Modern child theme for the Resilient Philippines humanitarian knowledge hub.
-Version: 1.1.16
+Version: 1.1.17
 Text Domain: resilient-hub
 */
 
@@ -2712,14 +2712,12 @@ input[type="submit"].give-submit:focus {
   color: #92400e;
 }
 
-.rp-role-badge-rp_hr_department,
-.rp-role-badge-rp_hr_reviewer {
+.rp-role-badge-rp_hr_department {
   background: #e0f2fe;
   color: #075985;
 }
 
-.rp-role-badge-rp_procurement_department,
-.rp-role-badge-rp_procurement_reviewer {
+.rp-role-badge-rp_procurement_department {
   background: #ecfdf5;
   color: #047857;
 }

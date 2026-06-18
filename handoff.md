@@ -160,3 +160,40 @@ Path: `app/public/wp-content/themes/resilient-hub-child/`
   - AJAX role update successfully assigned `rp_hr_department` to a temporary target user.
   - Confirmed the saved DB role value was `a:1:{s:16:"rp_hr_department";b:1;}`.
   - Temporary test users were removed.
+
+---
+
+## 8. Latest Session Record - Simplified HR and Procurement Roles
+
+- **Date**: June 18, 2026
+- **Purpose**: Remove the HR/Procurement reviewer distinction. Only department roles should exist and be assignable.
+- **Changed files**:
+  - `wp-content/plugins/rp-resource-hub/rp-resource-hub.php`
+  - `wp-content/plugins/rp-resource-hub/includes/opportunities.php`
+  - `wp-content/themes/resilient-hub-child/functions.php`
+  - `wp-content/themes/resilient-hub-child/template-user-management.php`
+  - `wp-content/themes/resilient-hub-child/style.css`
+  - `handoff.md`
+- **What changed**:
+  - Bumped Resource Hub plugin version to `1.10.4`.
+  - Bumped Opportunities module version to `1.0.4`.
+  - Bumped child theme version to `1.1.17`.
+  - Kept only these department roles:
+    - `ACCORD HR` (`rp_hr_department`)
+    - `ACCORD Procurement` (`rp_procurement_department`)
+  - Stopped creating `rp_hr_reviewer` and `rp_procurement_reviewer`.
+  - Added migration from old reviewer roles to the matching department roles.
+  - Removed old reviewer roles from WordPress after migration.
+  - Removed reviewer roles from User Management dropdowns, AJAX allowlist, labels, and badge CSS.
+- **Access model**:
+  - ACCORD HR can post job ads, access the Job Applications Dashboard, and take action on job applications.
+  - ACCORD Procurement can post invitations to bid, access the Bid Submissions Dashboard, and take action on bid submissions.
+- **Local verification**:
+  - PHP lint passed for changed plugin/theme PHP files.
+  - Local role registry contains `rp_hr_department` and `rp_procurement_department`.
+  - Local role registry no longer contains `rp_hr_reviewer` or `rp_procurement_reviewer`.
+  - User Management shows only ACCORD HR and ACCORD Procurement for department roles.
+  - AJAX role assignment succeeded for both ACCORD HR and ACCORD Procurement.
+  - ACCORD HR assignment showed job posting access and no ITB posting access.
+  - ACCORD Procurement assignment showed ITB posting/dashboard access and no job dashboard access.
+  - Temporary test users were removed.

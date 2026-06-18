@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_OPPORTUNITIES_VERSION', '1.0.3' );
+define( 'RP_OPPORTUNITIES_VERSION', '1.0.4' );
 define( 'RP_JOB_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_JOB_MAX_ATTACHMENTS', 5 );
 define( 'RP_BID_MAX_ATTACHMENT_BYTES', 25 * 1024 * 1024 );
@@ -135,25 +135,6 @@ function rp_opportunities_apply_roles_and_caps() {
 		}
 	}
 
-	$hr = get_role( 'rp_hr_reviewer' );
-	if ( ! $hr ) {
-		add_role(
-			'rp_hr_reviewer',
-			__( 'HR Reviewer', 'rp-resource-hub' ),
-			array(
-				'read'                    => true,
-				'upload_files'            => true,
-				'manage_job_applications' => true,
-				'submit_job_opportunities' => true,
-			)
-		);
-	} else {
-		$hr->add_cap( 'read' );
-		$hr->add_cap( 'upload_files' );
-		$hr->add_cap( 'manage_job_applications' );
-		$hr->add_cap( 'submit_job_opportunities' );
-	}
-
 	$hr_department = get_role( 'rp_hr_department' );
 	if ( ! $hr_department ) {
 		add_role(
@@ -173,25 +154,6 @@ function rp_opportunities_apply_roles_and_caps() {
 		$hr_department->add_cap( 'submit_job_opportunities' );
 	}
 
-	$procurement = get_role( 'rp_procurement_reviewer' );
-	if ( ! $procurement ) {
-		add_role(
-			'rp_procurement_reviewer',
-			__( 'Procurement Reviewer', 'rp-resource-hub' ),
-			array(
-				'read'                   => true,
-				'upload_files'           => true,
-				'manage_bid_submissions' => true,
-				'submit_itb_opportunities' => true,
-			)
-		);
-	} else {
-		$procurement->add_cap( 'read' );
-		$procurement->add_cap( 'upload_files' );
-		$procurement->add_cap( 'manage_bid_submissions' );
-		$procurement->add_cap( 'submit_itb_opportunities' );
-	}
-
 	$procurement_department = get_role( 'rp_procurement_department' );
 	if ( ! $procurement_department ) {
 		add_role(
@@ -209,6 +171,25 @@ function rp_opportunities_apply_roles_and_caps() {
 		$procurement_department->add_cap( 'upload_files' );
 		$procurement_department->add_cap( 'manage_bid_submissions' );
 		$procurement_department->add_cap( 'submit_itb_opportunities' );
+	}
+
+	rp_opportunities_migrate_department_role( 'rp_hr_reviewer', 'rp_hr_department' );
+	rp_opportunities_migrate_department_role( 'rp_procurement_reviewer', 'rp_procurement_department' );
+	remove_role( 'rp_hr_reviewer' );
+	remove_role( 'rp_procurement_reviewer' );
+}
+
+function rp_opportunities_migrate_department_role( $old_role, $new_role ) {
+	$users = get_users(
+		array(
+			'role'   => $old_role,
+			'fields' => array( 'ID' ),
+		)
+	);
+
+	foreach ( $users as $user ) {
+		$wp_user = new WP_User( $user->ID );
+		$wp_user->set_role( $new_role );
 	}
 }
 

@@ -540,7 +540,7 @@ function rp_ajax_update_user_role_handler() {
 		wp_send_json_error( array( 'message' => __( 'You cannot change your own role.', 'resilient-hub' ) ) );
 	}
 
-	$allowed_roles = array( 'administrator', 'editor', 'rp_hr_department', 'rp_procurement_department', 'rp_hr_reviewer', 'rp_procurement_reviewer', 'partner_contributor', 'hub_subscriber', 'subscriber' );
+	$allowed_roles = array( 'administrator', 'editor', 'rp_hr_department', 'rp_procurement_department', 'partner_contributor', 'hub_subscriber', 'subscriber' );
 	if ( ! in_array( $new_role, $allowed_roles, true ) ) {
 		wp_send_json_error( array( 'message' => __( 'Invalid role selected.', 'resilient-hub' ) ) );
 	}
@@ -557,8 +557,6 @@ function rp_ajax_update_user_role_handler() {
 		'editor'                    => __( 'Editor', 'resilient-hub' ),
 		'rp_hr_department'          => __( 'ACCORD HR', 'resilient-hub' ),
 		'rp_procurement_department' => __( 'ACCORD Procurement', 'resilient-hub' ),
-		'rp_hr_reviewer'            => __( 'HR Reviewer', 'resilient-hub' ),
-		'rp_procurement_reviewer'   => __( 'Procurement Reviewer', 'resilient-hub' ),
 		'partner_contributor'       => __( 'Partner Contributor', 'resilient-hub' ),
 		'hub_subscriber'            => __( 'Hub Subscriber', 'resilient-hub' ),
 		'subscriber'                => __( 'Subscriber', 'resilient-hub' ),
