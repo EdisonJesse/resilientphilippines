@@ -197,3 +197,32 @@ Path: `app/public/wp-content/themes/resilient-hub-child/`
   - ACCORD HR assignment showed job posting access and no ITB posting access.
   - ACCORD Procurement assignment showed ITB posting/dashboard access and no job dashboard access.
   - Temporary test users were removed.
+
+---
+
+## 9. Latest Session Record - Immediate Opportunity Publishing
+
+- **Date**: June 18, 2026
+- **Purpose**: HR and Procurement should not need administrator approval when posting opportunities.
+- **Changed files**:
+  - `wp-content/plugins/rp-resource-hub/rp-resource-hub.php`
+  - `wp-content/plugins/rp-resource-hub/includes/opportunities.php`
+  - `wp-content/themes/resilient-hub-child/style.css`
+  - `handoff.md`
+- **What changed**:
+  - Bumped Resource Hub plugin version to `1.10.5`.
+  - Bumped Opportunities module version to `1.0.5`.
+  - Bumped child theme version to `1.1.18`.
+  - Front-end job/ITB posting submissions now create `rp_opportunity` posts with `publish` status instead of `pending`.
+  - Submit page wording now says postings are created/published directly.
+  - Submit button text changed from `Submit for Review` to `Publish Posting`.
+  - Success notice now says `Your opportunity was published.`
+- **Local verification**:
+  - PHP lint passed for changed plugin files.
+  - Local site returned `200`.
+  - Temporary ACCORD HR user submitted a job posting through `/submit-job-opportunity/`; DB confirmed `post_status = publish`.
+  - Temporary ACCORD Procurement user submitted an ITB through `/submit-invitation-to-bid/`; DB confirmed `post_status = publish`.
+  - Version options updated:
+    - `rp_opportunities_version = 1.0.5`
+    - `rp_resource_hub_version = 1.10.5`
+  - Temporary test posts and users were removed.

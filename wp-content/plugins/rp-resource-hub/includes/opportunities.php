@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_OPPORTUNITIES_VERSION', '1.0.4' );
+define( 'RP_OPPORTUNITIES_VERSION', '1.0.5' );
 define( 'RP_JOB_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_JOB_MAX_ATTACHMENTS', 5 );
 define( 'RP_BID_MAX_ATTACHMENT_BYTES', 25 * 1024 * 1024 );
@@ -538,7 +538,7 @@ function rp_opportunities_submit_notice_html() {
 	}
 	$key = sanitize_key( wp_unslash( $_GET['rp_opp_submit_notice'] ) );
 	$messages = array(
-		'submitted' => __( 'Your opportunity was submitted for administrator review.', 'rp-resource-hub' ),
+		'submitted' => __( 'Your opportunity was published.', 'rp-resource-hub' ),
 		'error'     => __( 'The opportunity could not be submitted. Please check the required fields and try again.', 'rp-resource-hub' ),
 	);
 	if ( isset( $messages[ $key ] ) ) {
@@ -585,13 +585,13 @@ function rp_opportunities_submit_shortcode( $atts = array() ) {
 	$single_type = 1 === count( $allowed_types ) ? $allowed_types[0] : '';
 	$form_action = rp_opportunities_submit_redirect_for_type( $single_type );
 	$title = __( 'Submit Opportunity', 'rp-resource-hub' );
-	$subtitle = __( 'Create a job ad or invitation to bid for administrator review and publishing.', 'rp-resource-hub' );
+	$subtitle = __( 'Create and publish a job ad or invitation to bid.', 'rp-resource-hub' );
 	if ( 'job' === $single_type ) {
 		$title = __( 'Submit Job Posting', 'rp-resource-hub' );
-		$subtitle = __( 'Create a job opportunity for administrator review and publishing.', 'rp-resource-hub' );
+		$subtitle = __( 'Create and publish a job opportunity.', 'rp-resource-hub' );
 	} elseif ( 'itb' === $single_type ) {
 		$title = __( 'Submit Invitation to Bid', 'rp-resource-hub' );
-		$subtitle = __( 'Create a procurement posting for administrator review and publishing.', 'rp-resource-hub' );
+		$subtitle = __( 'Create and publish a procurement posting.', 'rp-resource-hub' );
 	}
 
 	ob_start();
@@ -649,7 +649,7 @@ function rp_opportunities_submit_shortcode( $atts = array() ) {
 				<?php rp_opportunities_file_field( 'opportunity_tor', __( 'Terms of Reference document', 'rp-resource-hub' ), false ); ?>
 			<?php endif; ?>
 			<?php rp_opportunities_file_field( 'opportunity_document', 'itb' === $single_type ? __( 'Bid / procurement document', 'rp-resource-hub' ) : __( 'Additional posting document', 'rp-resource-hub' ), false, 'bid' ); ?>
-			<button class="rp-button" type="submit"><?php esc_html_e( 'Submit for Review', 'rp-resource-hub' ); ?></button>
+			<button class="rp-button" type="submit"><?php esc_html_e( 'Publish Posting', 'rp-resource-hub' ); ?></button>
 		</form>
 	</div>
 	<?php
@@ -689,7 +689,7 @@ function rp_opportunities_handle_frontend_submit() {
 	$post_id = wp_insert_post(
 		array(
 			'post_type'    => 'rp_opportunity',
-			'post_status'  => 'pending',
+			'post_status'  => 'publish',
 			'post_title'   => $title,
 			'post_content' => $description,
 			'post_author'  => get_current_user_id(),
