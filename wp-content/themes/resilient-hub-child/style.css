@@ -3,7 +3,7 @@ Theme Name: Resilient Humanitarian Hub
 Template: foreverwood-premium
 Author: ACCORD
 Description: Modern child theme for the Resilient Philippines humanitarian knowledge hub.
-Version: 1.1.12
+Version: 1.1.13
 Text Domain: resilient-hub
 */
 
@@ -3737,5 +3737,258 @@ input[type="submit"].give-submit:focus {
 
   .rp-tinig-form input[type="file"] {
     font-size: 0.92rem;
+  }
+}
+
+/* Opportunities, job applications, and ITB submissions */
+.rp-opportunities-shell,
+.rp-opportunity-dashboard {
+  margin: 0 auto;
+  max-width: 1180px;
+}
+
+.rp-opportunities-filter {
+  align-items: flex-end;
+  background: var(--rp-color-soft);
+  border: 1px solid var(--rp-color-border);
+  border-radius: var(--rp-radius);
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) auto;
+  margin: 24px 0;
+  padding: 18px;
+}
+
+.rp-opportunities-filter label {
+  color: var(--rp-color-ink);
+  display: grid;
+  font-weight: 800;
+  gap: 8px;
+}
+
+.rp-opportunities-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.rp-opportunity-card,
+.rp-opportunity-details,
+.rp-opportunity-form-section {
+  background: var(--rp-color-surface);
+  border: 1px solid var(--rp-color-border);
+  border-radius: var(--rp-radius);
+  box-shadow: var(--rp-shadow-soft);
+  padding: 22px;
+}
+
+.rp-opportunity-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rp-opportunity-card h3 {
+  color: var(--rp-color-navy);
+  font-size: 1.25rem;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.rp-opportunity-card p {
+  margin: 0;
+}
+
+.rp-opportunity-card .rp-button {
+  margin-top: auto;
+}
+
+.rp-opportunity-card-top {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rp-opportunity-open {
+  background: #e8f6ee;
+  color: var(--rp-color-green);
+}
+
+.rp-opportunity-closed {
+  background: #f4e7e5;
+  color: #8a2f25;
+}
+
+.rp-opportunity-details {
+  margin: 24px 0;
+}
+
+.rp-opportunity-meta {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 18px 0;
+}
+
+.rp-opportunity-meta div {
+  background: var(--rp-color-soft);
+  border: 1px solid var(--rp-color-border);
+  border-radius: var(--rp-radius);
+  padding: 14px;
+}
+
+.rp-opportunity-meta dt {
+  color: var(--rp-color-muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rp-opportunity-meta dd {
+  color: var(--rp-color-ink);
+  font-weight: 800;
+  margin: 4px 0 0;
+}
+
+.rp-opportunity-note {
+  background: #eef7f2;
+  border-left: 5px solid var(--rp-color-green);
+  border-radius: var(--rp-radius);
+  margin-top: 16px;
+  padding: 16px 18px;
+}
+
+.rp-opportunity-downloads {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.rp-opportunity-downloads h3 {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.rp-opportunity-form-section {
+  margin-top: 28px;
+}
+
+.rp-opportunity-form {
+  display: grid;
+  gap: 18px;
+}
+
+.rp-opportunity-form .rp-field label,
+.rp-opportunity-form fieldset legend {
+  color: var(--rp-color-ink);
+  font-weight: 800;
+}
+
+.rp-opportunity-form fieldset {
+  border: 1px solid var(--rp-color-border);
+  border-radius: var(--rp-radius);
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 14px;
+}
+
+.rp-opportunity-form input[type="file"] {
+  background: var(--rp-color-soft);
+  border: 1px dashed var(--rp-color-border);
+  border-radius: var(--rp-radius);
+  cursor: pointer;
+  padding: 14px;
+  width: 100%;
+}
+
+.rp-field-help {
+  color: var(--rp-color-muted);
+  font-size: 0.88rem;
+  margin: 6px 0 0;
+}
+
+.rp-checkbox-line {
+  align-items: flex-start;
+  display: flex;
+  gap: 8px;
+}
+
+.rp-opportunity-dashboard .rp-dashboard-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.rp-opportunity-dashboard-table th,
+.rp-opportunity-dashboard-table td {
+  vertical-align: top;
+}
+
+.rp-opportunity-dashboard-table td span {
+  color: var(--rp-color-muted);
+  display: inline-block;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  margin-top: 4px;
+}
+
+.rp-opportunity-attachments {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.rp-opportunity-status-form {
+  display: grid;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.rp-opportunity-status-form textarea,
+.rp-opportunity-status-form select {
+  width: 100%;
+}
+
+.rp-opportunity-status-form .rp-button {
+  min-height: 40px;
+  padding-block: 8px;
+}
+
+@media (max-width: 1024px) {
+  .rp-opportunities-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rp-opportunity-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .rp-opportunities-filter,
+  .rp-opportunities-grid,
+  .rp-opportunity-meta,
+  .rp-opportunity-dashboard .rp-dashboard-header {
+    grid-template-columns: 1fr;
+  }
+
+  .rp-opportunity-dashboard .rp-dashboard-header {
+    display: grid;
+  }
+
+  .rp-opportunities-filter .rp-button,
+  .rp-opportunity-dashboard .rp-dashboard-header .rp-button {
+    width: 100%;
+  }
+
+  .rp-opportunity-card,
+  .rp-opportunity-details,
+  .rp-opportunity-form-section {
+    padding: 18px;
   }
 }

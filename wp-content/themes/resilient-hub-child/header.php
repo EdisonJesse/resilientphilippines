@@ -45,6 +45,7 @@
 				<ul id="rp-primary-menu">
 					<li><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/resource-hub/' ) ); ?>"><?php esc_html_e( 'Resources', 'resilient-hub' ); ?></a></li>
+					<li><a href="<?php echo esc_url( home_url( '/opportunities/' ) ); ?>"><?php esc_html_e( 'Opportunities', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/sitrep-dashboard/' ) ); ?>"><?php esc_html_e( 'Situation Reports', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/tinig/' ) ); ?>"><?php esc_html_e( 'Tinig', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>"><?php esc_html_e( 'Submit', 'resilient-hub' ); ?></a></li>
@@ -75,22 +76,33 @@
 							<?php 
 							$can_moderate = current_user_can( 'manage_options' ) || current_user_can( 'publish_posts' ) || current_user_can( 'publish_partner_resources' ) || current_user_can( 'publish_rp_sitreps' );
 							$can_manage_tinig = current_user_can( 'manage_options' ) || current_user_can( 'manage_tinig_cases' );
-							if ( $can_moderate ) : ?>
+							$can_manage_jobs = current_user_can( 'manage_options' ) || current_user_can( 'manage_job_applications' );
+							$can_manage_bids = current_user_can( 'manage_options' ) || current_user_can( 'manage_bid_submissions' );
+							$can_manage_opportunities = current_user_can( 'manage_options' ) || current_user_can( 'manage_opportunities' );
+							$has_admin_links = $can_moderate || $can_manage_tinig || $can_manage_jobs || $can_manage_bids || $can_manage_opportunities;
+							if ( $has_admin_links ) : ?>
 								<li class="rp-dropdown-divider" aria-hidden="true"></li>
 								<li class="rp-dropdown-section-label"><?php esc_html_e( 'Admin', 'resilient-hub' ); ?></li>
-								<li><a href="<?php echo esc_url( home_url( '/moderation-dashboard/' ) ); ?>"><?php esc_html_e( 'Moderation Dashboard', 'resilient-hub' ); ?></a></li>
-								<li><a href="<?php echo esc_url( home_url( '/analytics-dashboard/' ) ); ?>"><?php esc_html_e( 'Analytics Dashboard', 'resilient-hub' ); ?></a></li>
+								<?php if ( $can_moderate ) : ?>
+									<li><a href="<?php echo esc_url( home_url( '/moderation-dashboard/' ) ); ?>"><?php esc_html_e( 'Moderation Dashboard', 'resilient-hub' ); ?></a></li>
+									<li><a href="<?php echo esc_url( home_url( '/analytics-dashboard/' ) ); ?>"><?php esc_html_e( 'Analytics Dashboard', 'resilient-hub' ); ?></a></li>
+								<?php endif; ?>
 								<?php if ( $can_manage_tinig ) : ?>
 									<li><a href="<?php echo esc_url( home_url( '/tinig-dashboard/' ) ); ?>"><?php esc_html_e( 'Tinig Dashboard', 'resilient-hub' ); ?></a></li>
+								<?php endif; ?>
+								<?php if ( $can_manage_jobs ) : ?>
+									<li><a href="<?php echo esc_url( home_url( '/job-applications-dashboard/' ) ); ?>"><?php esc_html_e( 'Job Applications Dashboard', 'resilient-hub' ); ?></a></li>
+								<?php endif; ?>
+								<?php if ( $can_manage_bids ) : ?>
+									<li><a href="<?php echo esc_url( home_url( '/bid-submissions-dashboard/' ) ); ?>"><?php esc_html_e( 'Bid Submissions Dashboard', 'resilient-hub' ); ?></a></li>
+								<?php endif; ?>
+								<?php if ( $can_manage_opportunities ) : ?>
+									<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=rp_opportunity' ) ); ?>"><?php esc_html_e( 'Manage Opportunities', 'resilient-hub' ); ?></a></li>
 								<?php endif; ?>
 								<?php if ( current_user_can( 'manage_options' ) ) : ?>
 									<li><a href="<?php echo esc_url( home_url( '/user-management/' ) ); ?>"><?php esc_html_e( 'User Management', 'resilient-hub' ); ?></a></li>
 									<li><a href="<?php echo esc_url( admin_url() ); ?>"><?php esc_html_e( 'WP Admin', 'resilient-hub' ); ?></a></li>
 								<?php endif; ?>
-							<?php elseif ( $can_manage_tinig ) : ?>
-								<li class="rp-dropdown-divider" aria-hidden="true"></li>
-								<li class="rp-dropdown-section-label"><?php esc_html_e( 'Admin', 'resilient-hub' ); ?></li>
-								<li><a href="<?php echo esc_url( home_url( '/tinig-dashboard/' ) ); ?>"><?php esc_html_e( 'Tinig Dashboard', 'resilient-hub' ); ?></a></li>
 							<?php endif; ?>
 							<li class="rp-dropdown-divider" aria-hidden="true"></li>
 							<li><a href="<?php echo esc_url( wp_logout_url( home_url( '/' ) ) ); ?>"><?php esc_html_e( 'Logout', 'resilient-hub' ); ?></a></li>

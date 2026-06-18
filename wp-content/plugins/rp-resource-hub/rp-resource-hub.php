@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Resource Hub
  * Description: Custom post types, taxonomies, roles, upload workflow, and catalog shortcodes for the humanitarian resource hub.
- * Version: 1.9.6
+ * Version: 1.10.0
  * Author: ACCORD
  * Text Domain: rp-resource-hub
  */
@@ -11,13 +11,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_RESOURCE_HUB_VERSION', '1.9.6' );
+define( 'RP_RESOURCE_HUB_VERSION', '1.10.0' );
 define( 'RP_RESOURCE_HUB_FILE', __FILE__ );
 define( 'RP_RESOURCE_HUB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_URL', plugin_dir_url( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_MAX_UPLOAD_BYTES', 25 * 1024 * 1024 );
 define( 'RP_TINIG_NOTIFICATION_EMAIL', 'tinig@accord.org.ph' );
 define( 'RP_CONTACT_NOTIFICATION_EMAIL', 'info@accord.org.ph' );
+define( 'RP_JOB_NOTIFICATION_EMAIL', 'hrd@accord.org.ph' );
+define( 'RP_BID_NOTIFICATION_EMAIL', 'procurement@accord.org.ph' );
 define( 'RP_TINIG_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_TINIG_MAX_ATTACHMENTS', 5 );
 if ( ! defined( 'RP_GRAPH_MAIL_TENANT_ID' ) ) {
@@ -32,6 +34,8 @@ if ( ! defined( 'RP_GRAPH_MAIL_CLIENT_SECRET' ) ) {
 if ( ! defined( 'RP_GRAPH_MAIL_SENDER' ) ) {
 	define( 'RP_GRAPH_MAIL_SENDER', 'website.notifications@accord.org.ph' );
 }
+
+require_once RP_RESOURCE_HUB_PATH . 'includes/opportunities.php';
 
 function rp_resource_hub_register_post_types() {
 	$shared_args = array(
@@ -1395,7 +1399,7 @@ function rp_tinig_graph_get_access_token() {
 	return $data['access_token'];
 }
 
-function rp_tinig_graph_send_mail( $subject, $message, $recipient = RP_TINIG_NOTIFICATION_EMAIL, $reply_to = '' ) {
+function rp_tinig_graph_send_mail( $subject, $message, $recipient = RP_TINIG_NOTIFICATION_EMAIL, $reply_to = '', $cc_recipients = array() ) {
 	if ( ! rp_tinig_graph_mail_is_configured() ) {
 		return new WP_Error( 'rp_tinig_graph_not_configured', __( 'Microsoft Graph mailer is not fully configured.', 'rp-resource-hub' ) );
 	}
@@ -1409,7 +1413,8 @@ function rp_tinig_graph_send_mail( $subject, $message, $recipient = RP_TINIG_NOT
 		return $token;
 	}
 
-	$reply_to = $reply_to && is_email( $reply_to ) ? $reply_to : $recipient;
+	$reply_to      = $reply_to && is_email( $reply_to ) ? $reply_to : $recipient;
+	$cc_recipients = array_filter( array_map( 'sanitize_email', (array) $cc_recipients ), 'is_email' );
 	$payload = array(
 		'message'         => array(
 			'subject'      => $subject,
@@ -1434,6 +1439,19 @@ function rp_tinig_graph_send_mail( $subject, $message, $recipient = RP_TINIG_NOT
 		),
 		'saveToSentItems' => true,
 	);
+
+	if ( $cc_recipients ) {
+		$payload['message']['ccRecipients'] = array_map(
+			function ( $email ) {
+				return array(
+					'emailAddress' => array(
+						'address' => $email,
+					),
+				);
+			},
+			array_values( array_unique( $cc_recipients ) )
+		);
+	}
 
 	$send_url = sprintf(
 		'https://graph.microsoft.com/v1.0/users/%s/sendMail',

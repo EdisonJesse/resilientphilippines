@@ -17,6 +17,9 @@
 				<ul class="rp-footer-list">
 					<li><a href="<?php echo esc_url( home_url( '/resource-hub/' ) ); ?>"><?php esc_html_e( 'Resource Hub', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>"><?php esc_html_e( 'Submit Resource', 'resilient-hub' ); ?></a></li>
+					<li><a href="<?php echo esc_url( home_url( '/opportunities/' ) ); ?>"><?php esc_html_e( 'Opportunities', 'resilient-hub' ); ?></a></li>
+					<li><a href="<?php echo esc_url( add_query_arg( 'opportunity_type', 'job', home_url( '/opportunities/' ) ) ); ?>"><?php esc_html_e( 'Job Ads', 'resilient-hub' ); ?></a></li>
+					<li><a href="<?php echo esc_url( add_query_arg( 'opportunity_type', 'itb', home_url( '/opportunities/' ) ) ); ?>"><?php esc_html_e( 'Invitations to Bid', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/tinig/' ) ); ?>"><?php esc_html_e( 'Tinig Feedback', 'resilient-hub' ); ?></a></li>
 				</ul>
 			</div>
