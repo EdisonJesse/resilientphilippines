@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Resource Hub
  * Description: Custom post types, taxonomies, roles, upload workflow, and catalog shortcodes for the humanitarian resource hub.
- * Version: 1.10.9
+ * Version: 1.11.0
  * Author: ACCORD
  * Text Domain: rp-resource-hub
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_RESOURCE_HUB_VERSION', '1.10.9' );
+define( 'RP_RESOURCE_HUB_VERSION', '1.11.0' );
 define( 'RP_RESOURCE_HUB_FILE', __FILE__ );
 define( 'RP_RESOURCE_HUB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_URL', plugin_dir_url( __FILE__ ) );
@@ -36,6 +36,7 @@ if ( ! defined( 'RP_GRAPH_MAIL_SENDER' ) ) {
 }
 
 require_once RP_RESOURCE_HUB_PATH . 'includes/opportunities.php';
+require_once RP_RESOURCE_HUB_PATH . 'includes/gallery.php';
 
 function rp_resource_hub_register_post_types() {
 	$shared_args = array(
@@ -679,6 +680,14 @@ function rp_resource_hub_create_pages() {
 		'news-stories' => array(
 			'title'   => __( 'News & Stories', 'rp-resource-hub' ),
 			'content' => '[rp_news_catalog]',
+		),
+		'photo-gallery' => array(
+			'title'   => __( 'Photo Gallery', 'rp-resource-hub' ),
+			'content' => '[rp_photo_gallery]',
+		),
+		'submit-photo' => array(
+			'title'   => __( 'Submit Photo', 'rp-resource-hub' ),
+			'content' => '[rp_photo_upload_form]',
 		),
 		'submit-post' => array(
 			'title'   => __( 'Submit Post or Story', 'rp-resource-hub' ),

@@ -348,13 +348,18 @@ function rp_child_logout_redirect( $redirect_to, $requested_redirect_to, $user )
 add_filter( 'logout_redirect', 'rp_child_logout_redirect', 10, 3 );
 
 /**
- * Protect the submit-resource and my-contributions pages and redirect logged-out users to the custom portal entry page.
+ * Protect contribution pages and redirect logged-out users to the custom portal entry page.
  */
 function rp_child_submit_resource_auth_gate() {
 	if ( ! is_user_logged_in() ) {
 		if ( is_page( 'submit-resource' ) ) {
 			$login_url    = home_url( '/portal-entry/' );
 			$redirect_url = add_query_arg( 'redirect_to', esc_url( home_url( '/submit-resource/' ) ), $login_url );
+			wp_safe_redirect( $redirect_url );
+			exit;
+		} elseif ( is_page( 'submit-photo' ) ) {
+			$login_url    = home_url( '/portal-entry/' );
+			$redirect_url = add_query_arg( 'redirect_to', esc_url( home_url( '/submit-photo/' ) ), $login_url );
 			wp_safe_redirect( $redirect_url );
 			exit;
 		} elseif ( is_page( 'submit-post' ) ) {
