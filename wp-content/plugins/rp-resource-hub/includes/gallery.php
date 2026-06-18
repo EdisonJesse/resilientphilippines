@@ -27,6 +27,12 @@ if ( ! defined( 'RP_GALLERY_SP_CLIENT_SECRET' ) ) {
 if ( ! defined( 'RP_GALLERY_SP_DRIVE_ID' ) ) {
 	define( 'RP_GALLERY_SP_DRIVE_ID', '' );
 }
+if ( ! defined( 'RP_GALLERY_SP_SITE_ID' ) ) {
+	define( 'RP_GALLERY_SP_SITE_ID', '' );
+}
+if ( ! defined( 'RP_GALLERY_SP_LIBRARY_NAME' ) ) {
+	define( 'RP_GALLERY_SP_LIBRARY_NAME', 'Original Photo Submissions' );
+}
 if ( ! defined( 'RP_GALLERY_SP_UPLOAD_ROOT' ) ) {
 	define( 'RP_GALLERY_SP_UPLOAD_ROOT', '' );
 }
@@ -416,7 +422,7 @@ function rp_gallery_selected_tag_names() {
 }
 
 function rp_gallery_sharepoint_upload( $file_path, $file_name, $submission_id, $metadata ) {
-	if ( ! RP_GALLERY_SP_TENANT_ID || ! RP_GALLERY_SP_CLIENT_ID || ! RP_GALLERY_SP_CLIENT_SECRET || ! RP_GALLERY_SP_DRIVE_ID ) {
+	if ( ! RP_GALLERY_SP_TENANT_ID || ! RP_GALLERY_SP_CLIENT_ID || ! RP_GALLERY_SP_CLIENT_SECRET ) {
 		return new WP_Error( 'sharepoint_not_configured', __( 'SharePoint upload is not configured yet.', 'rp-resource-hub' ) );
 	}
 
@@ -425,16 +431,21 @@ function rp_gallery_sharepoint_upload( $file_path, $file_name, $submission_id, $
 		return $token;
 	}
 
+	$drive_id = rp_gallery_sharepoint_drive_id( $token );
+	if ( is_wp_error( $drive_id ) ) {
+		return $drive_id;
+	}
+
 	$year        = gmdate( 'Y' );
 	$month       = gmdate( 'Y-m' );
 	$folder_path = ltrim( trim( RP_GALLERY_SP_UPLOAD_ROOT, '/' ) . '/' . $year . '/' . $month . '/' . $submission_id, '/' );
-	$folder      = rp_gallery_sharepoint_ensure_folder_path( $token, $folder_path );
+	$folder      = rp_gallery_sharepoint_ensure_folder_path( $token, $drive_id, $folder_path );
 	if ( is_wp_error( $folder ) ) {
 		return $folder;
 	}
 
 	$remote_path = $folder_path . '/' . $file_name;
-	$url         = 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( RP_GALLERY_SP_DRIVE_ID ) . '/root:/' . str_replace( '%2F', '/', rawurlencode( $remote_path ) ) . ':/content';
+	$url         = 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( $drive_id ) . '/root:/' . str_replace( '%2F', '/', rawurlencode( $remote_path ) ) . ':/content';
 
 	$response = wp_remote_request(
 		$url,
@@ -459,19 +470,85 @@ function rp_gallery_sharepoint_upload( $file_path, $file_name, $submission_id, $
 		return new WP_Error( 'sharepoint_upload_failed', rp_gallery_sharepoint_error_message( $response, __( 'Original photo could not be uploaded to SharePoint.', 'rp-resource-hub' ) ) );
 	}
 
-	rp_gallery_sharepoint_update_metadata( $token, $body['id'], $submission_id, $metadata );
+	rp_gallery_sharepoint_update_metadata( $token, $drive_id, $body['id'], $submission_id, $metadata );
 
 	return $body;
 }
 
-function rp_gallery_sharepoint_ensure_folder_path( $token, $folder_path ) {
+function rp_gallery_sharepoint_drive_id( $token ) {
+	if ( RP_GALLERY_SP_DRIVE_ID ) {
+		return RP_GALLERY_SP_DRIVE_ID;
+	}
+
+	if ( ! RP_GALLERY_SP_SITE_ID || ! RP_GALLERY_SP_LIBRARY_NAME ) {
+		return new WP_Error( 'sharepoint_drive_not_configured', __( 'SharePoint drive ID or site ID and library name must be configured.', 'rp-resource-hub' ) );
+	}
+
+	$lists_url = 'https://graph.microsoft.com/v1.0/sites/' . rawurlencode( RP_GALLERY_SP_SITE_ID ) . '/lists?$select=id,displayName';
+	$response  = wp_remote_get(
+		$lists_url,
+		array(
+			'timeout' => 30,
+			'headers' => array(
+				'Authorization' => 'Bearer ' . $token,
+			),
+		)
+	);
+
+	if ( is_wp_error( $response ) ) {
+		return $response;
+	}
+
+	$code = wp_remote_retrieve_response_code( $response );
+	$body = json_decode( wp_remote_retrieve_body( $response ), true );
+	if ( $code < 200 || $code > 299 ) {
+		return new WP_Error( 'sharepoint_lists_failed', rp_gallery_sharepoint_error_message( $response, __( 'SharePoint libraries could not be listed.', 'rp-resource-hub' ) ) );
+	}
+
+	$library_id = '';
+	foreach ( isset( $body['value'] ) ? $body['value'] : array() as $list ) {
+		if ( isset( $list['displayName'] ) && 0 === strcasecmp( $list['displayName'], RP_GALLERY_SP_LIBRARY_NAME ) ) {
+			$library_id = $list['id'];
+			break;
+		}
+	}
+
+	if ( ! $library_id ) {
+		return new WP_Error( 'sharepoint_library_not_found', sprintf( __( 'SharePoint library "%s" was not found for this site.', 'rp-resource-hub' ), RP_GALLERY_SP_LIBRARY_NAME ) );
+	}
+
+	$drive_url = 'https://graph.microsoft.com/v1.0/sites/' . rawurlencode( RP_GALLERY_SP_SITE_ID ) . '/lists/' . rawurlencode( $library_id ) . '/drive?$select=id';
+	$response  = wp_remote_get(
+		$drive_url,
+		array(
+			'timeout' => 30,
+			'headers' => array(
+				'Authorization' => 'Bearer ' . $token,
+			),
+		)
+	);
+
+	if ( is_wp_error( $response ) ) {
+		return $response;
+	}
+
+	$code = wp_remote_retrieve_response_code( $response );
+	$body = json_decode( wp_remote_retrieve_body( $response ), true );
+	if ( $code < 200 || $code > 299 || empty( $body['id'] ) ) {
+		return new WP_Error( 'sharepoint_drive_lookup_failed', rp_gallery_sharepoint_error_message( $response, __( 'SharePoint library drive ID could not be resolved.', 'rp-resource-hub' ) ) );
+	}
+
+	return $body['id'];
+}
+
+function rp_gallery_sharepoint_ensure_folder_path( $token, $drive_id, $folder_path ) {
 	$segments = array_filter( explode( '/', trim( $folder_path, '/' ) ) );
 	$current = '';
 
 	foreach ( $segments as $segment ) {
 		$parent_path = $current;
 		$current     = $current ? $current . '/' . $segment : $segment;
-		$get_url     = 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( RP_GALLERY_SP_DRIVE_ID ) . '/root:/' . str_replace( '%2F', '/', rawurlencode( $current ) );
+		$get_url     = 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( $drive_id ) . '/root:/' . str_replace( '%2F', '/', rawurlencode( $current ) );
 		$get         = wp_remote_get(
 			$get_url,
 			array(
@@ -487,8 +564,8 @@ function rp_gallery_sharepoint_ensure_folder_path( $token, $folder_path ) {
 		}
 
 		$parent_url = $parent_path
-			? 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( RP_GALLERY_SP_DRIVE_ID ) . '/root:/' . str_replace( '%2F', '/', rawurlencode( $parent_path ) ) . ':/children'
-			: 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( RP_GALLERY_SP_DRIVE_ID ) . '/root/children';
+			? 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( $drive_id ) . '/root:/' . str_replace( '%2F', '/', rawurlencode( $parent_path ) ) . ':/children'
+			: 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( $drive_id ) . '/root/children';
 
 		$create = wp_remote_post(
 			$parent_url,
@@ -558,7 +635,7 @@ function rp_gallery_graph_token() {
 	return $body['access_token'];
 }
 
-function rp_gallery_sharepoint_update_metadata( $token, $item_id, $submission_id, $metadata ) {
+function rp_gallery_sharepoint_update_metadata( $token, $drive_id, $item_id, $submission_id, $metadata ) {
 	$fields = apply_filters(
 		'rp_gallery_sharepoint_fields',
 		array(
@@ -576,7 +653,7 @@ function rp_gallery_sharepoint_update_metadata( $token, $item_id, $submission_id
 		$submission_id
 	);
 
-	$url = 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( RP_GALLERY_SP_DRIVE_ID ) . '/items/' . rawurlencode( $item_id ) . '/listItem/fields';
+	$url = 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( $drive_id ) . '/items/' . rawurlencode( $item_id ) . '/listItem/fields';
 	wp_remote_request(
 		$url,
 		array(
