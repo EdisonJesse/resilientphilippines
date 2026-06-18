@@ -21,11 +21,15 @@ if ( ! current_user_can( 'manage_options' ) ) {
 
 // Available roles for the dropdown
 $editable_roles = array(
-	'administrator'        => __( 'Administrator', 'resilient-hub' ),
-	'editor'               => __( 'Editor', 'resilient-hub' ),
-	'partner_contributor'  => __( 'Partner Contributor', 'resilient-hub' ),
-	'hub_subscriber'       => __( 'Hub Subscriber', 'resilient-hub' ),
-	'subscriber'           => __( 'Subscriber', 'resilient-hub' ),
+	'administrator'              => __( 'Administrator', 'resilient-hub' ),
+	'editor'                     => __( 'Editor', 'resilient-hub' ),
+	'rp_hr_department'           => __( 'ACCORD HR', 'resilient-hub' ),
+	'rp_procurement_department'  => __( 'ACCORD Procurement', 'resilient-hub' ),
+	'rp_hr_reviewer'             => __( 'HR Reviewer', 'resilient-hub' ),
+	'rp_procurement_reviewer'    => __( 'Procurement Reviewer', 'resilient-hub' ),
+	'partner_contributor'        => __( 'Partner Contributor', 'resilient-hub' ),
+	'hub_subscriber'             => __( 'Hub Subscriber', 'resilient-hub' ),
+	'subscriber'                 => __( 'Subscriber', 'resilient-hub' ),
 );
 
 // Filter parameters

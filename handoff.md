@@ -131,3 +131,32 @@ Path: `app/public/wp-content/themes/resilient-hub-child/`
   - Temporary `rp_hr_department` user saw only `Submit Job Posting`, could access the job form/dashboard, and was denied the ITB form.
   - Temporary `rp_procurement_department` user saw only `Submit ITB Posting`, could access the ITB form/dashboard, and was denied the job form.
   - Temporary test users were removed.
+
+---
+
+## 7. Latest Session Record - User Management Role Dropdown
+
+- **Date**: June 18, 2026
+- **Purpose**: Make the new HR and Procurement roles visible and assignable on the front-end User Management page.
+- **Changed files**:
+  - `wp-content/themes/resilient-hub-child/template-user-management.php`
+  - `wp-content/themes/resilient-hub-child/functions.php`
+  - `wp-content/themes/resilient-hub-child/style.css`
+  - `handoff.md`
+- **What changed**:
+  - Added these roles to the User Management filter and role-change dropdowns:
+    - `ACCORD HR` (`rp_hr_department`)
+    - `ACCORD Procurement` (`rp_procurement_department`)
+    - `HR Reviewer` (`rp_hr_reviewer`)
+    - `Procurement Reviewer` (`rp_procurement_reviewer`)
+  - Added the same roles to the AJAX role-update allowlist.
+  - Added role labels for AJAX success messages.
+  - Added badge styling for HR and Procurement roles.
+  - Bumped child theme version to `1.1.16`.
+- **Local verification**:
+  - PHP lint passed for `template-user-management.php` and `functions.php`.
+  - Temporary admin user loaded `/user-management/`.
+  - Confirmed all four HR/Procurement role options appeared in the page HTML.
+  - AJAX role update successfully assigned `rp_hr_department` to a temporary target user.
+  - Confirmed the saved DB role value was `a:1:{s:16:"rp_hr_department";b:1;}`.
+  - Temporary test users were removed.
