@@ -75,7 +75,7 @@
 							<?php endif; ?>
 							<li><a href="<?php echo esc_url( home_url( '/submit-sitrep/' ) ); ?>"><?php esc_html_e( 'Submit a SitRep', 'resilient-hub' ); ?></a></li>
 							<?php 
-							$can_moderate = current_user_can( 'manage_options' ) || current_user_can( 'publish_posts' ) || current_user_can( 'publish_partner_resources' ) || current_user_can( 'publish_rp_sitreps' );
+							$can_moderate = rp_child_current_user_can_access_moderation();
 							$can_manage_tinig = current_user_can( 'manage_options' ) || current_user_can( 'manage_tinig_cases' );
 							$can_manage_jobs = current_user_can( 'manage_options' ) || current_user_can( 'manage_job_applications' );
 							$can_manage_bids = current_user_can( 'manage_options' ) || current_user_can( 'manage_bid_submissions' );

@@ -487,15 +487,110 @@ function rp_child_setup_donation_platform() {
 add_action( 'init', 'rp_child_setup_donation_platform' );
 
 /**
+ * Return the post types managed by the moderation dashboard.
+ */
+function rp_child_moderation_post_types() {
+	return array( 'partner_resources', 'rp_sitrep', 'accord_library', 'post', 'rp_gallery_photo' );
+}
+
+/**
+ * Check whether the current user can access the moderation dashboard.
+ */
+function rp_child_current_user_can_access_moderation() {
+	if ( current_user_can( 'manage_options' ) ) {
+		return true;
+	}
+
+	foreach ( array( 'publish_posts', 'publish_partner_resources', 'publish_rp_sitreps', 'publish_accord_products' ) as $capability ) {
+		if ( current_user_can( $capability ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Check moderation permissions against the specific submission type.
+ */
+function rp_child_current_user_can_moderate_post( $post ) {
+	$post = get_post( $post );
+	if ( ! $post || ! in_array( $post->post_type, rp_child_moderation_post_types(), true ) ) {
+		return false;
+	}
+
+	if ( current_user_can( 'manage_options' ) ) {
+		return true;
+	}
+
+	$post_type = get_post_type_object( $post->post_type );
+	return $post_type
+		&& current_user_can( 'edit_post', $post->ID )
+		&& current_user_can( $post_type->cap->publish_posts );
+}
+
+/**
+ * Notify a submission author after a moderation decision.
+ */
+function rp_child_send_moderation_notification( $post, $decision, $reason = '' ) {
+	$author = get_userdata( $post->post_author );
+	if ( ! $author || ! is_email( $author->user_email ) ) {
+		return false;
+	}
+
+	if ( 'approved' === $decision ) {
+		$subject = sprintf( __( 'Submission approved: %s', 'resilient-hub' ), $post->post_title );
+		$message = sprintf(
+			__( "Hello %1\$s,\n\nYour submission \"%2\$s\" has been approved and published.\n\nView it here: %3\$s", 'resilient-hub' ),
+			$author->display_name,
+			$post->post_title,
+			get_permalink( $post->ID )
+		);
+	} else {
+		$subject = sprintf( __( 'Submission needs revision: %s', 'resilient-hub' ), $post->post_title );
+		$message = sprintf(
+			__( "Hello %1\$s,\n\nYour submission \"%2\$s\" was not approved.\n\nReviewer feedback:\n%3\$s\n\nYou can revise and resubmit eligible contributions here: %4\$s", 'resilient-hub' ),
+			$author->display_name,
+			$post->post_title,
+			$reason,
+			home_url( '/my-contributions/' )
+		);
+	}
+
+	if ( function_exists( 'rp_tinig_graph_mail_is_configured' ) && rp_tinig_graph_mail_is_configured() && function_exists( 'rp_tinig_graph_send_mail' ) ) {
+		$result = rp_tinig_graph_send_mail( $subject, $message, $author->user_email );
+		if ( ! is_wp_error( $result ) ) {
+			update_post_meta( $post->ID, '_rp_moderation_notification_method', 'graph' );
+			delete_post_meta( $post->ID, '_rp_moderation_notification_error' );
+			return true;
+		}
+		update_post_meta( $post->ID, '_rp_moderation_notification_error', $result->get_error_message() );
+	}
+
+	$sent = wp_mail( $author->user_email, $subject, $message );
+	update_post_meta( $post->ID, '_rp_moderation_notification_method', $sent ? 'wp_mail' : 'failed' );
+	return $sent;
+}
+
+/**
+ * Record a moderation decision for audit purposes.
+ */
+function rp_child_record_moderation_decision( $post_id, $decision, $reason = '' ) {
+	update_post_meta( $post_id, '_rp_moderation_decision', $decision );
+	update_post_meta( $post_id, '_rp_moderation_reviewer_id', get_current_user_id() );
+	update_post_meta( $post_id, '_rp_moderation_reviewed_at', current_time( 'mysql', true ) );
+
+	if ( $reason ) {
+		update_post_meta( $post_id, '_rp_moderation_rejection_reason', $reason );
+	}
+}
+
+/**
  * AJAX handler for approving pending submissions.
  */
 function rp_ajax_approve_resource_handler() {
 	if ( ! is_user_logged_in() ) {
 		wp_send_json_error( array( 'message' => __( 'You must be logged in.', 'resilient-hub' ) ) );
-	}
-
-	if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'publish_posts' ) && ! current_user_can( 'publish_partner_resources' ) ) {
-		wp_send_json_error( array( 'message' => __( 'You do not have permission to approve resources.', 'resilient-hub' ) ) );
 	}
 
 	$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
@@ -506,8 +601,11 @@ function rp_ajax_approve_resource_handler() {
 	}
 
 	$post = get_post( $post_id );
-	if ( ! $post || ! in_array( $post->post_type, array( 'partner_resources', 'rp_sitrep', 'accord_library', 'post', 'rp_gallery_photo' ), true ) || 'pending' !== $post->post_status ) {
+	if ( ! $post || ! in_array( $post->post_type, rp_child_moderation_post_types(), true ) || 'pending' !== $post->post_status ) {
 		wp_send_json_error( array( 'message' => __( 'Submission not found or is not pending review.', 'resilient-hub' ) ) );
+	}
+	if ( ! rp_child_current_user_can_moderate_post( $post ) ) {
+		wp_send_json_error( array( 'message' => __( 'You do not have permission to approve this submission.', 'resilient-hub' ) ) );
 	}
 
 	// Update the post status to publish
@@ -520,9 +618,66 @@ function rp_ajax_approve_resource_handler() {
 		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 	}
 
-	wp_send_json_success( array( 'message' => __( 'Published successfully.', 'resilient-hub' ) ) );
+	rp_child_record_moderation_decision( $post_id, 'approved' );
+	$notified = rp_child_send_moderation_notification( get_post( $post_id ), 'approved' );
+
+	wp_send_json_success( array(
+		'message' => __( 'Published successfully.', 'resilient-hub' ),
+		'warning' => $notified ? '' : __( 'The submission was published, but the author notification could not be sent.', 'resilient-hub' ),
+	) );
 }
 add_action( 'wp_ajax_rp_approve_resource', 'rp_ajax_approve_resource_handler' );
+
+/**
+ * AJAX handler for rejecting pending submissions.
+ */
+function rp_ajax_reject_resource_handler() {
+	if ( ! is_user_logged_in() ) {
+		wp_send_json_error( array( 'message' => __( 'You must be logged in.', 'resilient-hub' ) ) );
+	}
+
+	$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+	$nonce   = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+	$reason  = isset( $_POST['reason'] ) ? sanitize_textarea_field( wp_unslash( $_POST['reason'] ) ) : '';
+
+	if ( ! $post_id || ! wp_verify_nonce( $nonce, 'rp_reject_resource_' . $post_id ) ) {
+		wp_send_json_error( array( 'message' => __( 'Security check failed. Please refresh and try again.', 'resilient-hub' ) ) );
+	}
+	if ( ! $reason ) {
+		wp_send_json_error( array( 'message' => __( 'A rejection reason is required.', 'resilient-hub' ) ) );
+	}
+	if ( strlen( $reason ) > 1000 ) {
+		wp_send_json_error( array( 'message' => __( 'The rejection reason must be 1,000 characters or fewer.', 'resilient-hub' ) ) );
+	}
+
+	$post = get_post( $post_id );
+	if ( ! $post || ! in_array( $post->post_type, rp_child_moderation_post_types(), true ) || 'pending' !== $post->post_status ) {
+		wp_send_json_error( array( 'message' => __( 'Submission not found or is not pending review.', 'resilient-hub' ) ) );
+	}
+	if ( ! rp_child_current_user_can_moderate_post( $post ) ) {
+		wp_send_json_error( array( 'message' => __( 'You do not have permission to reject this submission.', 'resilient-hub' ) ) );
+	}
+
+	$result = wp_update_post(
+		array(
+			'ID'          => $post_id,
+			'post_status' => 'draft',
+		),
+		true
+	);
+	if ( is_wp_error( $result ) ) {
+		wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+	}
+
+	rp_child_record_moderation_decision( $post_id, 'rejected', $reason );
+	$notified = rp_child_send_moderation_notification( get_post( $post_id ), 'rejected', $reason );
+
+	wp_send_json_success( array(
+		'message' => __( 'Submission rejected and saved as a draft.', 'resilient-hub' ),
+		'warning' => $notified ? '' : __( 'The submission was rejected, but the author notification could not be sent.', 'resilient-hub' ),
+	) );
+}
+add_action( 'wp_ajax_rp_reject_resource', 'rp_ajax_reject_resource_handler' );
 
 /**
  * AJAX handler for updating a user's role from the frontend User Management page.
@@ -1151,7 +1306,7 @@ function rp_child_filter_primary_nav_menu( $items, $args ) {
 		return $items;
 	}
 
-	$can_moderate = current_user_can( 'manage_options' ) || current_user_can( 'publish_posts' ) || current_user_can( 'publish_partner_resources' ) || current_user_can( 'publish_rp_sitreps' );
+	$can_moderate = rp_child_current_user_can_access_moderation();
 
 	foreach ( $items as $key => $item ) {
 		if ( strpos( strtolower( $item->url ), '/moderation-dashboard' ) !== false && ! $can_moderate ) {

@@ -3968,9 +3968,11 @@ function rp_resource_hub_my_contributions_shortcode() {
 					</thead>
 					<tbody>
 						<?php while ( $query->have_posts() ) : $query->the_post(); 
-							$post_id = get_the_ID();
-							$status = get_post_status( $post_id );
-							$post_type = get_post_type( $post_id );
+							$post_id             = get_the_ID();
+							$status              = get_post_status( $post_id );
+							$post_type           = get_post_type( $post_id );
+							$moderation_decision = get_post_meta( $post_id, '_rp_moderation_decision', true );
+							$rejection_reason    = get_post_meta( $post_id, '_rp_moderation_rejection_reason', true );
 							?>
 							<tr style="border-bottom:1px solid var(--rp-color-border); transition: background-color 150ms ease;">
 								<td style="padding:16px 18px; font-weight:700;">
@@ -4000,6 +4002,11 @@ function rp_resource_hub_my_contributions_shortcode() {
 										echo '<span class="rp-status-badge rp-status-publish">' . esc_html__( 'Published', 'rp-resource-hub' ) . '</span>';
 									} elseif ( 'pending' === $status ) {
 										echo '<span class="rp-status-badge rp-status-pending">' . esc_html__( 'Pending Review', 'rp-resource-hub' ) . '</span>';
+									} elseif ( 'draft' === $status && 'rejected' === $moderation_decision ) {
+										echo '<span class="rp-status-badge rp-status-draft">' . esc_html__( 'Needs Revision', 'rp-resource-hub' ) . '</span>';
+										if ( $rejection_reason ) {
+											echo '<div style="max-width:280px; margin-top:6px; color:#7f1d1d; font-size:12px; line-height:1.4;">' . esc_html( $rejection_reason ) . '</div>';
+										}
 									} elseif ( 'draft' === $status ) {
 										echo '<span class="rp-status-badge rp-status-draft">' . esc_html__( 'Unpublished', 'rp-resource-hub' ) . '</span>';
 									}

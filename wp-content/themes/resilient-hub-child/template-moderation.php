@@ -14,7 +14,7 @@ if ( ! is_user_logged_in() ) {
     exit;
 }
 
-if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'publish_posts' ) && ! current_user_can( 'publish_partner_resources' ) ) {
+if ( ! rp_child_current_user_can_access_moderation() ) {
     wp_safe_redirect( home_url( '/' ) );
     exit;
 }
@@ -83,8 +83,12 @@ get_header();
                                     $submitting_info .= sprintf( ' (%s)', $org_list );
                                 }
 
-                                // Nonce for AJAX approval
+                                $can_moderate = rp_child_current_user_can_moderate_post( $post_id );
+                                $edit_url     = current_user_can( 'edit_post', $post_id ) ? get_edit_post_link( $post_id, 'raw' ) : '';
+
+                                // Nonces for AJAX moderation actions
                                 $approve_nonce = wp_create_nonce( 'rp_approve_resource_' . $post_id );
+                                $reject_nonce  = wp_create_nonce( 'rp_reject_resource_' . $post_id );
                                 ?>
                                 <tr id="rp-pending-row-<?php echo absint( $post_id ); ?>">
                                     <td>
@@ -156,9 +160,21 @@ get_header();
                                         <span class="rp-moderation-date"><?php echo esc_html( get_the_date() ); ?></span>
                                     </td>
                                     <td class="rp-table-actions">
-                                        <button class="rp-button rp-approve-btn" data-post-id="<?php echo absint( $post_id ); ?>" data-nonce="<?php echo esc_attr( $approve_nonce ); ?>">
-                                            <?php esc_html_e( 'Approve', 'resilient-hub' ); ?>
-                                        </button>
+                                        <?php if ( $can_moderate ) : ?>
+                                            <div class="rp-moderation-actions">
+                                                <?php if ( $edit_url ) : ?>
+                                                    <a class="rp-button rp-button-secondary rp-edit-btn" href="<?php echo esc_url( $edit_url ); ?>"><?php esc_html_e( 'Edit', 'resilient-hub' ); ?></a>
+                                                <?php endif; ?>
+                                                <button class="rp-button rp-approve-btn" data-post-id="<?php echo absint( $post_id ); ?>" data-nonce="<?php echo esc_attr( $approve_nonce ); ?>">
+                                                    <?php esc_html_e( 'Approve', 'resilient-hub' ); ?>
+                                                </button>
+                                                <button class="rp-button rp-reject-btn" data-post-id="<?php echo absint( $post_id ); ?>" data-nonce="<?php echo esc_attr( $reject_nonce ); ?>">
+                                                    <?php esc_html_e( 'Reject', 'resilient-hub' ); ?>
+                                                </button>
+                                            </div>
+                                        <?php else : ?>
+                                            <span aria-label="<?php esc_attr_e( 'No actions available', 'resilient-hub' ); ?>">&mdash;</span>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php

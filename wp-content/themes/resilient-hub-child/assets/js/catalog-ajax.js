@@ -192,41 +192,55 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // -------------------------------------------------------------
-    // 2. Admin Moderation Quick Approvals
+    // 2. Admin Moderation Actions
     // -------------------------------------------------------------
     const moderationTable = document.querySelector('.rp-moderation-table');
     if (moderationTable) {
         moderationTable.addEventListener('click', function(e) {
-            const approveBtn = e.target.closest('.rp-approve-btn');
-            if (!approveBtn) return;
+            const actionBtn = e.target.closest('.rp-approve-btn, .rp-reject-btn');
+            if (!actionBtn) return;
 
             e.preventDefault();
 
-            if (approveBtn.disabled || approveBtn.classList.contains('processing')) {
+            if (actionBtn.disabled || actionBtn.classList.contains('processing')) {
                 return;
             }
 
-            const postId = approveBtn.getAttribute('data-post-id');
-            const nonce = approveBtn.getAttribute('data-nonce');
-            const row = approveBtn.closest('tr');
+            const isReject = actionBtn.classList.contains('rp-reject-btn');
+            const postId = actionBtn.getAttribute('data-post-id');
+            const nonce = actionBtn.getAttribute('data-nonce');
+            const row = actionBtn.closest('tr');
+            let reason = '';
 
             if (!postId || !nonce || !row) return;
 
-            // Confirm approval
-            if (!confirm('Are you sure you want to approve and publish this submission?')) {
+            if (isReject) {
+                reason = prompt('Enter the reason for rejecting this submission. The author will receive this feedback:');
+                if (reason === null) return;
+                reason = reason.trim();
+                if (!reason) {
+                    alert('A rejection reason is required.');
+                    return;
+                }
+                if (reason.length > 1000) {
+                    alert('The rejection reason must be 1,000 characters or fewer.');
+                    return;
+                }
+            } else if (!confirm('Are you sure you want to approve and publish this submission?')) {
                 return;
             }
 
-            // Set loading state
-            approveBtn.disabled = true;
-            approveBtn.classList.add('processing');
-            const originalText = approveBtn.textContent;
-            approveBtn.textContent = 'Approving...';
+            const rowButtons = row.querySelectorAll('button');
+            rowButtons.forEach(button => { button.disabled = true; });
+            actionBtn.classList.add('processing');
+            const originalText = actionBtn.textContent;
+            actionBtn.textContent = isReject ? 'Rejecting...' : 'Approving...';
 
             const params = new URLSearchParams();
-            params.append('action', 'rp_approve_resource');
+            params.append('action', isReject ? 'rp_reject_resource' : 'rp_approve_resource');
             params.append('post_id', postId);
             params.append('nonce', nonce);
+            if (isReject) params.append('reason', reason);
 
             fetch(rp_ajax.ajax_url, {
                 method: 'POST',
@@ -238,17 +252,17 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Visual success feedback
-                    approveBtn.className = 'rp-approve-btn success-approved';
-                    approveBtn.textContent = 'Approved ✓';
+                    actionBtn.classList.remove('processing');
+                    actionBtn.classList.add(isReject ? 'success-rejected' : 'success-approved');
+                    actionBtn.textContent = isReject ? 'Rejected ✓' : 'Approved ✓';
+
+                    if (data.data.warning) alert(data.data.warning);
                     
-                    // Fade out and remove the row
                     setTimeout(() => {
                         row.classList.add('rp-row-fading');
-                        // Wait for transition to complete before removing from DOM
-                        row.addEventListener('transitionend', function() {
+                        const removeRow = function() {
+                            if (!row.parentNode) return;
                             row.remove();
-                            // If table is empty, show empty state message
                             const remainingRows = moderationTable.querySelectorAll('tbody tr');
                             if (remainingRows.length === 0) {
                                 const container = moderationTable.parentNode;
@@ -256,21 +270,23 @@ document.addEventListener('DOMContentLoaded', function() {
                                     container.innerHTML = '<div class="rp-moderation-empty"><p>No pending submissions to review.</p></div>';
                                 }
                             }
-                        }, { once: true });
+                        };
+                        row.addEventListener('transitionend', removeRow, { once: true });
+                        setTimeout(removeRow, 500);
                     }, 600);
                 } else {
                     alert(data.data.message || 'An error occurred. Please try again.');
-                    approveBtn.disabled = false;
-                    approveBtn.classList.remove('processing');
-                    approveBtn.textContent = originalText;
+                    rowButtons.forEach(button => { button.disabled = false; });
+                    actionBtn.classList.remove('processing');
+                    actionBtn.textContent = originalText;
                 }
             })
             .catch(error => {
-                console.error('Approval AJAX Error:', error);
+                console.error('Moderation AJAX Error:', error);
                 alert('Connection error. Please try again.');
-                approveBtn.disabled = false;
-                approveBtn.classList.remove('processing');
-                approveBtn.textContent = originalText;
+                rowButtons.forEach(button => { button.disabled = false; });
+                actionBtn.classList.remove('processing');
+                actionBtn.textContent = originalText;
             });
         });
     }

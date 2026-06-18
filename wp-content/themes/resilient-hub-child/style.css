@@ -2539,13 +2539,24 @@ input[type="submit"].give-submit:focus {
   text-align: right;
 }
 
+.rp-moderation-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.rp-moderation-actions .rp-button {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  min-height: auto;
+}
+
 .rp-approve-btn {
   background: var(--rp-color-green, #176b52);
   border-color: var(--rp-color-green, #176b52);
   color: #ffffff;
-  padding: 8px 16px;
-  font-size: 0.9rem;
-  min-height: auto;
 }
 
 .rp-approve-btn:hover:not(:disabled),
@@ -2554,7 +2565,20 @@ input[type="submit"].give-submit:focus {
   border-color: var(--rp-color-green-dark, #0f4a38);
 }
 
-.rp-approve-btn.processing {
+.rp-reject-btn {
+  background: #ffffff;
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+
+.rp-reject-btn:hover:not(:disabled),
+.rp-reject-btn:focus:not(:disabled) {
+  background: #b91c1c;
+  color: #ffffff;
+}
+
+.rp-approve-btn.processing,
+.rp-reject-btn.processing {
   opacity: 0.7;
   cursor: not-allowed;
 }
@@ -2562,6 +2586,13 @@ input[type="submit"].give-submit:focus {
 .rp-approve-btn.success-approved {
   background: #2e7d32 !important;
   border-color: #2e7d32 !important;
+  color: #ffffff !important;
+  cursor: default !important;
+}
+
+.rp-reject-btn.success-rejected {
+  background: #991b1b !important;
+  border-color: #991b1b !important;
   color: #ffffff !important;
   cursor: default !important;
 }
