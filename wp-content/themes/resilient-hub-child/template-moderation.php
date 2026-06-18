@@ -3,7 +3,7 @@
  * Template Name: Moderation Dashboard
  *
  * A front-end moderation page for administrators and editors
- * to quickly review and approve pending partner resource submissions.
+ * to quickly review and approve pending submissions.
  *
  * @package ResilientHub
  */
@@ -32,14 +32,14 @@ get_header();
     <div class="rp-dashboard-body">
     <div class="rp-page-shell">
         <header class="rp-dashboard-header">
-            <p class="rp-dashboard-subtitle"><?php esc_html_e( 'Review and approve resources submitted by partner organizations.', 'resilient-hub' ); ?></p>
+            <p class="rp-dashboard-subtitle"><?php esc_html_e( 'Review and approve submitted resources, reports, stories, and gallery photos.', 'resilient-hub' ); ?></p>
         </header>
 
         <div class="rp-moderation-container">
             <?php
-            // Query pending partner resources, situation reports, and accord library products
+            // Query pending partner resources, situation reports, accord library products, posts, and gallery photos
             $pending_query = new WP_Query( array(
-                'post_type'      => array( 'partner_resources', 'rp_sitrep', 'accord_library', 'post' ),
+                'post_type'      => array( 'partner_resources', 'rp_sitrep', 'accord_library', 'post', 'rp_gallery_photo' ),
                 'post_status'    => 'pending',
                 'posts_per_page' => -1, // Retrieve all pending
                 'orderby'        => 'date',
@@ -70,8 +70,11 @@ get_header();
                                     $author_name = get_the_author_meta( 'user_login' );
                                 }
 
+                                $post_id = get_the_ID();
+                                $post_type = get_post_type();
+
                                 // Get contributing organization terms
-                                $orgs = get_the_terms( get_the_ID(), 'contributing_org' );
+                                $orgs = get_the_terms( $post_id, 'contributing_org' );
                                 $org_list = ( ! is_wp_error( $orgs ) && ! empty( $orgs ) ) ? implode( ', ', wp_list_pluck( $orgs, 'name' ) ) : '';
 
                                 // Combine contributor & org
@@ -81,36 +84,65 @@ get_header();
                                 }
 
                                 // Nonce for AJAX approval
-                                $approve_nonce = wp_create_nonce( 'rp_approve_resource_' . get_the_ID() );
+                                $approve_nonce = wp_create_nonce( 'rp_approve_resource_' . $post_id );
                                 ?>
-                                <tr id="rp-pending-row-<?php the_ID(); ?>">
+                                <tr id="rp-pending-row-<?php echo absint( $post_id ); ?>">
                                     <td>
                                         <div class="rp-moderation-title-wrapper">
+                                            <?php if ( 'rp_gallery_photo' === $post_type && has_post_thumbnail( $post_id ) ) : ?>
+                                                <div class="rp-moderation-thumb" style="margin-bottom:8px; max-width:140px;">
+                                                    <?php echo get_the_post_thumbnail( $post_id, 'thumbnail', array( 'style' => 'width:100%; height:auto; border-radius:6px; display:block;' ) ); ?>
+                                                </div>
+                                            <?php endif; ?>
                                             <strong><?php the_title(); ?></strong>
                                             <div class="rp-moderation-links">
-                                                <a href="<?php echo esc_url( get_preview_post_link( get_the_ID() ) ); ?>" target="_blank"><?php esc_html_e( 'Preview details', 'resilient-hub' ); ?></a>
+                                                <a href="<?php echo esc_url( get_preview_post_link( $post_id ) ); ?>" target="_blank"><?php esc_html_e( 'Preview details', 'resilient-hub' ); ?></a>
+                                                <?php if ( 'rp_gallery_photo' === $post_type ) : ?>
+                                                    <?php $sharepoint_url = get_post_meta( $post_id, '_rp_gallery_sharepoint_web_url', true ); ?>
+                                                    <?php if ( $sharepoint_url ) : ?>
+                                                        <span aria-hidden="true"> | </span><a href="<?php echo esc_url( $sharepoint_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'SharePoint original', 'resilient-hub' ); ?></a>
+                                                    <?php endif; ?>
+                                                    <div class="rp-gallery-review-meta" style="font-size:12px; color:var(--rp-color-muted); margin-top:6px;">
+                                                        <?php
+                                                        $gallery_meta = array_filter( array(
+                                                            get_post_meta( $post_id, '_rp_gallery_location', true ),
+                                                            get_post_meta( $post_id, '_rp_gallery_photo_date', true ),
+                                                            get_post_meta( $post_id, '_rp_gallery_project_program', true ),
+                                                        ) );
+                                                        echo esc_html( implode( ' | ', $gallery_meta ) );
+                                                        $gallery_tags = get_the_terms( $post_id, 'rp_gallery_tag' );
+                                                        if ( ! is_wp_error( $gallery_tags ) && ! empty( $gallery_tags ) ) {
+                                                            echo esc_html( ' | Tags: ' . implode( ', ', wp_list_pluck( $gallery_tags, 'name' ) ) );
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <span class="rp-moderation-badge rp-badge-<?php echo esc_attr( get_post_type() ); ?>" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; background: <?php 
-                                            if ( 'rp_sitrep' === get_post_type() ) {
+                                        <span class="rp-moderation-badge rp-badge-<?php echo esc_attr( $post_type ); ?>" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; display: inline-block; background: <?php
+                                            if ( 'rp_sitrep' === $post_type ) {
                                                 echo '#fef3c7; color: #d97706;';
-                                            } elseif ( 'accord_library' === get_post_type() ) {
+                                            } elseif ( 'accord_library' === $post_type ) {
                                                 echo '#f0fdf4; color: #16a34a;';
-                                            } elseif ( 'post' === get_post_type() ) {
+                                            } elseif ( 'post' === $post_type ) {
                                                 echo '#f3e8ff; color: #7c3aed;';
+                                            } elseif ( 'rp_gallery_photo' === $post_type ) {
+                                                echo '#ecfeff; color: #0e7490;';
                                             } else {
                                                 echo '#dbeafe; color: #2563eb;';
                                             }
                                         ?>">
                                             <?php 
-                                                if ( 'rp_sitrep' === get_post_type() ) {
+                                                if ( 'rp_sitrep' === $post_type ) {
                                                     echo esc_html__( 'Situation Report', 'resilient-hub' );
-                                                } elseif ( 'accord_library' === get_post_type() ) {
+                                                } elseif ( 'accord_library' === $post_type ) {
                                                     echo esc_html__( 'ACCORD Library', 'resilient-hub' );
-                                                } elseif ( 'post' === get_post_type() ) {
+                                                } elseif ( 'post' === $post_type ) {
                                                     echo esc_html__( 'Post / Story', 'resilient-hub' );
+                                                } elseif ( 'rp_gallery_photo' === $post_type ) {
+                                                    echo esc_html__( 'Gallery Photo', 'resilient-hub' );
                                                 } else {
                                                     echo esc_html__( 'Partner Resource', 'resilient-hub' );
                                                 }
@@ -124,7 +156,7 @@ get_header();
                                         <span class="rp-moderation-date"><?php echo esc_html( get_the_date() ); ?></span>
                                     </td>
                                     <td class="rp-table-actions">
-                                        <button class="rp-button rp-approve-btn" data-post-id="<?php the_ID(); ?>" data-nonce="<?php echo esc_attr( $approve_nonce ); ?>">
+                                        <button class="rp-button rp-approve-btn" data-post-id="<?php echo absint( $post_id ); ?>" data-nonce="<?php echo esc_attr( $approve_nonce ); ?>">
                                             <?php esc_html_e( 'Approve', 'resilient-hub' ); ?>
                                         </button>
                                     </td>
@@ -138,7 +170,7 @@ get_header();
                 </div>
             <?php else : ?>
                 <div class="rp-moderation-empty">
-                    <p><?php esc_html_e( 'No pending resources to review.', 'resilient-hub' ); ?></p>
+                    <p><?php esc_html_e( 'No pending submissions to review.', 'resilient-hub' ); ?></p>
                 </div>
             <?php endif; ?>
         </div>

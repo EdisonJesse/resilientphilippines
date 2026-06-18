@@ -487,7 +487,7 @@ function rp_child_setup_donation_platform() {
 add_action( 'init', 'rp_child_setup_donation_platform' );
 
 /**
- * AJAX handler for approving pending partner resources.
+ * AJAX handler for approving pending submissions.
  */
 function rp_ajax_approve_resource_handler() {
 	if ( ! is_user_logged_in() ) {
@@ -506,7 +506,7 @@ function rp_ajax_approve_resource_handler() {
 	}
 
 	$post = get_post( $post_id );
-	if ( ! $post || ! in_array( $post->post_type, array( 'partner_resources', 'rp_sitrep', 'accord_library', 'post' ), true ) || 'pending' !== $post->post_status ) {
+	if ( ! $post || ! in_array( $post->post_type, array( 'partner_resources', 'rp_sitrep', 'accord_library', 'post', 'rp_gallery_photo' ), true ) || 'pending' !== $post->post_status ) {
 		wp_send_json_error( array( 'message' => __( 'Submission not found or is not pending review.', 'resilient-hub' ) ) );
 	}
 

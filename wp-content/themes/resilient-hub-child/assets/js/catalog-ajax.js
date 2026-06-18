@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!postId || !nonce || !row) return;
 
             // Confirm approval
-            if (!confirm('Are you sure you want to approve and publish this resource?')) {
+            if (!confirm('Are you sure you want to approve and publish this submission?')) {
                 return;
             }
 
@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (remainingRows.length === 0) {
                                 const container = moderationTable.parentNode;
                                 if (container) {
-                                    container.innerHTML = '<div class="rp-moderation-empty"><p>No pending resources to review.</p></div>';
+                                    container.innerHTML = '<div class="rp-moderation-empty"><p>No pending submissions to review.</p></div>';
                                 }
                             }
                         }, { once: true });
