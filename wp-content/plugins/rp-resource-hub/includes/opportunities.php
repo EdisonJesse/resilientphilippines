@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_OPPORTUNITIES_VERSION', '1.0.2' );
+define( 'RP_OPPORTUNITIES_VERSION', '1.0.3' );
 define( 'RP_JOB_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_JOB_MAX_ATTACHMENTS', 5 );
 define( 'RP_BID_MAX_ATTACHMENT_BYTES', 25 * 1024 * 1024 );
@@ -67,7 +67,7 @@ function rp_opportunities_user_can_manage_submission_type( $type ) {
 }
 
 function rp_opportunities_user_can_submit() {
-	return is_user_logged_in() && ( current_user_can( 'manage_opportunities' ) || current_user_can( 'manage_job_applications' ) || current_user_can( 'manage_bid_submissions' ) || current_user_can( 'manage_options' ) );
+	return is_user_logged_in() && ( current_user_can( 'manage_opportunities' ) || current_user_can( 'manage_job_applications' ) || current_user_can( 'manage_bid_submissions' ) || current_user_can( 'submit_job_opportunities' ) || current_user_can( 'submit_itb_opportunities' ) || current_user_can( 'manage_options' ) );
 }
 
 function rp_opportunities_allowed_submit_types() {
@@ -75,10 +75,10 @@ function rp_opportunities_allowed_submit_types() {
 	if ( current_user_can( 'manage_options' ) || current_user_can( 'manage_opportunities' ) ) {
 		return array_keys( rp_opportunities_type_options() );
 	}
-	if ( current_user_can( 'manage_job_applications' ) ) {
+	if ( current_user_can( 'manage_job_applications' ) || current_user_can( 'submit_job_opportunities' ) ) {
 		$types[] = 'job';
 	}
-	if ( current_user_can( 'manage_bid_submissions' ) ) {
+	if ( current_user_can( 'manage_bid_submissions' ) || current_user_can( 'submit_itb_opportunities' ) ) {
 		$types[] = 'itb';
 	}
 	return $types;
@@ -118,6 +118,8 @@ function rp_opportunities_apply_roles_and_caps() {
 		'manage_opportunities',
 		'manage_job_applications',
 		'manage_bid_submissions',
+		'submit_job_opportunities',
+		'submit_itb_opportunities',
 	);
 
 	foreach ( array( 'administrator', 'editor' ) as $role_name ) {
@@ -142,12 +144,33 @@ function rp_opportunities_apply_roles_and_caps() {
 				'read'                    => true,
 				'upload_files'            => true,
 				'manage_job_applications' => true,
+				'submit_job_opportunities' => true,
 			)
 		);
 	} else {
 		$hr->add_cap( 'read' );
 		$hr->add_cap( 'upload_files' );
 		$hr->add_cap( 'manage_job_applications' );
+		$hr->add_cap( 'submit_job_opportunities' );
+	}
+
+	$hr_department = get_role( 'rp_hr_department' );
+	if ( ! $hr_department ) {
+		add_role(
+			'rp_hr_department',
+			__( 'ACCORD HR', 'rp-resource-hub' ),
+			array(
+				'read'                     => true,
+				'upload_files'             => true,
+				'manage_job_applications'  => true,
+				'submit_job_opportunities' => true,
+			)
+		);
+	} else {
+		$hr_department->add_cap( 'read' );
+		$hr_department->add_cap( 'upload_files' );
+		$hr_department->add_cap( 'manage_job_applications' );
+		$hr_department->add_cap( 'submit_job_opportunities' );
 	}
 
 	$procurement = get_role( 'rp_procurement_reviewer' );
@@ -159,12 +182,33 @@ function rp_opportunities_apply_roles_and_caps() {
 				'read'                   => true,
 				'upload_files'           => true,
 				'manage_bid_submissions' => true,
+				'submit_itb_opportunities' => true,
 			)
 		);
 	} else {
 		$procurement->add_cap( 'read' );
 		$procurement->add_cap( 'upload_files' );
 		$procurement->add_cap( 'manage_bid_submissions' );
+		$procurement->add_cap( 'submit_itb_opportunities' );
+	}
+
+	$procurement_department = get_role( 'rp_procurement_department' );
+	if ( ! $procurement_department ) {
+		add_role(
+			'rp_procurement_department',
+			__( 'ACCORD Procurement', 'rp-resource-hub' ),
+			array(
+				'read'                     => true,
+				'upload_files'             => true,
+				'manage_bid_submissions'   => true,
+				'submit_itb_opportunities' => true,
+			)
+		);
+	} else {
+		$procurement_department->add_cap( 'read' );
+		$procurement_department->add_cap( 'upload_files' );
+		$procurement_department->add_cap( 'manage_bid_submissions' );
+		$procurement_department->add_cap( 'submit_itb_opportunities' );
 	}
 }
 

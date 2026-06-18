@@ -100,3 +100,34 @@ Path: `app/public/wp-content/themes/resilient-hub-child/`
   - Temporary Procurement user saw only the ITB posting form/link and could not access the job posting form.
   - Temporary dashboard records confirmed Layer 1 and Layer 2 action controls for both HR and Procurement.
   - Temporary test users, posts, applications, and bid submissions were removed.
+
+---
+
+## 6. Latest Session Record - HR and Procurement Roles
+
+- **Date**: June 18, 2026
+- **Purpose**: Add explicit department roles for opportunities workflows and confirm access to the related pages.
+- **Changed files**:
+  - `wp-content/plugins/rp-resource-hub/rp-resource-hub.php`
+  - `wp-content/plugins/rp-resource-hub/includes/opportunities.php`
+  - `handoff.md`
+- **Implemented roles**:
+  - `rp_hr_department`, label `ACCORD HR`
+    - Capabilities: `read`, `upload_files`, `manage_job_applications`, `submit_job_opportunities`
+    - Related pages: `/submit-job-opportunity/`, `/job-applications-dashboard/`
+  - `rp_procurement_department`, label `ACCORD Procurement`
+    - Capabilities: `read`, `upload_files`, `manage_bid_submissions`, `submit_itb_opportunities`
+    - Related pages: `/submit-invitation-to-bid/`, `/bid-submissions-dashboard/`
+- **Compatibility kept**:
+  - Existing `rp_hr_reviewer` and `rp_procurement_reviewer` roles remain available.
+  - Existing reviewer roles also receive the matching submit capability.
+  - Administrators receive both new submit capabilities.
+- **Local verification**:
+  - PHP lint passed for the changed plugin files.
+  - WordPress role registry contains both new roles and labels.
+  - Plugin options updated:
+    - `rp_opportunities_version = 1.0.3`
+    - `rp_resource_hub_version = 1.10.3`
+  - Temporary `rp_hr_department` user saw only `Submit Job Posting`, could access the job form/dashboard, and was denied the ITB form.
+  - Temporary `rp_procurement_department` user saw only `Submit ITB Posting`, could access the ITB form/dashboard, and was denied the job form.
+  - Temporary test users were removed.
