@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! defined( 'RP_GALLERY_MAX_UPLOAD_BYTES' ) ) {
 	define( 'RP_GALLERY_MAX_UPLOAD_BYTES', 15 * 1024 * 1024 );
 }
+if ( ! defined( 'RP_GALLERY_MAX_BULK_FILES' ) ) {
+	define( 'RP_GALLERY_MAX_BULK_FILES', 10 );
+}
 if ( ! defined( 'RP_GALLERY_SP_TENANT_ID' ) ) {
 	define( 'RP_GALLERY_SP_TENANT_ID', '' );
 }
@@ -131,9 +134,9 @@ function rp_gallery_shortcode_upload_form() {
 		<?php wp_nonce_field( 'rp_gallery_photo_upload', 'rp_gallery_photo_upload_nonce' ); ?>
 
 		<div class="rp-field">
-			<label for="rp_gallery_photo"><?php esc_html_e( 'Photo', 'rp-resource-hub' ); ?></label>
-			<input id="rp_gallery_photo" name="rp_gallery_photo" type="file" accept="image/jpeg,image/png,image/webp" required>
-			<p class="rp-field-help"><?php esc_html_e( 'Upload JPG, PNG, or WebP. The original will be stored privately in SharePoint.', 'rp-resource-hub' ); ?></p>
+			<label for="rp_gallery_photo"><?php esc_html_e( 'Photos', 'rp-resource-hub' ); ?></label>
+			<input id="rp_gallery_photo" name="rp_gallery_photo[]" type="file" accept="image/jpeg,image/png,image/webp" multiple required>
+			<p class="rp-field-help"><?php printf( esc_html__( 'Upload up to %d JPG, PNG, or WebP files. Shared information, tags, and consent will apply to every photo. Originals will be stored privately in SharePoint.', 'rp-resource-hub' ), absint( RP_GALLERY_MAX_BULK_FILES ) ); ?></p>
 		</div>
 
 		<div class="rp-field">
@@ -197,7 +200,7 @@ function rp_gallery_shortcode_upload_form() {
 			</div>
 		</div>
 
-		<button type="submit" class="rp-button"><?php esc_html_e( 'Submit Photo', 'rp-resource-hub' ); ?></button>
+		<button type="submit" class="rp-button"><?php esc_html_e( 'Submit Photo(s)', 'rp-resource-hub' ); ?></button>
 	</form>
 	<?php
 	return ob_get_clean();
@@ -230,6 +233,33 @@ function rp_gallery_allowed_file( $file ) {
 	return $type;
 }
 
+function rp_gallery_normalize_uploaded_files( $field ) {
+	if ( empty( $field['name'] ) ) {
+		return array();
+	}
+
+	$files = array();
+	if ( is_array( $field['name'] ) ) {
+		foreach ( $field['name'] as $index => $name ) {
+			if ( empty( $name ) ) {
+				continue;
+			}
+
+			$files[] = array(
+				'name'     => $name,
+				'type'     => isset( $field['type'][ $index ] ) ? $field['type'][ $index ] : '',
+				'tmp_name' => isset( $field['tmp_name'][ $index ] ) ? $field['tmp_name'][ $index ] : '',
+				'error'    => isset( $field['error'][ $index ] ) ? $field['error'][ $index ] : UPLOAD_ERR_NO_FILE,
+				'size'     => isset( $field['size'][ $index ] ) ? $field['size'][ $index ] : 0,
+			);
+		}
+	} else {
+		$files[] = $field;
+	}
+
+	return $files;
+}
+
 function rp_gallery_handle_upload() {
 	if ( ! is_user_logged_in() ) {
 		wp_safe_redirect( home_url( '/portal-entry/?redirect_to=' . urlencode( rp_gallery_upload_url() ) ) );
@@ -247,10 +277,25 @@ function rp_gallery_handle_upload() {
 		}
 	}
 
-	$file = isset( $_FILES['rp_gallery_photo'] ) ? $_FILES['rp_gallery_photo'] : array();
-	$file_type = rp_gallery_allowed_file( $file );
-	if ( is_wp_error( $file_type ) ) {
-		rp_gallery_store_notice_and_redirect( 'error', $file_type->get_error_message() );
+	$files = rp_gallery_normalize_uploaded_files( isset( $_FILES['rp_gallery_photo'] ) ? $_FILES['rp_gallery_photo'] : array() );
+	if ( empty( $files ) ) {
+		rp_gallery_store_notice_and_redirect( 'error', __( 'At least one photo file is required.', 'rp-resource-hub' ) );
+	}
+	if ( count( $files ) > RP_GALLERY_MAX_BULK_FILES ) {
+		rp_gallery_store_notice_and_redirect( 'error', sprintf( __( 'Please upload no more than %d photos at a time.', 'rp-resource-hub' ), absint( RP_GALLERY_MAX_BULK_FILES ) ) );
+	}
+
+	$file_types = array();
+	foreach ( $files as $index => $file ) {
+		if ( ! empty( $file['error'] ) && UPLOAD_ERR_OK !== (int) $file['error'] ) {
+			rp_gallery_store_notice_and_redirect( 'error', sprintf( __( 'Upload failed for %s.', 'rp-resource-hub' ), sanitize_file_name( $file['name'] ) ) );
+		}
+
+		$file_type = rp_gallery_allowed_file( $file );
+		if ( is_wp_error( $file_type ) ) {
+			rp_gallery_store_notice_and_redirect( 'error', sprintf( '%s: %s', sanitize_file_name( $file['name'] ), $file_type->get_error_message() ) );
+		}
+		$file_types[ $index ] = $file_type;
 	}
 
 	$location       = isset( $_POST['rp_gallery_location'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_gallery_location'] ) ) : '';
@@ -263,73 +308,98 @@ function rp_gallery_handle_upload() {
 	$project_value  = 'Other' === $project && $project_other ? $project_other : $project;
 
 	if ( empty( $location ) || empty( $photo_date ) || empty( $caption ) || empty( $project_value ) ) {
-		rp_gallery_store_notice_and_redirect( 'error', __( 'Photo, location, date, caption, and project/program are required.', 'rp-resource-hub' ) );
+		rp_gallery_store_notice_and_redirect( 'error', __( 'Photos, location, date, caption, and project/program are required.', 'rp-resource-hub' ) );
 	}
 
 	$user          = wp_get_current_user();
 	$submitted_at  = current_time( 'mysql' );
 	$title         = wp_trim_words( $caption, 10, '' );
 	$title         = $title ? $title : __( 'Gallery Photo Submission', 'rp-resource-hub' );
-	$post_id       = wp_insert_post(
-		array(
-			'post_type'    => 'rp_gallery_photo',
-			'post_title'   => $title,
-			'post_content' => $caption,
-			'post_status'  => 'pending',
-			'post_author'  => get_current_user_id(),
-		),
-		true
-	);
-
-	if ( is_wp_error( $post_id ) ) {
-		rp_gallery_store_notice_and_redirect( 'error', $post_id->get_error_message() );
-	}
-
-	$submission_id = 'RP-' . gmdate( 'Ymd' ) . '-' . str_pad( (string) $post_id, 6, '0', STR_PAD_LEFT );
-	$extension     = strtolower( $file_type['ext'] );
-	$base_name     = sanitize_file_name( $submission_id . '-original.' . $extension );
-
-	$sharepoint = rp_gallery_sharepoint_upload( $file['tmp_name'], $base_name, $submission_id, array(
-		'SubmittedBy'     => $user->display_name ? $user->display_name : $user->user_login,
-		'WebsiteUserID'   => (string) get_current_user_id(),
-		'PhotoDate'       => $photo_date,
-		'Location'        => $location,
-		'Caption'         => $caption,
-		'ProjectProgram'  => $project_value,
-		'Tags'            => rp_gallery_selected_tag_names(),
-	) );
-
-	if ( is_wp_error( $sharepoint ) ) {
-		wp_delete_post( $post_id, true );
-		rp_gallery_store_notice_and_redirect( 'error', $sharepoint->get_error_message() );
-	}
-
-	$attachment_id = rp_gallery_create_public_image( $file['tmp_name'], $post_id, $submission_id, $extension );
-	if ( is_wp_error( $attachment_id ) ) {
-		wp_delete_post( $post_id, true );
-		rp_gallery_store_notice_and_redirect( 'error', $attachment_id->get_error_message() );
-	}
-
-	set_post_thumbnail( $post_id, $attachment_id );
-
-	update_post_meta( $post_id, '_rp_gallery_submission_id', $submission_id );
-	update_post_meta( $post_id, '_rp_gallery_location', $location );
-	update_post_meta( $post_id, '_rp_gallery_photo_date', $photo_date );
-	update_post_meta( $post_id, '_rp_gallery_project_program', $project_value );
-	update_post_meta( $post_id, '_rp_gallery_photographer', $photographer );
-	update_post_meta( $post_id, '_rp_gallery_reviewer_notes', $reviewer_notes );
-	update_post_meta( $post_id, '_rp_gallery_consent_timestamp', $submitted_at );
-	update_post_meta( $post_id, '_rp_gallery_consent_version', '2026-06-18' );
-	update_post_meta( $post_id, '_rp_gallery_sharepoint_item_id', isset( $sharepoint['id'] ) ? $sharepoint['id'] : '' );
-	update_post_meta( $post_id, '_rp_gallery_sharepoint_web_url', isset( $sharepoint['webUrl'] ) ? esc_url_raw( $sharepoint['webUrl'] ) : '' );
-
 	$tag_ids = isset( $_POST['rp_gallery_tags'] ) ? array_map( 'absint', (array) $_POST['rp_gallery_tags'] ) : array();
 	$tag_ids = array_filter( $tag_ids );
-	if ( $tag_ids ) {
-		wp_set_object_terms( $post_id, $tag_ids, 'rp_gallery_tag' );
+	$tag_names = rp_gallery_selected_tag_names();
+	$success_count = 0;
+	$errors = array();
+
+	foreach ( $files as $index => $file ) {
+		$file_title = $title;
+		if ( count( $files ) > 1 ) {
+			$file_title = sprintf( '%s %d', $title, $index + 1 );
+		}
+
+		$post_id = wp_insert_post(
+			array(
+				'post_type'    => 'rp_gallery_photo',
+				'post_title'   => $file_title,
+				'post_content' => $caption,
+				'post_status'  => 'pending',
+				'post_author'  => get_current_user_id(),
+			),
+			true
+		);
+
+		if ( is_wp_error( $post_id ) ) {
+			$errors[] = sanitize_file_name( $file['name'] ) . ': ' . $post_id->get_error_message();
+			continue;
+		}
+
+		$submission_id = 'RP-' . gmdate( 'Ymd' ) . '-' . str_pad( (string) $post_id, 6, '0', STR_PAD_LEFT );
+		$extension     = strtolower( $file_types[ $index ]['ext'] );
+		$base_name     = sanitize_file_name( $submission_id . '-original.' . $extension );
+
+		$sharepoint = rp_gallery_sharepoint_upload( $file['tmp_name'], $base_name, $submission_id, array(
+			'SubmittedBy'     => $user->display_name ? $user->display_name : $user->user_login,
+			'WebsiteUserID'   => (string) get_current_user_id(),
+			'PhotoDate'       => $photo_date,
+			'Location'        => $location,
+			'Caption'         => $caption,
+			'ProjectProgram'  => $project_value,
+			'Tags'            => $tag_names,
+		) );
+
+		if ( is_wp_error( $sharepoint ) ) {
+			wp_delete_post( $post_id, true );
+			$errors[] = sanitize_file_name( $file['name'] ) . ': ' . $sharepoint->get_error_message();
+			continue;
+		}
+
+		$attachment_id = rp_gallery_create_public_image( $file['tmp_name'], $post_id, $submission_id, $extension );
+		if ( is_wp_error( $attachment_id ) ) {
+			wp_delete_post( $post_id, true );
+			$errors[] = sanitize_file_name( $file['name'] ) . ': ' . $attachment_id->get_error_message();
+			continue;
+		}
+
+		set_post_thumbnail( $post_id, $attachment_id );
+
+		update_post_meta( $post_id, '_rp_gallery_submission_id', $submission_id );
+		update_post_meta( $post_id, '_rp_gallery_location', $location );
+		update_post_meta( $post_id, '_rp_gallery_photo_date', $photo_date );
+		update_post_meta( $post_id, '_rp_gallery_project_program', $project_value );
+		update_post_meta( $post_id, '_rp_gallery_photographer', $photographer );
+		update_post_meta( $post_id, '_rp_gallery_reviewer_notes', $reviewer_notes );
+		update_post_meta( $post_id, '_rp_gallery_consent_timestamp', $submitted_at );
+		update_post_meta( $post_id, '_rp_gallery_consent_version', '2026-06-18' );
+		update_post_meta( $post_id, '_rp_gallery_original_filename', sanitize_file_name( $file['name'] ) );
+		update_post_meta( $post_id, '_rp_gallery_sharepoint_item_id', isset( $sharepoint['id'] ) ? $sharepoint['id'] : '' );
+		update_post_meta( $post_id, '_rp_gallery_sharepoint_web_url', isset( $sharepoint['webUrl'] ) ? esc_url_raw( $sharepoint['webUrl'] ) : '' );
+
+		if ( $tag_ids ) {
+			wp_set_object_terms( $post_id, $tag_ids, 'rp_gallery_tag' );
+		}
+
+		$success_count++;
 	}
 
-	rp_gallery_store_notice_and_redirect( 'success', __( 'Photo submitted for review. Thank you.', 'rp-resource-hub' ) );
+	if ( $success_count && empty( $errors ) ) {
+		rp_gallery_store_notice_and_redirect( 'success', sprintf( _n( '%d photo submitted for review. Thank you.', '%d photos submitted for review. Thank you.', $success_count, 'rp-resource-hub' ), $success_count ) );
+	}
+
+	if ( $success_count ) {
+		rp_gallery_store_notice_and_redirect( 'error', sprintf( __( '%1$d photo(s) were submitted, but %2$d failed: %3$s', 'rp-resource-hub' ), $success_count, count( $errors ), implode( '; ', array_slice( $errors, 0, 3 ) ) ) );
+	}
+
+	rp_gallery_store_notice_and_redirect( 'error', sprintf( __( 'No photos were submitted. %s', 'rp-resource-hub' ), implode( '; ', array_slice( $errors, 0, 3 ) ) ) );
 }
 add_action( 'admin_post_rp_gallery_photo_upload', 'rp_gallery_handle_upload' );
 
