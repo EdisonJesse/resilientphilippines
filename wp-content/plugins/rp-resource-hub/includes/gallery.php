@@ -36,6 +36,30 @@ if ( ! defined( 'RP_GALLERY_SP_LIBRARY_NAME' ) ) {
 if ( ! defined( 'RP_GALLERY_SP_UPLOAD_ROOT' ) ) {
 	define( 'RP_GALLERY_SP_UPLOAD_ROOT', '' );
 }
+if ( ! defined( 'RP_GALLERY_SP_FIELD_SUBMISSION_ID' ) ) {
+	define( 'RP_GALLERY_SP_FIELD_SUBMISSION_ID', 'SubmissionID' );
+}
+if ( ! defined( 'RP_GALLERY_SP_FIELD_SUBMITTED_BY' ) ) {
+	define( 'RP_GALLERY_SP_FIELD_SUBMITTED_BY', 'SubmittedBy' );
+}
+if ( ! defined( 'RP_GALLERY_SP_FIELD_WEBSITE_USER_ID' ) ) {
+	define( 'RP_GALLERY_SP_FIELD_WEBSITE_USER_ID', 'WebsiteUserID' );
+}
+if ( ! defined( 'RP_GALLERY_SP_FIELD_PHOTO_DATE' ) ) {
+	define( 'RP_GALLERY_SP_FIELD_PHOTO_DATE', 'PhotoDate' );
+}
+if ( ! defined( 'RP_GALLERY_SP_FIELD_LOCATION' ) ) {
+	define( 'RP_GALLERY_SP_FIELD_LOCATION', 'Location' );
+}
+if ( ! defined( 'RP_GALLERY_SP_FIELD_CAPTION' ) ) {
+	define( 'RP_GALLERY_SP_FIELD_CAPTION', 'Caption' );
+}
+if ( ! defined( 'RP_GALLERY_SP_FIELD_PROJECT_PROGRAM' ) ) {
+	define( 'RP_GALLERY_SP_FIELD_PROJECT_PROGRAM', 'ProjectProgram' );
+}
+if ( ! defined( 'RP_GALLERY_SP_FIELD_TAGS' ) ) {
+	define( 'RP_GALLERY_SP_FIELD_TAGS', 'Tags' );
+}
 
 function rp_gallery_register_post_type_and_taxonomy() {
 	register_post_type(
@@ -389,6 +413,9 @@ function rp_gallery_handle_upload() {
 		update_post_meta( $post_id, '_rp_gallery_original_filename', sanitize_file_name( $file['name'] ) );
 		update_post_meta( $post_id, '_rp_gallery_sharepoint_item_id', isset( $sharepoint['id'] ) ? $sharepoint['id'] : '' );
 		update_post_meta( $post_id, '_rp_gallery_sharepoint_web_url', isset( $sharepoint['webUrl'] ) ? esc_url_raw( $sharepoint['webUrl'] ) : '' );
+		if ( ! empty( $sharepoint['rpMetadataError'] ) ) {
+			update_post_meta( $post_id, '_rp_gallery_sharepoint_metadata_error', sanitize_text_field( $sharepoint['rpMetadataError'] ) );
+		}
 
 		if ( $tag_ids ) {
 			wp_set_object_terms( $post_id, $tag_ids, 'rp_gallery_tag' );
@@ -438,7 +465,7 @@ function rp_gallery_sharepoint_upload( $file_path, $file_name, $submission_id, $
 
 	$year        = gmdate( 'Y' );
 	$month       = gmdate( 'Y-m' );
-	$folder_path = ltrim( trim( RP_GALLERY_SP_UPLOAD_ROOT, '/' ) . '/' . $year . '/' . $month . '/' . $submission_id, '/' );
+	$folder_path = ltrim( trim( RP_GALLERY_SP_UPLOAD_ROOT, '/' ) . '/' . $year . '/' . $month, '/' );
 	$folder      = rp_gallery_sharepoint_ensure_folder_path( $token, $drive_id, $folder_path );
 	if ( is_wp_error( $folder ) ) {
 		return $folder;
@@ -470,7 +497,10 @@ function rp_gallery_sharepoint_upload( $file_path, $file_name, $submission_id, $
 		return new WP_Error( 'sharepoint_upload_failed', rp_gallery_sharepoint_error_message( $response, __( 'Original photo could not be uploaded to SharePoint.', 'rp-resource-hub' ) ) );
 	}
 
-	rp_gallery_sharepoint_update_metadata( $token, $drive_id, $body['id'], $submission_id, $metadata );
+	$metadata_result = rp_gallery_sharepoint_update_metadata( $token, $drive_id, $body['id'], $submission_id, $metadata );
+	if ( is_wp_error( $metadata_result ) ) {
+		$body['rpMetadataError'] = $metadata_result->get_error_message();
+	}
 
 	return $body;
 }
@@ -639,22 +669,29 @@ function rp_gallery_sharepoint_update_metadata( $token, $drive_id, $item_id, $su
 	$fields = apply_filters(
 		'rp_gallery_sharepoint_fields',
 		array(
-			'Title'              => $submission_id,
-			'SubmissionID'       => $submission_id,
-			'SubmittedBy'        => $metadata['SubmittedBy'],
-			'WebsiteUserID'      => $metadata['WebsiteUserID'],
-			'PhotoDate'          => $metadata['PhotoDate'],
-			'Location'           => $metadata['Location'],
-			'Caption'            => $metadata['Caption'],
-			'ProjectProgram'     => $metadata['ProjectProgram'],
-			'Tags'               => $metadata['Tags'],
+			'Title'                               => $submission_id,
+			RP_GALLERY_SP_FIELD_SUBMISSION_ID     => $submission_id,
+			RP_GALLERY_SP_FIELD_SUBMITTED_BY      => $metadata['SubmittedBy'],
+			RP_GALLERY_SP_FIELD_WEBSITE_USER_ID   => $metadata['WebsiteUserID'],
+			RP_GALLERY_SP_FIELD_PHOTO_DATE        => $metadata['PhotoDate'],
+			RP_GALLERY_SP_FIELD_LOCATION          => $metadata['Location'],
+			RP_GALLERY_SP_FIELD_CAPTION           => $metadata['Caption'],
+			RP_GALLERY_SP_FIELD_PROJECT_PROGRAM   => $metadata['ProjectProgram'],
+			RP_GALLERY_SP_FIELD_TAGS              => $metadata['Tags'],
 		),
 		$metadata,
 		$submission_id
 	);
+	$fields = array_filter(
+		$fields,
+		static function( $key ) {
+			return '' !== (string) $key;
+		},
+		ARRAY_FILTER_USE_KEY
+	);
 
 	$url = 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( $drive_id ) . '/items/' . rawurlencode( $item_id ) . '/listItem/fields';
-	wp_remote_request(
+	$response = wp_remote_request(
 		$url,
 		array(
 			'method'  => 'PATCH',
@@ -666,6 +703,17 @@ function rp_gallery_sharepoint_update_metadata( $token, $drive_id, $item_id, $su
 			'body'    => wp_json_encode( $fields ),
 		)
 	);
+
+	if ( is_wp_error( $response ) ) {
+		return $response;
+	}
+
+	$code = wp_remote_retrieve_response_code( $response );
+	if ( $code < 200 || $code > 299 ) {
+		return new WP_Error( 'sharepoint_metadata_failed', rp_gallery_sharepoint_error_message( $response, __( 'SharePoint photo metadata could not be updated.', 'rp-resource-hub' ) ) );
+	}
+
+	return true;
 }
 
 function rp_gallery_create_public_image( $source_path, $post_id, $submission_id, $extension ) {
@@ -849,6 +897,7 @@ function rp_gallery_render_submission_meta_box( $post ) {
 		__( 'Consent Timestamp', 'rp-resource-hub' )   => get_post_meta( $post->ID, '_rp_gallery_consent_timestamp', true ),
 	);
 	$sharepoint_url = get_post_meta( $post->ID, '_rp_gallery_sharepoint_web_url', true );
+	$metadata_error = get_post_meta( $post->ID, '_rp_gallery_sharepoint_metadata_error', true );
 	$notes          = get_post_meta( $post->ID, '_rp_gallery_reviewer_notes', true );
 	?>
 	<table class="widefat striped">
@@ -873,6 +922,12 @@ function rp_gallery_render_submission_meta_box( $post ) {
 				<tr>
 					<th scope="row"><?php esc_html_e( 'Reviewer Notes', 'rp-resource-hub' ); ?></th>
 					<td><?php echo esc_html( $notes ); ?></td>
+				</tr>
+			<?php endif; ?>
+			<?php if ( $metadata_error ) : ?>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'SharePoint Metadata Error', 'rp-resource-hub' ); ?></th>
+					<td><?php echo esc_html( $metadata_error ); ?></td>
 				</tr>
 			<?php endif; ?>
 		</tbody>
