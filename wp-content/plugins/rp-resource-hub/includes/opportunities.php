@@ -1712,8 +1712,49 @@ function rp_opportunities_decode_fields( $row ) {
 	return is_array( $fields ) ? $fields : array();
 }
 
+function rp_opportunities_submission_filter_options( $type ) {
+	if ( 'job' !== $type ) {
+		return array();
+	}
+
+	$yes_no = array(
+		'yes' => __( 'Yes', 'rp-resource-hub' ),
+		'no'  => __( 'No', 'rp-resource-hub' ),
+	);
+
+	return array(
+		'education'               => array(
+			'post_grad'         => __( "Post Graduate Diploma/Master's Degree", 'rp-resource-hub' ),
+			'bachelors'         => __( "Bachelor's Degree", 'rp-resource-hub' ),
+			'vocational'        => __( 'Vocational Diploma', 'rp-resource-hub' ),
+			'college_undergrad' => __( 'College Undergraduate', 'rp-resource-hub' ),
+			'high_school'       => __( 'High School Graduate', 'rp-resource-hub' ),
+			'other'             => __( 'Other', 'rp-resource-hub' ),
+		),
+		'application_source'      => array(
+			'facebook'      => __( 'Facebook', 'rp-resource-hub' ),
+			'referral'      => __( 'Referral', 'rp-resource-hub' ),
+			'job_portal'    => __( 'Job Portal', 'rp-resource-hub' ),
+			'linkedin'      => __( 'LinkedIn', 'rp-resource-hub' ),
+			'word_of_mouth' => __( 'Word of Mouth', 'rp-resource-hub' ),
+			'other'         => __( 'Other', 'rp-resource-hub' ),
+		),
+		'emergency_work'          => $yes_no,
+		'travel_outside_location' => $yes_no,
+		'overtime_weekends'       => $yes_no,
+		'availability'            => array(
+			'asap'         => __( 'ASAP', 'rp-resource-hub' ),
+			'15_days'      => __( '15 days notice', 'rp-resource-hub' ),
+			'30_days'      => __( '30 days notice', 'rp-resource-hub' ),
+			'more_than_30' => __( 'More than 30 days notice', 'rp-resource-hub' ),
+			'other'        => __( 'Other', 'rp-resource-hub' ),
+		),
+	);
+}
+
 function rp_opportunities_render_submission_filters( $type, $statuses, $opportunity_id = 0 ) {
 	$labels = rp_opportunities_submission_field_labels( $type );
+	$options = rp_opportunities_submission_filter_options( $type );
 	?>
 	<form class="rp-opportunity-submission-filters" method="get">
 		<input type="hidden" name="opportunity_id" value="<?php echo esc_attr( $opportunity_id ? absint( $opportunity_id ) : ( isset( $_GET['opportunity_id'] ) ? absint( $_GET['opportunity_id'] ) : 0 ) ); ?>">
@@ -1726,7 +1767,19 @@ function rp_opportunities_render_submission_filters( $type, $statuses, $opportun
 		<label><span><?php esc_html_e( 'Phone', 'rp-resource-hub' ); ?></span><input type="search" name="filter_phone" value="<?php echo esc_attr( isset( $_GET['filter_phone'] ) ? sanitize_text_field( wp_unslash( $_GET['filter_phone'] ) ) : '' ); ?>"></label>
 		<label><span><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></span><select name="filter_status"><option value=""><?php esc_html_e( 'All statuses', 'rp-resource-hub' ); ?></option><?php foreach ( $statuses as $value => $label ) : ?><option value="<?php echo esc_attr( $value ); ?>" <?php selected( isset( $_GET['filter_status'] ) ? sanitize_key( wp_unslash( $_GET['filter_status'] ) ) : '', $value ); ?>><?php echo esc_html( $label ); ?></option><?php endforeach; ?></select></label>
 		<?php foreach ( $labels as $key => $label ) : ?>
-			<label><span><?php echo esc_html( $label ); ?></span><input type="search" name="<?php echo esc_attr( 'filter_field_' . $key ); ?>" value="<?php echo esc_attr( isset( $_GET[ 'filter_field_' . $key ] ) ? sanitize_text_field( wp_unslash( $_GET[ 'filter_field_' . $key ] ) ) : '' ); ?>"></label>
+			<?php $filter_value = isset( $_GET[ 'filter_field_' . $key ] ) ? sanitize_text_field( wp_unslash( $_GET[ 'filter_field_' . $key ] ) ) : ''; ?>
+			<label><span><?php echo esc_html( $label ); ?></span>
+				<?php if ( isset( $options[ $key ] ) ) : ?>
+					<select name="<?php echo esc_attr( 'filter_field_' . $key ); ?>">
+						<option value=""><?php esc_html_e( 'Any', 'rp-resource-hub' ); ?></option>
+						<?php foreach ( $options[ $key ] as $value => $option_label ) : ?>
+							<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $filter_value, $value ); ?>><?php echo esc_html( $option_label ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				<?php else : ?>
+					<input type="search" name="<?php echo esc_attr( 'filter_field_' . $key ); ?>" value="<?php echo esc_attr( $filter_value ); ?>">
+				<?php endif; ?>
+			</label>
 		<?php endforeach; ?>
 		<button class="rp-button" type="submit"><?php esc_html_e( 'Filter', 'rp-resource-hub' ); ?></button>
 	</form>
@@ -1764,7 +1817,7 @@ function rp_opportunities_render_submission_table( $type, $opportunity_id ) {
 					<?php if ( 'bid' === $type ) : ?><td><?php echo esc_html( $row->contact_person ); ?></td><?php endif; ?>
 					<td><?php echo esc_html( $row->email ); ?></td>
 					<td><?php echo esc_html( $row->phone ); ?></td>
-					<?php foreach ( $labels as $key => $label ) : ?><td><?php echo esc_html( isset( $fields[ $key ] ) ? $fields[ $key ] : '' ); ?></td><?php endforeach; ?>
+					<?php foreach ( $labels as $key => $label ) : ?><td><?php echo esc_html( isset( $fields[ $key ] ) ? rp_opportunities_submission_field_display_value( $type, $key, $fields[ $key ] ) : '' ); ?></td><?php endforeach; ?>
 					<td><?php echo esc_html( rp_opportunities_format_datetime( $row->submitted_at ) ); ?></td>
 					<td><span class="rp-status-badge"><?php echo esc_html( isset( $statuses[ $row->status ] ) ? $statuses[ $row->status ] : $row->status ); ?></span></td>
 					<td><?php echo wp_kses_post( rp_opportunities_submission_attachment_links( $type, $row ) ); ?></td>
@@ -1785,6 +1838,14 @@ function rp_opportunities_submission_flat_fields( $type, $row ) {
 		$fields['message'] = $row->message;
 	}
 	return $fields;
+}
+
+function rp_opportunities_submission_field_display_value( $type, $key, $value ) {
+	$options = rp_opportunities_submission_filter_options( $type );
+	if ( isset( $options[ $key ][ $value ] ) ) {
+		return $options[ $key ][ $value ];
+	}
+	return $value;
 }
 
 function rp_opportunities_filter_submission_rows( $type, $rows ) {
