@@ -3,7 +3,7 @@ Theme Name: Resilient Humanitarian Hub
 Template: foreverwood-premium
 Author: ACCORD
 Description: Modern child theme for the Resilient Philippines humanitarian knowledge hub.
-Version: 1.1.19
+Version: 1.1.20
 Text Domain: resilient-hub
 */
 
@@ -3789,6 +3789,7 @@ input[type="submit"].give-submit:focus {
 
 .rp-opportunity-card,
 .rp-opportunity-details,
+.rp-opportunity-single-content,
 .rp-opportunity-form-section {
   background: var(--rp-color-surface);
   border: 1px solid var(--rp-color-border);
@@ -3960,7 +3961,10 @@ input[type="submit"].give-submit:focus {
 }
 
 .rp-dashboard-actions .rp-button {
-  min-width: 132px;
+  font-size: 0.82rem;
+  min-height: 36px;
+  min-width: 108px;
+  padding: 8px 12px;
   text-align: center;
 }
 
@@ -3985,12 +3989,66 @@ input[type="submit"].give-submit:focus {
   padding-block: 8px;
 }
 
+.rp-opportunity-submission-filters {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 20px;
+}
+
+.rp-opportunity-submission-filters label {
+  display: grid;
+  gap: 6px;
+}
+
+.rp-opportunity-submission-filters span {
+  color: var(--rp-color-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rp-opportunity-submission-filters input,
+.rp-opportunity-submission-filters select {
+  min-height: 42px;
+  width: 100%;
+}
+
+.rp-submission-details {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  min-width: 260px;
+}
+
+.rp-submission-details div {
+  display: grid;
+  gap: 2px;
+}
+
+.rp-submission-details dt {
+  color: var(--rp-color-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rp-submission-details dd {
+  margin: 0;
+}
+
 @media (max-width: 1024px) {
   .rp-opportunities-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .rp-opportunity-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rp-opportunity-submission-filters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -4005,6 +4063,10 @@ input[type="submit"].give-submit:focus {
 
   .rp-opportunity-dashboard .rp-dashboard-header {
     display: grid;
+  }
+
+  .rp-opportunity-submission-filters {
+    grid-template-columns: 1fr;
   }
 
   .rp-opportunities-filter .rp-button,

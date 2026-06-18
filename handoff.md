@@ -316,3 +316,45 @@ Path: `app/public/wp-content/themes/resilient-hub-child/`
   - Confirmed `Duration of engagement` and `Require portfolio/proof of work` appear in the same consultant-only region.
   - Confirmed the portfolio label appears only once.
   - Temporary test user was removed.
+
+---
+
+## 13. Latest Session Record - Opportunity Posting Pages and Submission Dashboards
+
+- **Date**: June 18, 2026
+- **Purpose**: Polish public job/ITB posting pages, improve HR/Procurement dashboard review workflows, and fix ITB attachment upload failures.
+- **Changed files**:
+  - `wp-content/plugins/rp-resource-hub/rp-resource-hub.php`
+  - `wp-content/plugins/rp-resource-hub/includes/opportunities.php`
+  - `wp-content/themes/resilient-hub-child/style.css`
+  - `wp-content/themes/resilient-hub-child/single-rp_opportunity.php`
+  - `handoff.md`
+- **What changed**:
+  - Bumped Resource Hub plugin version to `1.10.9`.
+  - Bumped Opportunities module version to `1.0.9`.
+  - Bumped child theme version to `1.1.20`.
+  - Added a dedicated single template for opportunity postings.
+  - Public job and ITB posting pages no longer show author metadata or previous/next story navigation.
+  - Posting body now appears in the same white boxed layout style as the generated job/ITB details and application areas.
+  - Dashboard row action buttons are smaller and more consistent for `View Applications`, `View Submissions`, `Edit Job Posting`, and `Edit ITB Posting`.
+  - Front-end edit forms now show existing Terms of Reference / posting document links when files are already attached.
+  - `/submit-invitation-to-bid/` no longer asks for contact email, bid opening date, or clarification period.
+  - ITB public details no longer display bid opening or clarification period fields.
+  - Submission second-layer dashboards now include decoded applicant/supplier details and answers in the table.
+  - Added submission filters for status, name/company, contact person where relevant, email, phone, and all stored form-answer fields.
+  - Replaced the status-email checkbox with a manual `Send Status Email` button.
+  - Status emails now use different body text based on the current status while still CC'ing the responsible department.
+  - ITB submission upload handling now uses `wp_handle_upload()` plus explicit attachment creation, avoiding the previous critical error path from `media_handle_upload()`.
+- **Local verification**:
+  - PHP lint passed for changed plugin files and the new theme template.
+  - Created temporary job and ITB postings for testing, then removed them.
+  - Confirmed single posting pages do not contain author or previous/next story text.
+  - Confirmed single posting pages render the new `rp-opportunity-single-content` white content box.
+  - Confirmed `/submit-invitation-to-bid/` no longer renders contact email, bid opening date, or clarification period.
+  - Submitted a temporary ITB with quotation, business permit, BIR 2303, and receipt sample files.
+  - Confirmed the ITB submission completed without a critical error and stored attachment IDs.
+  - Confirmed bid dashboard second layer shows supplier details, decoded message, filters, and `Send Status Email` as a button.
+  - Confirmed job dashboard second layer includes filters for job application fields.
+  - Confirmed front-end edit form shows the existing attached posting document link.
+  - Confirmed `wp-content/debug.log` was not created during tests.
+  - Removed temporary admin user, posts, submission, attachments, uploaded test files, and cookies.

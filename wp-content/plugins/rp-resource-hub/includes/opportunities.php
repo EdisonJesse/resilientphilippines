@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_OPPORTUNITIES_VERSION', '1.0.8' );
+define( 'RP_OPPORTUNITIES_VERSION', '1.0.9' );
 define( 'RP_JOB_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_JOB_MAX_ATTACHMENTS', 5 );
 define( 'RP_BID_MAX_ATTACHMENT_BYTES', 25 * 1024 * 1024 );
@@ -655,13 +655,6 @@ function rp_opportunities_submit_shortcode( $atts = array() ) {
 			<?php if ( 'job' !== $single_type ) : ?>
 				<?php rp_opportunities_text_field( 'reference_number', __( 'ITB reference number', 'rp-resource-hub' ), false ); ?>
 			<?php endif; ?>
-			<?php if ( 'job' !== $single_type ) : ?>
-				<?php rp_opportunities_email_field( 'contact_email', __( 'Contact email', 'rp-resource-hub' ), false ); ?>
-			<?php endif; ?>
-			<?php if ( 'job' !== $single_type ) : ?>
-				<?php rp_opportunities_text_field( 'bid_opening_date', __( 'Bid opening date', 'rp-resource-hub' ), false ); ?>
-				<?php rp_opportunities_text_field( 'clarification_period', __( 'Clarification period', 'rp-resource-hub' ), false ); ?>
-			<?php endif; ?>
 			<?php if ( 'itb' !== $single_type ) : ?>
 				<div class="rp-consultant-only-field">
 					<?php rp_opportunities_text_field( 'duration', __( 'Duration of engagement', 'rp-resource-hub' ), false ); ?>
@@ -751,9 +744,9 @@ function rp_opportunities_handle_frontend_submit() {
 		'_rp_opportunity_location'             => rp_opportunities_sanitize_text_post( 'location' ),
 		'_rp_opportunity_employment_type'      => '',
 		'_rp_opportunity_reference_number'     => rp_opportunities_sanitize_text_post( 'reference_number' ),
-		'_rp_opportunity_contact_email'        => sanitize_email( rp_opportunities_sanitize_text_post( 'contact_email' ) ),
-		'_rp_opportunity_bid_opening_date'     => rp_opportunities_sanitize_text_post( 'bid_opening_date' ),
-		'_rp_opportunity_clarification_period' => rp_opportunities_sanitize_text_post( 'clarification_period' ),
+		'_rp_opportunity_contact_email'        => '',
+		'_rp_opportunity_bid_opening_date'     => '',
+		'_rp_opportunity_clarification_period' => '',
 		'_rp_opportunity_duration'             => 'consultant' === $hiring_type ? rp_opportunities_sanitize_text_post( 'duration' ) : '',
 		'_rp_opportunity_deliverables'         => rp_opportunities_sanitize_textarea_post( 'deliverables' ),
 		'_rp_opportunity_require_portfolio'    => ! empty( $_POST['require_portfolio'] ) ? '1' : '0',
@@ -830,9 +823,9 @@ function rp_opportunities_handle_frontend_update() {
 		'_rp_opportunity_location'             => 'job' === $type ? rp_opportunities_sanitize_text_post( 'location' ) : '',
 		'_rp_opportunity_employment_type'      => '',
 		'_rp_opportunity_reference_number'     => 'itb' === $type ? rp_opportunities_sanitize_text_post( 'reference_number' ) : '',
-		'_rp_opportunity_contact_email'        => 'itb' === $type ? sanitize_email( rp_opportunities_sanitize_text_post( 'contact_email' ) ) : '',
-		'_rp_opportunity_bid_opening_date'     => 'itb' === $type ? rp_opportunities_sanitize_text_post( 'bid_opening_date' ) : '',
-		'_rp_opportunity_clarification_period' => 'itb' === $type ? rp_opportunities_sanitize_text_post( 'clarification_period' ) : '',
+		'_rp_opportunity_contact_email'        => '',
+		'_rp_opportunity_bid_opening_date'     => '',
+		'_rp_opportunity_clarification_period' => '',
 		'_rp_opportunity_duration'             => ( 'job' === $type && 'consultant' === $hiring_type ) ? rp_opportunities_sanitize_text_post( 'duration' ) : '',
 		'_rp_opportunity_deliverables'         => rp_opportunities_sanitize_textarea_post( 'deliverables' ),
 		'_rp_opportunity_require_portfolio'    => ( 'job' === $type && ! empty( $_POST['require_portfolio'] ) ) ? '1' : '0',
@@ -1034,8 +1027,6 @@ function rp_opportunities_render_single_details( $post_id ) {
 				<?php if ( get_post_meta( $post_id, '_rp_opportunity_duration', true ) ) : ?><div><dt><?php esc_html_e( 'Duration', 'rp-resource-hub' ); ?></dt><dd><?php echo esc_html( get_post_meta( $post_id, '_rp_opportunity_duration', true ) ); ?></dd></div><?php endif; ?>
 			<?php else : ?>
 				<?php if ( get_post_meta( $post_id, '_rp_opportunity_reference_number', true ) ) : ?><div><dt><?php esc_html_e( 'Reference number', 'rp-resource-hub' ); ?></dt><dd><?php echo esc_html( get_post_meta( $post_id, '_rp_opportunity_reference_number', true ) ); ?></dd></div><?php endif; ?>
-				<?php if ( get_post_meta( $post_id, '_rp_opportunity_bid_opening_date', true ) ) : ?><div><dt><?php esc_html_e( 'Bid opening', 'rp-resource-hub' ); ?></dt><dd><?php echo esc_html( rp_opportunities_format_datetime( get_post_meta( $post_id, '_rp_opportunity_bid_opening_date', true ) ) ); ?></dd></div><?php endif; ?>
-				<?php if ( get_post_meta( $post_id, '_rp_opportunity_clarification_period', true ) ) : ?><div><dt><?php esc_html_e( 'Clarification period', 'rp-resource-hub' ); ?></dt><dd><?php echo esc_html( get_post_meta( $post_id, '_rp_opportunity_clarification_period', true ) ); ?></dd></div><?php endif; ?>
 			<?php endif; ?>
 		</dl>
 		<?php if ( get_post_meta( $post_id, '_rp_opportunity_deliverables', true ) ) : ?>
@@ -1376,8 +1367,6 @@ function rp_opportunities_protect_upload_dir() {
 
 function rp_opportunities_upload_submission_files( $fields, $submission_type, $submission_id, $max_size ) {
 	require_once ABSPATH . 'wp-admin/includes/file.php';
-	require_once ABSPATH . 'wp-admin/includes/media.php';
-	require_once ABSPATH . 'wp-admin/includes/image.php';
 	rp_opportunities_protect_upload_dir();
 
 	$attachment_ids = array();
@@ -1390,10 +1379,24 @@ function rp_opportunities_upload_submission_files( $fields, $submission_type, $s
 			continue;
 		}
 		add_filter( 'upload_dir', 'rp_opportunities_upload_dir' );
-		$attachment_id = media_handle_upload( $field, 0 );
+		$upload = wp_handle_upload( $_FILES[ $field ], array( 'test_form' => false ) );
 		remove_filter( 'upload_dir', 'rp_opportunities_upload_dir' );
-		if ( is_wp_error( $attachment_id ) ) {
-			rp_opportunities_add_note( $submission_type, $submission_id, 0, 'system', '', '', '', sprintf( 'Attachment upload failed for field %1$s: %2$s', $field, $attachment_id->get_error_message() ) );
+		if ( empty( $upload['file'] ) || ! empty( $upload['error'] ) ) {
+			rp_opportunities_add_note( $submission_type, $submission_id, 0, 'system', '', '', '', sprintf( 'Attachment upload failed for field %1$s: %2$s', $field, isset( $upload['error'] ) ? $upload['error'] : 'unknown error' ) );
+			continue;
+		}
+		$filetype = wp_check_filetype( basename( $upload['file'] ), null );
+		$attachment_id = wp_insert_attachment(
+			array(
+				'post_mime_type' => isset( $filetype['type'] ) ? $filetype['type'] : 'application/octet-stream',
+				'post_title'     => sanitize_file_name( pathinfo( $upload['file'], PATHINFO_FILENAME ) ),
+				'post_content'   => '',
+				'post_status'    => 'private',
+			),
+			$upload['file']
+		);
+		if ( is_wp_error( $attachment_id ) || ! $attachment_id ) {
+			rp_opportunities_add_note( $submission_type, $submission_id, 0, 'system', '', '', '', sprintf( 'Attachment record failed for field %s.', $field ) );
 			continue;
 		}
 		update_post_meta( $attachment_id, '_rp_opportunity_submission_type', $submission_type );
@@ -1614,16 +1617,15 @@ function rp_opportunities_render_edit_posting( $type, $post_id ) {
 				</div>
 			<?php else : ?>
 				<?php rp_opportunities_text_field( 'reference_number', __( 'ITB reference number', 'rp-resource-hub' ), false, get_post_meta( $post_id, '_rp_opportunity_reference_number', true ) ); ?>
-				<?php rp_opportunities_email_field( 'contact_email', __( 'Contact email', 'rp-resource-hub' ), false, get_post_meta( $post_id, '_rp_opportunity_contact_email', true ) ); ?>
-				<?php rp_opportunities_text_field( 'bid_opening_date', __( 'Bid opening date', 'rp-resource-hub' ), false, get_post_meta( $post_id, '_rp_opportunity_bid_opening_date', true ) ); ?>
-				<?php rp_opportunities_text_field( 'clarification_period', __( 'Clarification period', 'rp-resource-hub' ), false, get_post_meta( $post_id, '_rp_opportunity_clarification_period', true ) ); ?>
 			<?php endif; ?>
 			<?php rp_opportunities_textarea_field( 'description', __( 'Posting description', 'rp-resource-hub' ), true, $post->post_content ); ?>
 			<?php rp_opportunities_textarea_field( 'deliverables', 'job' === $type ? __( 'Expected deliverables / scope notes', 'rp-resource-hub' ) : __( 'Procurement scope / requirements notes', 'rp-resource-hub' ), false, get_post_meta( $post_id, '_rp_opportunity_deliverables', true ) ); ?>
 			<?php if ( 'job' === $type ) : ?>
 				<?php rp_opportunities_file_field( 'opportunity_tor', __( 'Replace Terms of Reference document', 'rp-resource-hub' ), false ); ?>
+				<?php echo wp_kses_post( rp_opportunities_admin_attachment_link( get_post_meta( $post_id, '_rp_opportunity_tor_id', true ) ) ); ?>
 			<?php endif; ?>
 			<?php rp_opportunities_file_field( 'opportunity_document', 'job' === $type ? __( 'Replace additional posting document', 'rp-resource-hub' ) : __( 'Replace bid / procurement document', 'rp-resource-hub' ), false, 'bid' ); ?>
+			<?php echo wp_kses_post( rp_opportunities_admin_attachment_link( get_post_meta( $post_id, '_rp_opportunity_document_id', true ) ) ); ?>
 			<button class="rp-button" type="submit"><?php esc_html_e( 'Save Posting', 'rp-resource-hub' ); ?></button>
 		</form>
 		<?php if ( 'job' === $type ) : ?>
@@ -1652,6 +1654,7 @@ function rp_opportunities_render_submission_layer( $type, $opportunity_id ) {
 	global $wpdb;
 	$table = 'job' === $type ? $wpdb->prefix . 'rp_job_applications' : $wpdb->prefix . 'rp_bid_submissions';
 	$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table WHERE opportunity_id = %d ORDER BY submitted_at DESC", $opportunity_id ) );
+	$rows = rp_opportunities_filter_submission_rows( $type, $rows );
 	$statuses = 'job' === $type ? rp_opportunities_job_status_options() : rp_opportunities_bid_status_options();
 	$back_url = 'job' === $type ? home_url( '/job-applications-dashboard/' ) : home_url( '/bid-submissions-dashboard/' );
 	$export_url = wp_nonce_url( admin_url( 'admin-post.php?action=rp_opportunity_export_submissions&type=' . $type . '&opportunity_id=' . absint( $opportunity_id ) ), 'rp_opportunity_export_' . $type . '_' . absint( $opportunity_id ) );
@@ -1664,14 +1667,16 @@ function rp_opportunities_render_submission_layer( $type, $opportunity_id ) {
 			<p class="rp-dashboard-subtitle"><?php echo esc_html( 'job' === $type ? __( 'Applications related to this job opening.', 'rp-resource-hub' ) : __( 'Submissions related to this Invitation to Bid.', 'rp-resource-hub' ) ); ?></p>
 			<a class="rp-button rp-button-secondary" href="<?php echo esc_url( $export_url ); ?>"><?php esc_html_e( 'Export CSV', 'rp-resource-hub' ); ?></a>
 		</div>
+		<?php rp_opportunities_render_submission_filters( $type, $statuses ); ?>
 		<div class="rp-table-responsive">
 			<table class="rp-moderation-table rp-opportunity-dashboard-table">
-				<thead><tr><th><?php echo esc_html( 'job' === $type ? __( 'Applicant', 'rp-resource-hub' ) : __( 'Supplier', 'rp-resource-hub' ) ); ?></th><th><?php esc_html_e( 'Contact', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Submitted', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Documents', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Update', 'rp-resource-hub' ); ?></th></tr></thead>
+				<thead><tr><th><?php echo esc_html( 'job' === $type ? __( 'Applicant', 'rp-resource-hub' ) : __( 'Supplier', 'rp-resource-hub' ) ); ?></th><th><?php esc_html_e( 'Contact', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Details', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Submitted', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Documents', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Update', 'rp-resource-hub' ); ?></th></tr></thead>
 				<tbody>
 				<?php foreach ( $rows as $row ) : ?>
 					<tr>
 						<td><strong><?php echo esc_html( 'job' === $type ? $row->full_name : $row->company_name ); ?></strong><?php if ( 'bid' === $type ) : ?><br><span><?php echo esc_html( $row->contact_person ); ?></span><?php endif; ?></td>
 						<td><?php echo esc_html( $row->email ); ?><br><span><?php echo esc_html( $row->phone ); ?></span></td>
+						<td><?php echo wp_kses_post( rp_opportunities_submission_details_html( $type, $row ) ); ?></td>
 						<td><?php echo esc_html( rp_opportunities_format_datetime( $row->submitted_at ) ); ?></td>
 						<td><span class="rp-status-badge"><?php echo esc_html( isset( $statuses[ $row->status ] ) ? $statuses[ $row->status ] : $row->status ); ?></span></td>
 						<td><?php echo wp_kses_post( rp_opportunities_submission_attachment_links( $type, $row ) ); ?></td>
@@ -1685,6 +1690,121 @@ function rp_opportunities_render_submission_layer( $type, $opportunity_id ) {
 	</div>
 	<?php
 	return ob_get_clean();
+}
+
+function rp_opportunities_submission_field_labels( $type ) {
+	if ( 'job' === $type ) {
+		return array(
+			'alternative_contact'      => __( 'Alternative contact details', 'rp-resource-hub' ),
+			'present_address'          => __( 'Complete present address', 'rp-resource-hub' ),
+			'date_of_birth'            => __( 'Date of birth', 'rp-resource-hub' ),
+			'education'                => __( 'Highest educational attainment', 'rp-resource-hub' ),
+			'university'               => __( 'University/school', 'rp-resource-hub' ),
+			'course'                   => __( 'Course/program', 'rp-resource-hub' ),
+			'position_applied_for'     => __( 'Position applied for', 'rp-resource-hub' ),
+			'application_source'       => __( 'Source of application', 'rp-resource-hub' ),
+			'referrer_name'            => __( 'Referrer name', 'rp-resource-hub' ),
+			'emergency_work'           => __( 'Emergency work', 'rp-resource-hub' ),
+			'travel_outside_location'  => __( 'Travel/work outside location', 'rp-resource-hub' ),
+			'overtime_weekends'        => __( 'Overtime/weekends/holidays', 'rp-resource-hub' ),
+			'availability'             => __( 'Availability', 'rp-resource-hub' ),
+			'health_conditions'        => __( 'Health conditions', 'rp-resource-hub' ),
+			'last_salary'              => __( 'Last drawn salary', 'rp-resource-hub' ),
+			'expected_salary'          => __( 'Expected salary', 'rp-resource-hub' ),
+			'skillsets'                => __( 'Relevant skillsets', 'rp-resource-hub' ),
+			'why_accord'               => __( 'Why ACCORD', 'rp-resource-hub' ),
+			'cover_message'            => __( 'Cover message', 'rp-resource-hub' ),
+			'consultancy_fee'          => __( 'Proposed consultancy fee', 'rp-resource-hub' ),
+		);
+	}
+
+	return array(
+		'message' => __( 'Message or remarks', 'rp-resource-hub' ),
+	);
+}
+
+function rp_opportunities_decode_fields( $row ) {
+	$fields = json_decode( $row->fields ? $row->fields : '{}', true );
+	return is_array( $fields ) ? $fields : array();
+}
+
+function rp_opportunities_render_submission_filters( $type, $statuses ) {
+	$labels = rp_opportunities_submission_field_labels( $type );
+	?>
+	<form class="rp-opportunity-submission-filters" method="get">
+		<input type="hidden" name="opportunity_id" value="<?php echo esc_attr( isset( $_GET['opportunity_id'] ) ? absint( $_GET['opportunity_id'] ) : 0 ); ?>">
+		<label><span><?php echo esc_html( 'job' === $type ? __( 'Full name', 'rp-resource-hub' ) : __( 'Company / supplier', 'rp-resource-hub' ) ); ?></span><input type="search" name="filter_name" value="<?php echo esc_attr( isset( $_GET['filter_name'] ) ? sanitize_text_field( wp_unslash( $_GET['filter_name'] ) ) : '' ); ?>"></label>
+		<?php if ( 'bid' === $type ) : ?>
+			<label><span><?php esc_html_e( 'Contact person', 'rp-resource-hub' ); ?></span><input type="search" name="filter_contact_person" value="<?php echo esc_attr( isset( $_GET['filter_contact_person'] ) ? sanitize_text_field( wp_unslash( $_GET['filter_contact_person'] ) ) : '' ); ?>"></label>
+		<?php endif; ?>
+		<label><span><?php esc_html_e( 'Email', 'rp-resource-hub' ); ?></span><input type="search" name="filter_email" value="<?php echo esc_attr( isset( $_GET['filter_email'] ) ? sanitize_text_field( wp_unslash( $_GET['filter_email'] ) ) : '' ); ?>"></label>
+		<label><span><?php esc_html_e( 'Phone', 'rp-resource-hub' ); ?></span><input type="search" name="filter_phone" value="<?php echo esc_attr( isset( $_GET['filter_phone'] ) ? sanitize_text_field( wp_unslash( $_GET['filter_phone'] ) ) : '' ); ?>"></label>
+		<label><span><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></span><select name="filter_status"><option value=""><?php esc_html_e( 'All statuses', 'rp-resource-hub' ); ?></option><?php foreach ( $statuses as $value => $label ) : ?><option value="<?php echo esc_attr( $value ); ?>" <?php selected( isset( $_GET['filter_status'] ) ? sanitize_key( wp_unslash( $_GET['filter_status'] ) ) : '', $value ); ?>><?php echo esc_html( $label ); ?></option><?php endforeach; ?></select></label>
+		<?php foreach ( $labels as $key => $label ) : ?>
+			<label><span><?php echo esc_html( $label ); ?></span><input type="search" name="<?php echo esc_attr( 'filter_field_' . $key ); ?>" value="<?php echo esc_attr( isset( $_GET[ 'filter_field_' . $key ] ) ? sanitize_text_field( wp_unslash( $_GET[ 'filter_field_' . $key ] ) ) : '' ); ?>"></label>
+		<?php endforeach; ?>
+		<button class="rp-button" type="submit"><?php esc_html_e( 'Filter', 'rp-resource-hub' ); ?></button>
+	</form>
+	<?php
+}
+
+function rp_opportunities_filter_submission_rows( $type, $rows ) {
+	$name_filter = isset( $_GET['filter_name'] ) ? strtolower( sanitize_text_field( wp_unslash( $_GET['filter_name'] ) ) ) : '';
+	$contact_person_filter = isset( $_GET['filter_contact_person'] ) ? strtolower( sanitize_text_field( wp_unslash( $_GET['filter_contact_person'] ) ) ) : '';
+	$email_filter = isset( $_GET['filter_email'] ) ? strtolower( sanitize_text_field( wp_unslash( $_GET['filter_email'] ) ) ) : '';
+	$phone_filter = isset( $_GET['filter_phone'] ) ? strtolower( sanitize_text_field( wp_unslash( $_GET['filter_phone'] ) ) ) : '';
+	$status_filter = isset( $_GET['filter_status'] ) ? sanitize_key( wp_unslash( $_GET['filter_status'] ) ) : '';
+	$field_labels = rp_opportunities_submission_field_labels( $type );
+
+	return array_values(
+		array_filter(
+			$rows,
+			function ( $row ) use ( $type, $name_filter, $contact_person_filter, $email_filter, $phone_filter, $status_filter, $field_labels ) {
+				$name = 'job' === $type ? $row->full_name : $row->company_name;
+				if ( $name_filter && false === strpos( strtolower( $name ), $name_filter ) ) {
+					return false;
+				}
+				if ( 'bid' === $type && $contact_person_filter && false === strpos( strtolower( $row->contact_person ), $contact_person_filter ) ) {
+					return false;
+				}
+				if ( $email_filter && false === strpos( strtolower( $row->email ), $email_filter ) ) {
+					return false;
+				}
+				if ( $phone_filter && false === strpos( strtolower( $row->phone ), $phone_filter ) ) {
+					return false;
+				}
+				if ( $status_filter && $row->status !== $status_filter ) {
+					return false;
+				}
+				$fields = rp_opportunities_decode_fields( $row );
+				foreach ( array_keys( $field_labels ) as $key ) {
+					$filter_key = 'filter_field_' . $key;
+					$needle = isset( $_GET[ $filter_key ] ) ? strtolower( sanitize_text_field( wp_unslash( $_GET[ $filter_key ] ) ) ) : '';
+					if ( $needle && false === strpos( strtolower( isset( $fields[ $key ] ) ? (string) $fields[ $key ] : ( isset( $row->$key ) ? (string) $row->$key : '' ) ), $needle ) ) {
+						return false;
+					}
+				}
+				return true;
+			}
+		)
+	);
+}
+
+function rp_opportunities_submission_details_html( $type, $row ) {
+	$fields = rp_opportunities_decode_fields( $row );
+	if ( 'bid' === $type && ! empty( $row->message ) ) {
+		$fields['message'] = $row->message;
+	}
+	$labels = rp_opportunities_submission_field_labels( $type );
+	$out = '<dl class="rp-submission-details">';
+	foreach ( $labels as $key => $label ) {
+		if ( ! isset( $fields[ $key ] ) || '' === (string) $fields[ $key ] ) {
+			continue;
+		}
+		$out .= '<div><dt>' . esc_html( $label ) . '</dt><dd>' . esc_html( $fields[ $key ] ) . '</dd></div>';
+	}
+	$out .= '</dl>';
+	return $out;
 }
 
 function rp_opportunities_submission_attachment_links( $type, $row ) {
@@ -1715,8 +1835,10 @@ function rp_opportunities_render_status_form( $type, $row, $statuses ) {
 			<?php endforeach; ?>
 		</select>
 		<textarea name="note" rows="2" placeholder="<?php esc_attr_e( 'Internal note', 'rp-resource-hub' ); ?>"></textarea>
-		<label class="rp-checkbox-line"><input type="checkbox" name="send_notice" value="1"> <?php esc_html_e( 'Send status email when successful/unsuccessful', 'rp-resource-hub' ); ?></label>
-		<button class="rp-button" type="submit"><?php esc_html_e( 'Save', 'rp-resource-hub' ); ?></button>
+		<div class="rp-dashboard-actions">
+			<button class="rp-button" type="submit" name="save_status" value="1"><?php esc_html_e( 'Save Status', 'rp-resource-hub' ); ?></button>
+			<button class="rp-button rp-button-secondary" type="submit" name="send_notice" value="1"><?php esc_html_e( 'Send Status Email', 'rp-resource-hub' ); ?></button>
+		</div>
 	</form>
 	<?php
 }
@@ -1753,7 +1875,7 @@ function rp_opportunities_handle_update_submission() {
 	);
 	rp_opportunities_add_note( $type, $submission_id, get_current_user_id(), 'internal', $submission->status, $new_status, '', $note ? $note : __( 'Status updated.', 'rp-resource-hub' ) );
 
-	if ( ! empty( $_POST['send_notice'] ) && in_array( $new_status, array( 'successful', 'unsuccessful' ), true ) ) {
+	if ( ! empty( $_POST['send_notice'] ) ) {
 		rp_opportunities_send_status_notice( $type, $submission_id, $new_status );
 	}
 
@@ -1772,21 +1894,35 @@ function rp_opportunities_send_status_notice( $type, $submission_id, $status ) {
 	$name = 'job' === $type ? $submission->full_name : $submission->company_name;
 	$post_title = get_the_title( $submission->opportunity_id );
 	$email_col = 'successful' === $status ? 'success_email_sent_at' : 'unsuccessful_email_sent_at';
-	if ( ! empty( $submission->$email_col ) ) {
+	if ( in_array( $status, array( 'successful', 'unsuccessful' ), true ) && ! empty( $submission->$email_col ) ) {
 		rp_opportunities_add_note( $type, $submission_id, get_current_user_id(), 'system', $submission->status, $status, $status, __( 'Status email was not sent because this notice had already been sent.', 'rp-resource-hub' ) );
 		return;
 	}
-	$subject = sprintf( '%s: %s', 'successful' === $status ? __( 'Application update', 'rp-resource-hub' ) : __( 'Application update', 'rp-resource-hub' ), $post_title );
-	if ( 'bid' === $type ) {
-		$subject = sprintf( '%s: %s', __( 'Bid submission update', 'rp-resource-hub' ), $post_title );
-	}
-	$body_status = 'successful' === $status ? __( 'successful', 'rp-resource-hub' ) : __( 'unsuccessful', 'rp-resource-hub' );
-	$message = sprintf( "Dear %s,\n\nThis is to inform you that your %s for %s has been marked as %s.\n\n%s", $name, 'job' === $type ? __( 'application', 'rp-resource-hub' ) : __( 'bid submission', 'rp-resource-hub' ), $post_title, $body_status, rp_opportunities_system_note( $dept_email ) );
+	$status_labels = 'job' === $type ? rp_opportunities_job_status_options() : rp_opportunities_bid_status_options();
+	$status_label = isset( $status_labels[ $status ] ) ? $status_labels[ $status ] : $status;
+	$submission_label = 'job' === $type ? __( 'application', 'rp-resource-hub' ) : __( 'bid submission', 'rp-resource-hub' );
+	$subject = sprintf( '%1$s: %2$s', $status_label, $post_title );
+	$status_messages = array(
+		'received'             => __( 'has been received and logged by ACCORD.', 'rp-resource-hub' ),
+		'under_review'         => __( 'is currently under review.', 'rp-resource-hub' ),
+		'shortlisted'          => __( 'has been shortlisted for the next stage.', 'rp-resource-hub' ),
+		'interview'            => __( 'has been moved to the interview stage. HR will contact you with details when applicable.', 'rp-resource-hub' ),
+		'clarification_needed' => __( 'requires clarification. Procurement will contact you if additional information is needed.', 'rp-resource-hub' ),
+		'responsive'           => __( 'has been marked responsive after review.', 'rp-resource-hub' ),
+		'non_responsive'       => __( 'has been marked non-responsive after review.', 'rp-resource-hub' ),
+		'successful'           => __( 'has been marked successful.', 'rp-resource-hub' ),
+		'unsuccessful'         => __( 'has been marked unsuccessful.', 'rp-resource-hub' ),
+		'withdrawn'            => __( 'has been marked withdrawn.', 'rp-resource-hub' ),
+	);
+	$status_message = isset( $status_messages[ $status ] ) ? $status_messages[ $status ] : sprintf( __( 'has been updated to %s.', 'rp-resource-hub' ), $status_label );
+	$message = sprintf( "Dear %s,\n\nThis is to inform you that your %s for %s %s\n\n%s", $name, $submission_label, $post_title, $status_message, rp_opportunities_system_note( $dept_email ) );
 	$sent = rp_opportunities_send_mail( $submission->email, $subject, $message, array( $dept_email ), $dept_email );
 	if ( $sent ) {
 		global $wpdb;
 		$table = 'job' === $type ? $wpdb->prefix . 'rp_job_applications' : $wpdb->prefix . 'rp_bid_submissions';
-		$wpdb->update( $table, array( $email_col => current_time( 'mysql' ) ), array( 'id' => $submission_id ), array( '%s' ), array( '%d' ) );
+		if ( in_array( $status, array( 'successful', 'unsuccessful' ), true ) ) {
+			$wpdb->update( $table, array( $email_col => current_time( 'mysql' ) ), array( 'id' => $submission_id ), array( '%s' ), array( '%d' ) );
+		}
 		rp_opportunities_add_note( $type, $submission_id, get_current_user_id(), 'system', $submission->status, $status, $status, __( 'Status email sent to submitter.', 'rp-resource-hub' ) );
 	} else {
 		rp_opportunities_add_note( $type, $submission_id, get_current_user_id(), 'system', $submission->status, $status, $status, __( 'Status email failed to send.', 'rp-resource-hub' ) );
