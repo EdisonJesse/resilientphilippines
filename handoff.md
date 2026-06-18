@@ -226,3 +226,33 @@ Path: `app/public/wp-content/themes/resilient-hub-child/`
     - `rp_opportunities_version = 1.0.5`
     - `rp_resource_hub_version = 1.10.5`
   - Temporary test posts and users were removed.
+
+---
+
+## 10. Latest Session Record - Publish Stuck Pending Opportunities
+
+- **Date**: June 18, 2026
+- **Purpose**: Fix legacy opportunity postings that were stuck in `pending` status after HR/Procurement approval was removed.
+- **Changed files**:
+  - `wp-content/plugins/rp-resource-hub/rp-resource-hub.php`
+  - `wp-content/plugins/rp-resource-hub/includes/opportunities.php`
+  - `handoff.md`
+- **What changed**:
+  - Bumped Resource Hub plugin version to `1.10.6`.
+  - Bumped Opportunities module version to `1.0.6`.
+  - Added `rp_opportunities_publish_pending_posts()`.
+  - Activation and upgrade routines now publish any `rp_opportunity` post still stuck as `pending`.
+- **Why**:
+  - The HR/Procurement dashboards included pending opportunities, so staff could see them there.
+  - The public `/opportunities/`, `/job-ads/`, and `/invitations-to-bid/` pages only list published postings.
+  - The general Moderation Dashboard does not include `rp_opportunity`, because opportunities no longer require admin approval.
+- **Local verification**:
+  - PHP lint passed for changed plugin files.
+  - Created temporary pending `rp_opportunity` job post.
+  - Loaded `/job-ads/` to trigger upgrade.
+  - Confirmed the temporary job appeared on `/job-ads/`.
+  - Confirmed DB changed the post from `pending` to `publish`.
+  - Version options updated:
+    - `rp_opportunities_version = 1.0.6`
+    - `rp_resource_hub_version = 1.10.6`
+  - Removed temporary test post and revision rows.

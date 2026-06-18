@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_OPPORTUNITIES_VERSION', '1.0.5' );
+define( 'RP_OPPORTUNITIES_VERSION', '1.0.6' );
 define( 'RP_JOB_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_JOB_MAX_ATTACHMENTS', 5 );
 define( 'RP_BID_MAX_ATTACHMENT_BYTES', 25 * 1024 * 1024 );
@@ -341,10 +341,31 @@ function rp_opportunities_activate() {
 	rp_opportunities_create_tables();
 	rp_opportunities_apply_roles_and_caps();
 	rp_opportunities_create_pages();
+	rp_opportunities_publish_pending_posts();
 	flush_rewrite_rules();
 	update_option( 'rp_opportunities_version', RP_OPPORTUNITIES_VERSION );
 }
 register_activation_hook( RP_RESOURCE_HUB_FILE, 'rp_opportunities_activate' );
+
+function rp_opportunities_publish_pending_posts() {
+	$pending = get_posts(
+		array(
+			'post_type'      => 'rp_opportunity',
+			'post_status'    => 'pending',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+		)
+	);
+
+	foreach ( $pending as $post_id ) {
+		wp_update_post(
+			array(
+				'ID'          => absint( $post_id ),
+				'post_status' => 'publish',
+			)
+		);
+	}
+}
 
 function rp_opportunities_maybe_upgrade() {
 	if ( RP_OPPORTUNITIES_VERSION === get_option( 'rp_opportunities_version' ) && get_page_by_path( 'opportunities' ) && get_page_by_path( 'job-ads' ) && get_page_by_path( 'invitations-to-bid' ) && get_page_by_path( 'submit-job-opportunity' ) && get_page_by_path( 'submit-invitation-to-bid' ) && get_page_by_path( 'job-applications-dashboard' ) && get_page_by_path( 'bid-submissions-dashboard' ) ) {
@@ -354,6 +375,7 @@ function rp_opportunities_maybe_upgrade() {
 	rp_opportunities_create_tables();
 	rp_opportunities_apply_roles_and_caps();
 	rp_opportunities_create_pages();
+	rp_opportunities_publish_pending_posts();
 	flush_rewrite_rules();
 	update_option( 'rp_opportunities_version', RP_OPPORTUNITIES_VERSION );
 }
