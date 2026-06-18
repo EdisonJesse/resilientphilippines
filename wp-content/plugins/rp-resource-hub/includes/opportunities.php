@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_OPPORTUNITIES_VERSION', '1.0.1' );
+define( 'RP_OPPORTUNITIES_VERSION', '1.0.2' );
 define( 'RP_JOB_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_JOB_MAX_ATTACHMENTS', 5 );
 define( 'RP_BID_MAX_ATTACHMENT_BYTES', 25 * 1024 * 1024 );
@@ -255,9 +255,25 @@ function rp_opportunities_create_pages() {
 			'title'   => __( 'Opportunities', 'rp-resource-hub' ),
 			'content' => '[rp_opportunities]',
 		),
+		'job-ads'                     => array(
+			'title'   => __( 'Job Ads', 'rp-resource-hub' ),
+			'content' => '[rp_opportunities type="job"]',
+		),
+		'invitations-to-bid'          => array(
+			'title'   => __( 'Invitations to Bid', 'rp-resource-hub' ),
+			'content' => '[rp_opportunities type="itb"]',
+		),
 		'submit-opportunity'          => array(
 			'title'   => __( 'Submit Opportunity', 'rp-resource-hub' ),
 			'content' => '[rp_submit_opportunity]',
+		),
+		'submit-job-opportunity'      => array(
+			'title'   => __( 'Submit Job Posting', 'rp-resource-hub' ),
+			'content' => '[rp_submit_job_opportunity]',
+		),
+		'submit-invitation-to-bid'    => array(
+			'title'   => __( 'Submit Invitation to Bid', 'rp-resource-hub' ),
+			'content' => '[rp_submit_itb_opportunity]',
 		),
 		'job-applications-dashboard'  => array(
 			'title'   => __( 'Job Applications Dashboard', 'rp-resource-hub' ),
@@ -306,7 +322,7 @@ function rp_opportunities_activate() {
 register_activation_hook( RP_RESOURCE_HUB_FILE, 'rp_opportunities_activate' );
 
 function rp_opportunities_maybe_upgrade() {
-	if ( RP_OPPORTUNITIES_VERSION === get_option( 'rp_opportunities_version' ) && get_page_by_path( 'opportunities' ) && get_page_by_path( 'submit-opportunity' ) && get_page_by_path( 'job-applications-dashboard' ) && get_page_by_path( 'bid-submissions-dashboard' ) ) {
+	if ( RP_OPPORTUNITIES_VERSION === get_option( 'rp_opportunities_version' ) && get_page_by_path( 'opportunities' ) && get_page_by_path( 'job-ads' ) && get_page_by_path( 'invitations-to-bid' ) && get_page_by_path( 'submit-job-opportunity' ) && get_page_by_path( 'submit-invitation-to-bid' ) && get_page_by_path( 'job-applications-dashboard' ) && get_page_by_path( 'bid-submissions-dashboard' ) ) {
 		return;
 	}
 
@@ -505,55 +521,109 @@ function rp_opportunities_submit_notice_html() {
 	}
 }
 
-function rp_opportunities_submit_shortcode() {
+function rp_opportunities_submit_redirect_for_type( $type = '' ) {
+	if ( 'job' === $type ) {
+		return home_url( '/submit-job-opportunity/' );
+	}
+	if ( 'itb' === $type ) {
+		return home_url( '/submit-invitation-to-bid/' );
+	}
+	return home_url( '/submit-opportunity/' );
+}
+
+function rp_opportunities_submit_shortcode( $atts = array() ) {
+	$atts = shortcode_atts(
+		array(
+			'type' => '',
+		),
+		$atts,
+		'rp_submit_opportunity'
+	);
+	$forced_type = sanitize_key( $atts['type'] );
+	if ( ! isset( rp_opportunities_type_options()[ $forced_type ] ) ) {
+		$forced_type = '';
+	}
+
 	if ( ! rp_opportunities_user_can_submit() ) {
-		return '<div class="rp-empty-state"><p>' . esc_html__( 'You must be authorized to submit opportunities.', 'rp-resource-hub' ) . '</p><p><a class="rp-button" href="' . esc_url( wp_login_url( home_url( '/submit-opportunity/' ) ) ) . '">' . esc_html__( 'Log in', 'rp-resource-hub' ) . '</a></p></div>';
+		$login_redirect = rp_opportunities_submit_redirect_for_type( $forced_type );
+		return '<div class="rp-empty-state"><p>' . esc_html__( 'You must be authorized to submit this type of posting.', 'rp-resource-hub' ) . '</p><p><a class="rp-button" href="' . esc_url( wp_login_url( $login_redirect ) ) . '">' . esc_html__( 'Log in', 'rp-resource-hub' ) . '</a></p></div>';
 	}
 
 	$allowed_types = rp_opportunities_allowed_submit_types();
+	if ( $forced_type ) {
+		$allowed_types = in_array( $forced_type, $allowed_types, true ) ? array( $forced_type ) : array();
+	}
 	if ( ! $allowed_types ) {
-		return '<div class="rp-empty-state"><p>' . esc_html__( 'Your account does not have an opportunity submission role.', 'rp-resource-hub' ) . '</p></div>';
+		return '<div class="rp-empty-state"><p>' . esc_html__( 'Your account does not have access to submit this type of posting.', 'rp-resource-hub' ) . '</p></div>';
+	}
+
+	$single_type = 1 === count( $allowed_types ) ? $allowed_types[0] : '';
+	$form_action = rp_opportunities_submit_redirect_for_type( $single_type );
+	$title = __( 'Submit Opportunity', 'rp-resource-hub' );
+	$subtitle = __( 'Create a job ad or invitation to bid for administrator review and publishing.', 'rp-resource-hub' );
+	if ( 'job' === $single_type ) {
+		$title = __( 'Submit Job Posting', 'rp-resource-hub' );
+		$subtitle = __( 'Create a job opportunity for administrator review and publishing.', 'rp-resource-hub' );
+	} elseif ( 'itb' === $single_type ) {
+		$title = __( 'Submit Invitation to Bid', 'rp-resource-hub' );
+		$subtitle = __( 'Create a procurement posting for administrator review and publishing.', 'rp-resource-hub' );
 	}
 
 	ob_start();
 	?>
 	<div class="rp-submit-opportunity-shell">
 		<div class="rp-dashboard-header">
-			<h2 class="rp-dashboard-title"><?php esc_html_e( 'Submit Opportunity', 'rp-resource-hub' ); ?></h2>
-			<p class="rp-dashboard-subtitle"><?php esc_html_e( 'Create a job ad or invitation to bid for administrator review and publishing.', 'rp-resource-hub' ); ?></p>
+			<h2 class="rp-dashboard-title"><?php echo esc_html( $title ); ?></h2>
+			<p class="rp-dashboard-subtitle"><?php echo esc_html( $subtitle ); ?></p>
 		</div>
 		<?php rp_opportunities_submit_notice_html(); ?>
-		<form class="rp-upload-form rp-opportunity-form rp-submit-opportunity-form" method="post" action="<?php echo esc_url( home_url( '/submit-opportunity/' ) ); ?>" enctype="multipart/form-data">
+		<form class="rp-upload-form rp-opportunity-form rp-submit-opportunity-form" method="post" action="<?php echo esc_url( $form_action ); ?>" enctype="multipart/form-data">
 			<input type="hidden" name="rp_submit_opportunity_action" value="1">
 			<?php wp_nonce_field( 'rp_submit_opportunity', 'rp_submit_opportunity_nonce' ); ?>
 			<?php rp_opportunities_text_field( 'opportunity_title', __( 'Posting title', 'rp-resource-hub' ), true ); ?>
-			<div class="rp-field">
-				<label for="opportunity_type"><?php esc_html_e( 'Posting type', 'rp-resource-hub' ); ?> <span aria-hidden="true">*</span></label>
-				<?php if ( 1 === count( $allowed_types ) ) : ?>
-					<input type="hidden" name="opportunity_type" value="<?php echo esc_attr( $allowed_types[0] ); ?>">
-					<input type="text" value="<?php echo esc_attr( rp_opportunities_type_options()[ $allowed_types[0] ] ); ?>" readonly>
-				<?php else : ?>
+			<?php if ( $single_type ) : ?>
+				<input type="hidden" name="opportunity_type" value="<?php echo esc_attr( $single_type ); ?>">
+			<?php else : ?>
+				<div class="rp-field">
+					<label for="opportunity_type"><?php esc_html_e( 'Posting type', 'rp-resource-hub' ); ?> <span aria-hidden="true">*</span></label>
 					<select id="opportunity_type" name="opportunity_type" required>
 						<?php foreach ( $allowed_types as $type ) : ?>
 							<option value="<?php echo esc_attr( $type ); ?>"><?php echo esc_html( rp_opportunities_type_options()[ $type ] ); ?></option>
 						<?php endforeach; ?>
 					</select>
-				<?php endif; ?>
-			</div>
-			<?php rp_opportunities_select_field( 'hiring_type', __( 'Hiring type, for job ads', 'rp-resource-hub' ), rp_opportunities_hiring_type_options(), false ); ?>
+				</div>
+			<?php endif; ?>
+			<?php if ( ! $single_type ) : ?>
+				<div class="rp-form-choice-note">
+					<p><?php esc_html_e( 'For clearer workflows, use the dedicated Submit Job Posting or Submit Invitation to Bid pages from the user menu.', 'rp-resource-hub' ); ?></p>
+				</div>
+			<?php endif; ?>
+			<?php if ( 'itb' !== $single_type ) : ?>
+				<?php rp_opportunities_select_field( 'hiring_type', __( 'Hiring type', 'rp-resource-hub' ), rp_opportunities_hiring_type_options(), false ); ?>
+			<?php endif; ?>
 			<?php rp_opportunities_text_field( 'deadline', __( 'Deadline, YYYY-MM-DD HH:MM', 'rp-resource-hub' ), true ); ?>
-			<?php rp_opportunities_text_field( 'location', __( 'Location / duty station', 'rp-resource-hub' ), false ); ?>
-			<?php rp_opportunities_text_field( 'employment_type', __( 'Employment type, for job ads', 'rp-resource-hub' ), false ); ?>
-			<?php rp_opportunities_text_field( 'reference_number', __( 'ITB reference number', 'rp-resource-hub' ), false ); ?>
+			<?php if ( 'itb' !== $single_type ) : ?>
+				<?php rp_opportunities_text_field( 'location', __( 'Location / duty station', 'rp-resource-hub' ), false ); ?>
+				<?php rp_opportunities_text_field( 'employment_type', __( 'Employment type', 'rp-resource-hub' ), false ); ?>
+			<?php endif; ?>
+			<?php if ( 'job' !== $single_type ) : ?>
+				<?php rp_opportunities_text_field( 'reference_number', __( 'ITB reference number', 'rp-resource-hub' ), false ); ?>
+			<?php endif; ?>
 			<?php rp_opportunities_email_field( 'contact_email', __( 'Contact email', 'rp-resource-hub' ), false ); ?>
-			<?php rp_opportunities_text_field( 'bid_opening_date', __( 'Bid opening date, for ITBs', 'rp-resource-hub' ), false ); ?>
-			<?php rp_opportunities_text_field( 'clarification_period', __( 'Clarification period, for ITBs', 'rp-resource-hub' ), false ); ?>
-			<?php rp_opportunities_text_field( 'duration', __( 'Duration of engagement, for consultants', 'rp-resource-hub' ), false ); ?>
+			<?php if ( 'job' !== $single_type ) : ?>
+				<?php rp_opportunities_text_field( 'bid_opening_date', __( 'Bid opening date', 'rp-resource-hub' ), false ); ?>
+				<?php rp_opportunities_text_field( 'clarification_period', __( 'Clarification period', 'rp-resource-hub' ), false ); ?>
+			<?php endif; ?>
+			<?php if ( 'itb' !== $single_type ) : ?>
+				<?php rp_opportunities_text_field( 'duration', __( 'Duration of engagement, for consultants', 'rp-resource-hub' ), false ); ?>
+			<?php endif; ?>
 			<?php rp_opportunities_textarea_field( 'description', __( 'Posting description', 'rp-resource-hub' ), true ); ?>
-			<?php rp_opportunities_textarea_field( 'deliverables', __( 'Expected deliverables / scope notes', 'rp-resource-hub' ), false ); ?>
-			<label class="rp-checkbox-line"><input type="checkbox" name="require_portfolio" value="1"> <?php esc_html_e( 'Require portfolio/proof of work for consultant applications', 'rp-resource-hub' ); ?></label>
-			<?php rp_opportunities_file_field( 'opportunity_tor', __( 'Terms of Reference document, for job postings', 'rp-resource-hub' ), false ); ?>
-			<?php rp_opportunities_file_field( 'opportunity_document', __( 'Additional posting document', 'rp-resource-hub' ), false, 'bid' ); ?>
+			<?php rp_opportunities_textarea_field( 'deliverables', 'itb' === $single_type ? __( 'Procurement scope / requirements notes', 'rp-resource-hub' ) : __( 'Expected deliverables / scope notes', 'rp-resource-hub' ), false ); ?>
+			<?php if ( 'itb' !== $single_type ) : ?>
+				<label class="rp-checkbox-line"><input type="checkbox" name="require_portfolio" value="1"> <?php esc_html_e( 'Require portfolio/proof of work for consultant applications', 'rp-resource-hub' ); ?></label>
+				<?php rp_opportunities_file_field( 'opportunity_tor', __( 'Terms of Reference document', 'rp-resource-hub' ), false ); ?>
+			<?php endif; ?>
+			<?php rp_opportunities_file_field( 'opportunity_document', 'itb' === $single_type ? __( 'Bid / procurement document', 'rp-resource-hub' ) : __( 'Additional posting document', 'rp-resource-hub' ), false, 'bid' ); ?>
 			<button class="rp-button" type="submit"><?php esc_html_e( 'Submit for Review', 'rp-resource-hub' ); ?></button>
 		</form>
 	</div>
@@ -561,16 +631,24 @@ function rp_opportunities_submit_shortcode() {
 	return ob_get_clean();
 }
 add_shortcode( 'rp_submit_opportunity', 'rp_opportunities_submit_shortcode' );
+add_shortcode( 'rp_submit_job_opportunity', function( $atts = array() ) {
+	$atts['type'] = 'job';
+	return rp_opportunities_submit_shortcode( $atts );
+} );
+add_shortcode( 'rp_submit_itb_opportunity', function( $atts = array() ) {
+	$atts['type'] = 'itb';
+	return rp_opportunities_submit_shortcode( $atts );
+} );
 
 function rp_opportunities_handle_frontend_submit() {
-	$redirect = home_url( '/submit-opportunity/' );
+	$type = isset( $_POST['opportunity_type'] ) ? sanitize_key( wp_unslash( $_POST['opportunity_type'] ) ) : '';
+	$redirect = rp_opportunities_submit_redirect_for_type( $type );
 	if ( ! rp_opportunities_user_can_submit() || ! isset( $_POST['rp_submit_opportunity_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['rp_submit_opportunity_nonce'] ) ), 'rp_submit_opportunity' ) ) {
 		wp_safe_redirect( add_query_arg( 'rp_opp_submit_notice', 'error', $redirect ) );
 		exit;
 	}
 
 	$allowed_types = rp_opportunities_allowed_submit_types();
-	$type          = isset( $_POST['opportunity_type'] ) ? sanitize_key( wp_unslash( $_POST['opportunity_type'] ) ) : '';
 	if ( ! in_array( $type, $allowed_types, true ) ) {
 		wp_safe_redirect( add_query_arg( 'rp_opp_submit_notice', 'error', $redirect ) );
 		exit;
@@ -673,7 +751,8 @@ function rp_opportunities_shortcode( $atts ) {
 		$atts,
 		'rp_opportunities'
 	);
-	$type   = isset( $_GET['opportunity_type'] ) ? sanitize_key( wp_unslash( $_GET['opportunity_type'] ) ) : sanitize_key( $atts['type'] );
+	$forced_type = sanitize_key( $atts['type'] );
+	$type   = $forced_type ? $forced_type : ( isset( $_GET['opportunity_type'] ) ? sanitize_key( wp_unslash( $_GET['opportunity_type'] ) ) : '' );
 	$status = isset( $_GET['opportunity_status'] ) ? sanitize_key( wp_unslash( $_GET['opportunity_status'] ) ) : 'open';
 	if ( ! isset( rp_opportunities_type_options()[ $type ] ) ) {
 		$type = '';
@@ -692,23 +771,35 @@ function rp_opportunities_shortcode( $atts ) {
 		)
 	);
 
+	$title = __( 'Opportunities', 'rp-resource-hub' );
+	$subtitle = __( 'Browse ACCORD job opportunities and invitations to bid.', 'rp-resource-hub' );
+	if ( 'job' === $type && $forced_type ) {
+		$title = __( 'Job Ads', 'rp-resource-hub' );
+		$subtitle = __( 'Browse current ACCORD job opportunities and submit applications online.', 'rp-resource-hub' );
+	} elseif ( 'itb' === $type && $forced_type ) {
+		$title = __( 'Invitations to Bid', 'rp-resource-hub' );
+		$subtitle = __( 'Browse current ACCORD procurement opportunities and submit bid documents online.', 'rp-resource-hub' );
+	}
+
 	ob_start();
 	?>
 	<div class="rp-opportunities-shell">
 		<div class="rp-dashboard-header">
-			<h2 class="rp-dashboard-title"><?php esc_html_e( 'Opportunities', 'rp-resource-hub' ); ?></h2>
-			<p class="rp-dashboard-subtitle"><?php esc_html_e( 'Browse ACCORD job opportunities and invitations to bid.', 'rp-resource-hub' ); ?></p>
+			<h2 class="rp-dashboard-title"><?php echo esc_html( $title ); ?></h2>
+			<p class="rp-dashboard-subtitle"><?php echo esc_html( $subtitle ); ?></p>
 		</div>
 		<form class="rp-opportunities-filter" method="get">
-			<label>
-				<span><?php esc_html_e( 'Type', 'rp-resource-hub' ); ?></span>
-				<select name="opportunity_type">
-					<option value=""><?php esc_html_e( 'All opportunities', 'rp-resource-hub' ); ?></option>
-					<?php foreach ( rp_opportunities_type_options() as $value => $label ) : ?>
-						<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $type, $value ); ?>><?php echo esc_html( $label ); ?></option>
-					<?php endforeach; ?>
-				</select>
-			</label>
+			<?php if ( ! $forced_type ) : ?>
+				<label>
+					<span><?php esc_html_e( 'Type', 'rp-resource-hub' ); ?></span>
+					<select name="opportunity_type">
+						<option value=""><?php esc_html_e( 'All opportunities', 'rp-resource-hub' ); ?></option>
+						<?php foreach ( rp_opportunities_type_options() as $value => $label ) : ?>
+							<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $type, $value ); ?>><?php echo esc_html( $label ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</label>
+			<?php endif; ?>
 			<label>
 				<span><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></span>
 				<select name="opportunity_status">

@@ -65,3 +65,38 @@ Path: `app/public/wp-content/themes/resilient-hub-child/`
 - **TinyMCE Button Contrast**: In `style.css`, a generic selector `.rp-upload-form button` style makes default TinyMCE editor visual buttons unreadable. Specific visual resets are placed at the bottom of `style.css` to restore visual text toolbar contrast.
 - **Card Height Stability**: Grid cards (`.rp-resource-card` and `.rp-card`) use a fixed `min-height: 350px`, along with `-webkit-line-clamp` (clamping titles to 2 lines and description paragraphs to 3 lines) to maintain perfectly consistent grid rows. This prevents jumpy height resizing transitions when catalog filters are toggled.
 - **Web Application Launching**: A resource format check `has_term( 'Web Application', 'resource_format' )` is utilized alongside the metadata field `_rp_is_web_app` to identify web applications, outputting a `Launch` button linking either to the extracted HTML index path or falling back to the package download path.
+
+---
+
+## 5. Latest Session Record - Split Opportunity Workflows
+
+- **Date**: June 18, 2026
+- **Purpose**: Correct the opportunities workflow so jobs and ITBs use separate public listing pages and separate authorized posting forms.
+- **Changed files**:
+  - `wp-content/plugins/rp-resource-hub/rp-resource-hub.php`
+  - `wp-content/plugins/rp-resource-hub/includes/opportunities.php`
+  - `wp-content/themes/resilient-hub-child/header.php`
+  - `wp-content/themes/resilient-hub-child/footer.php`
+  - `wp-content/themes/resilient-hub-child/style.css`
+  - `handoff.md`
+- **Implemented**:
+  - Resource Hub plugin bumped to `1.10.2`.
+  - Opportunities module bumped to `1.0.2`.
+  - Added `/job-ads/` with `[rp_opportunities type="job"]`.
+  - Added `/invitations-to-bid/` with `[rp_opportunities type="itb"]`.
+  - Added `/submit-job-opportunity/` with `[rp_submit_job_opportunity]`.
+  - Added `/submit-invitation-to-bid/` with `[rp_submit_itb_opportunity]`.
+  - Job posting form now shows job-only fields.
+  - ITB posting form now shows procurement-only fields.
+  - User dropdown now shows `Submit Job Posting` and/or `Submit ITB Posting` based on role.
+  - Removed the old combined `Submit Opportunity` dropdown link.
+  - Footer Job Ads and Invitations to Bid links now point to dedicated pages.
+  - Existing HR and Procurement dashboards continue to support two-layer review plus actions: status update, internal note, file links, CSV export, and optional successful/unsuccessful email notice.
+- **Local verification**:
+  - PHP lint passed for the changed PHP files.
+  - `/job-ads/`, `/invitations-to-bid/`, `/submit-job-opportunity/`, and `/submit-invitation-to-bid/` returned `200`.
+  - New pages were created in the database and version options updated.
+  - Temporary HR user saw only the job posting form/link and could not access the ITB posting form.
+  - Temporary Procurement user saw only the ITB posting form/link and could not access the job posting form.
+  - Temporary dashboard records confirmed Layer 1 and Layer 2 action controls for both HR and Procurement.
+  - Temporary test users, posts, applications, and bid submissions were removed.
