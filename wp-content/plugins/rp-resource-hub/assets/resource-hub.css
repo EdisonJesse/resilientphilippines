@@ -43,8 +43,6 @@
 }
 
 .rp-opportunity-consent-statement h3 {
-  background: var(--rp-color-green, #176b52);
-  color: #ffffff;
   font-size: 1rem;
   font-weight: 800;
   margin: 0;
