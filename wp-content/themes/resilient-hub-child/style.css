@@ -3807,39 +3807,8 @@ input[type="submit"].give-submit:focus {
 
 .rp-opportunity-job-intro {
   display: grid;
-  gap: 18px;
+  gap: 22px;
   margin: 24px 0;
-}
-
-.rp-opportunity-job-banner {
-  align-items: center;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.86)),
-    radial-gradient(circle at 30% 20%, #eef4f1 0, #ffffff 34%, #e7ece9 100%);
-  border: 1px solid var(--rp-color-border);
-  border-radius: var(--rp-radius);
-  display: grid;
-  justify-items: center;
-  min-height: 190px;
-  padding: 28px;
-  text-align: center;
-}
-
-.rp-opportunity-job-brand {
-  color: var(--rp-color-green);
-  font-size: 1.35rem;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  margin-bottom: 8px;
-}
-
-.rp-opportunity-job-banner p {
-  color: #071624;
-  font-size: 2.15rem;
-  font-weight: 900;
-  line-height: 1.1;
-  margin: 0;
-  max-width: 760px;
 }
 
 .rp-opportunity-job-intro-card {
@@ -3856,6 +3825,23 @@ input[type="submit"].give-submit:focus {
 .rp-opportunity-job-intro-card p {
   font-size: 1.05rem;
   line-height: 1.65;
+}
+
+.rp-opportunity-job-posting-copy {
+  border-top: 1px solid var(--rp-color-border);
+  margin-top: 24px;
+  padding-top: 20px;
+}
+
+.rp-opportunity-job-posting-copy h2 {
+  font-size: 1.35rem;
+  margin-bottom: 12px;
+}
+
+.rp-opportunity-job-divider {
+  border: 0;
+  border-top: 1px solid var(--rp-color-border);
+  margin: 0;
 }
 
 .rp-opportunity-single-content > :first-child {
@@ -4169,16 +4155,11 @@ input[type="submit"].give-submit:focus {
     padding: 18px;
   }
 
-  .rp-opportunity-job-banner {
-    min-height: 150px;
-    padding: 22px;
-  }
-
-  .rp-opportunity-job-banner p {
-    font-size: 1.55rem;
-  }
-
   .rp-opportunity-job-intro-card h2 {
     font-size: 1.55rem;
+  }
+
+  .rp-opportunity-job-posting-copy h2 {
+    font-size: 1.25rem;
   }
 }
