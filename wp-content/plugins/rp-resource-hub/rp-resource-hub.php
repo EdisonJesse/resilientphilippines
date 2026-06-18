@@ -768,6 +768,11 @@ function rp_resource_hub_redirect_backend() {
 		return;
 	}
 
+	global $pagenow;
+	if ( 'admin-post.php' === $pagenow ) {
+		return;
+	}
+
 	if ( current_user_can( 'manage_options' ) || current_user_can( 'edit_partner_resources' ) ) {
 		return;
 	}

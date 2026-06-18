@@ -128,6 +128,70 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // -------------------------------------------------------------
+    // 1b. Opportunity submission filtering
+    // -------------------------------------------------------------
+    const submissionFilterForm = document.querySelector('.rp-opportunity-submission-filters');
+    const submissionResults = document.querySelector('.rp-opportunity-submissions-results');
+
+    if (submissionFilterForm && submissionResults && typeof rp_ajax !== 'undefined') {
+        let submissionDebounce = null;
+
+        function fetchSubmissionResults() {
+            submissionResults.style.opacity = '0.55';
+
+            const formData = new FormData(submissionFilterForm);
+            const params = new URLSearchParams();
+            params.append('action', 'rp_filter_opportunity_submissions');
+            params.append('type', formData.get('submission_type') || submissionResults.dataset.type || '');
+            params.append('opportunity_id', formData.get('opportunity_id') || submissionResults.dataset.opportunityId || '');
+
+            formData.forEach((value, key) => {
+                if (key.indexOf('filter_') === 0) {
+                    params.append(key, value);
+                }
+            });
+
+            fetch(rp_ajax.ajax_url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params.toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    submissionResults.innerHTML = data.data.html;
+                } else {
+                    console.error('Submission filtering failed:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Submission AJAX Error:', error);
+            })
+            .finally(() => {
+                submissionResults.style.opacity = '1';
+            });
+        }
+
+        submissionFilterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetchSubmissionResults();
+        });
+
+        submissionFilterForm.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', fetchSubmissionResults);
+        });
+
+        submissionFilterForm.querySelectorAll('input[type="search"]').forEach(input => {
+            input.addEventListener('input', function() {
+                if (submissionDebounce) clearTimeout(submissionDebounce);
+                submissionDebounce = setTimeout(fetchSubmissionResults, 400);
+            });
+        });
+    }
+
+    // -------------------------------------------------------------
     // 2. Admin Moderation Quick Approvals
     // -------------------------------------------------------------
     const moderationTable = document.querySelector('.rp-moderation-table');

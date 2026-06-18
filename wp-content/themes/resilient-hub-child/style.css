@@ -3804,6 +3804,14 @@ input[type="submit"].give-submit:focus {
   gap: 12px;
 }
 
+.rp-opportunity-single-content > :first-child {
+  margin-top: 0;
+}
+
+.rp-opportunity-single-content > :last-child {
+  margin-bottom: 0;
+}
+
 .rp-opportunity-card h3 {
   color: var(--rp-color-navy);
   font-size: 1.25rem;
@@ -3990,10 +3998,36 @@ input[type="submit"].give-submit:focus {
 }
 
 .rp-opportunity-submission-filters {
+  background: var(--rp-color-surface);
+  border: 1px solid var(--rp-color-border);
+  border-radius: var(--rp-radius);
   display: grid;
   gap: 14px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-bottom: 20px;
+  grid-template-columns: 1fr;
+  margin: 0;
+  padding: 16px;
+}
+
+.rp-opportunity-submissions-layout {
+  align-items: start;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 280px minmax(0, 1fr);
+  margin-top: 20px;
+}
+
+.rp-opportunity-submissions-sidebar {
+  position: sticky;
+  top: 96px;
+}
+
+.rp-opportunity-submissions-results {
+  min-width: 0;
+  transition: opacity 0.18s ease;
+}
+
+.rp-opportunity-submissions-table {
+  min-width: 1500px;
 }
 
 .rp-opportunity-submission-filters label {
@@ -4048,8 +4082,12 @@ input[type="submit"].give-submit:focus {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .rp-opportunity-submission-filters {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .rp-opportunity-submissions-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .rp-opportunity-submissions-sidebar {
+    position: static;
   }
 }
 
@@ -4063,10 +4101,6 @@ input[type="submit"].give-submit:focus {
 
   .rp-opportunity-dashboard .rp-dashboard-header {
     display: grid;
-  }
-
-  .rp-opportunity-submission-filters {
-    grid-template-columns: 1fr;
   }
 
   .rp-opportunities-filter .rp-button,

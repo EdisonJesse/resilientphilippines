@@ -1651,10 +1651,6 @@ function rp_opportunities_render_submission_layer( $type, $opportunity_id ) {
 	if ( ! get_post( $opportunity_id ) || ( 'job' === $type && 'job' !== rp_opportunities_get_type( $opportunity_id ) ) || ( 'bid' === $type && 'itb' !== rp_opportunities_get_type( $opportunity_id ) ) ) {
 		return '<div class="rp-empty-state"><p>' . esc_html__( 'Selected posting could not be found.', 'rp-resource-hub' ) . '</p></div>';
 	}
-	global $wpdb;
-	$table = 'job' === $type ? $wpdb->prefix . 'rp_job_applications' : $wpdb->prefix . 'rp_bid_submissions';
-	$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table WHERE opportunity_id = %d ORDER BY submitted_at DESC", $opportunity_id ) );
-	$rows = rp_opportunities_filter_submission_rows( $type, $rows );
 	$statuses = 'job' === $type ? rp_opportunities_job_status_options() : rp_opportunities_bid_status_options();
 	$back_url = 'job' === $type ? home_url( '/job-applications-dashboard/' ) : home_url( '/bid-submissions-dashboard/' );
 	$export_url = wp_nonce_url( admin_url( 'admin-post.php?action=rp_opportunity_export_submissions&type=' . $type . '&opportunity_id=' . absint( $opportunity_id ) ), 'rp_opportunity_export_' . $type . '_' . absint( $opportunity_id ) );
@@ -1667,26 +1663,14 @@ function rp_opportunities_render_submission_layer( $type, $opportunity_id ) {
 			<p class="rp-dashboard-subtitle"><?php echo esc_html( 'job' === $type ? __( 'Applications related to this job opening.', 'rp-resource-hub' ) : __( 'Submissions related to this Invitation to Bid.', 'rp-resource-hub' ) ); ?></p>
 			<a class="rp-button rp-button-secondary" href="<?php echo esc_url( $export_url ); ?>"><?php esc_html_e( 'Export CSV', 'rp-resource-hub' ); ?></a>
 		</div>
-		<?php rp_opportunities_render_submission_filters( $type, $statuses ); ?>
-		<div class="rp-table-responsive">
-			<table class="rp-moderation-table rp-opportunity-dashboard-table">
-				<thead><tr><th><?php echo esc_html( 'job' === $type ? __( 'Applicant', 'rp-resource-hub' ) : __( 'Supplier', 'rp-resource-hub' ) ); ?></th><th><?php esc_html_e( 'Contact', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Details', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Submitted', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Documents', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Update', 'rp-resource-hub' ); ?></th></tr></thead>
-				<tbody>
-				<?php foreach ( $rows as $row ) : ?>
-					<tr>
-						<td><strong><?php echo esc_html( 'job' === $type ? $row->full_name : $row->company_name ); ?></strong><?php if ( 'bid' === $type ) : ?><br><span><?php echo esc_html( $row->contact_person ); ?></span><?php endif; ?></td>
-						<td><?php echo esc_html( $row->email ); ?><br><span><?php echo esc_html( $row->phone ); ?></span></td>
-						<td><?php echo wp_kses_post( rp_opportunities_submission_details_html( $type, $row ) ); ?></td>
-						<td><?php echo esc_html( rp_opportunities_format_datetime( $row->submitted_at ) ); ?></td>
-						<td><span class="rp-status-badge"><?php echo esc_html( isset( $statuses[ $row->status ] ) ? $statuses[ $row->status ] : $row->status ); ?></span></td>
-						<td><?php echo wp_kses_post( rp_opportunities_submission_attachment_links( $type, $row ) ); ?></td>
-						<td><?php rp_opportunities_render_status_form( $type, $row, $statuses ); ?></td>
-					</tr>
-				<?php endforeach; ?>
-				</tbody>
-			</table>
+		<div class="rp-opportunity-submissions-layout">
+			<aside class="rp-opportunity-submissions-sidebar">
+				<?php rp_opportunities_render_submission_filters( $type, $statuses, $opportunity_id ); ?>
+			</aside>
+			<div class="rp-opportunity-submissions-results" data-type="<?php echo esc_attr( $type ); ?>" data-opportunity-id="<?php echo esc_attr( $opportunity_id ); ?>">
+				<?php echo rp_opportunities_render_submission_table( $type, $opportunity_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			</div>
 		</div>
-		<?php if ( ! $rows ) : ?><div class="rp-empty-state"><p><?php esc_html_e( 'No submissions yet.', 'rp-resource-hub' ); ?></p></div><?php endif; ?>
 	</div>
 	<?php
 	return ob_get_clean();
@@ -1728,11 +1712,12 @@ function rp_opportunities_decode_fields( $row ) {
 	return is_array( $fields ) ? $fields : array();
 }
 
-function rp_opportunities_render_submission_filters( $type, $statuses ) {
+function rp_opportunities_render_submission_filters( $type, $statuses, $opportunity_id = 0 ) {
 	$labels = rp_opportunities_submission_field_labels( $type );
 	?>
 	<form class="rp-opportunity-submission-filters" method="get">
-		<input type="hidden" name="opportunity_id" value="<?php echo esc_attr( isset( $_GET['opportunity_id'] ) ? absint( $_GET['opportunity_id'] ) : 0 ); ?>">
+		<input type="hidden" name="opportunity_id" value="<?php echo esc_attr( $opportunity_id ? absint( $opportunity_id ) : ( isset( $_GET['opportunity_id'] ) ? absint( $_GET['opportunity_id'] ) : 0 ) ); ?>">
+		<input type="hidden" name="submission_type" value="<?php echo esc_attr( $type ); ?>">
 		<label><span><?php echo esc_html( 'job' === $type ? __( 'Full name', 'rp-resource-hub' ) : __( 'Company / supplier', 'rp-resource-hub' ) ); ?></span><input type="search" name="filter_name" value="<?php echo esc_attr( isset( $_GET['filter_name'] ) ? sanitize_text_field( wp_unslash( $_GET['filter_name'] ) ) : '' ); ?>"></label>
 		<?php if ( 'bid' === $type ) : ?>
 			<label><span><?php esc_html_e( 'Contact person', 'rp-resource-hub' ); ?></span><input type="search" name="filter_contact_person" value="<?php echo esc_attr( isset( $_GET['filter_contact_person'] ) ? sanitize_text_field( wp_unslash( $_GET['filter_contact_person'] ) ) : '' ); ?>"></label>
@@ -1746,6 +1731,60 @@ function rp_opportunities_render_submission_filters( $type, $statuses ) {
 		<button class="rp-button" type="submit"><?php esc_html_e( 'Filter', 'rp-resource-hub' ); ?></button>
 	</form>
 	<?php
+}
+
+function rp_opportunities_render_submission_table( $type, $opportunity_id ) {
+	global $wpdb;
+	$table = 'job' === $type ? $wpdb->prefix . 'rp_job_applications' : $wpdb->prefix . 'rp_bid_submissions';
+	$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table WHERE opportunity_id = %d ORDER BY submitted_at DESC", $opportunity_id ) );
+	$rows = rp_opportunities_filter_submission_rows( $type, $rows );
+	$statuses = 'job' === $type ? rp_opportunities_job_status_options() : rp_opportunities_bid_status_options();
+	$labels = rp_opportunities_submission_field_labels( $type );
+	ob_start();
+	?>
+	<div class="rp-table-responsive">
+		<table class="rp-moderation-table rp-opportunity-dashboard-table rp-opportunity-submissions-table">
+			<thead>
+				<tr>
+					<th><?php echo esc_html( 'job' === $type ? __( 'Applicant', 'rp-resource-hub' ) : __( 'Supplier', 'rp-resource-hub' ) ); ?></th>
+					<?php if ( 'bid' === $type ) : ?><th><?php esc_html_e( 'Contact Person', 'rp-resource-hub' ); ?></th><?php endif; ?>
+					<th><?php esc_html_e( 'Email', 'rp-resource-hub' ); ?></th>
+					<th><?php esc_html_e( 'Phone', 'rp-resource-hub' ); ?></th>
+					<?php foreach ( $labels as $label ) : ?><th><?php echo esc_html( $label ); ?></th><?php endforeach; ?>
+					<th><?php esc_html_e( 'Submitted', 'rp-resource-hub' ); ?></th>
+					<th><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></th>
+					<th><?php esc_html_e( 'Documents', 'rp-resource-hub' ); ?></th>
+					<th><?php esc_html_e( 'Update', 'rp-resource-hub' ); ?></th>
+				</tr>
+			</thead>
+			<tbody>
+			<?php foreach ( $rows as $row ) : $fields = rp_opportunities_submission_flat_fields( $type, $row ); ?>
+				<tr>
+					<td><strong><?php echo esc_html( 'job' === $type ? $row->full_name : $row->company_name ); ?></strong></td>
+					<?php if ( 'bid' === $type ) : ?><td><?php echo esc_html( $row->contact_person ); ?></td><?php endif; ?>
+					<td><?php echo esc_html( $row->email ); ?></td>
+					<td><?php echo esc_html( $row->phone ); ?></td>
+					<?php foreach ( $labels as $key => $label ) : ?><td><?php echo esc_html( isset( $fields[ $key ] ) ? $fields[ $key ] : '' ); ?></td><?php endforeach; ?>
+					<td><?php echo esc_html( rp_opportunities_format_datetime( $row->submitted_at ) ); ?></td>
+					<td><span class="rp-status-badge"><?php echo esc_html( isset( $statuses[ $row->status ] ) ? $statuses[ $row->status ] : $row->status ); ?></span></td>
+					<td><?php echo wp_kses_post( rp_opportunities_submission_attachment_links( $type, $row ) ); ?></td>
+					<td><?php rp_opportunities_render_status_form( $type, $row, $statuses ); ?></td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
+	</div>
+	<?php if ( ! $rows ) : ?><div class="rp-empty-state"><p><?php esc_html_e( 'No submissions yet.', 'rp-resource-hub' ); ?></p></div><?php endif; ?>
+	<?php
+	return ob_get_clean();
+}
+
+function rp_opportunities_submission_flat_fields( $type, $row ) {
+	$fields = rp_opportunities_decode_fields( $row );
+	if ( 'bid' === $type && ! empty( $row->message ) ) {
+		$fields['message'] = $row->message;
+	}
+	return $fields;
 }
 
 function rp_opportunities_filter_submission_rows( $type, $rows ) {
@@ -1791,10 +1830,7 @@ function rp_opportunities_filter_submission_rows( $type, $rows ) {
 }
 
 function rp_opportunities_submission_details_html( $type, $row ) {
-	$fields = rp_opportunities_decode_fields( $row );
-	if ( 'bid' === $type && ! empty( $row->message ) ) {
-		$fields['message'] = $row->message;
-	}
+	$fields = rp_opportunities_submission_flat_fields( $type, $row );
 	$labels = rp_opportunities_submission_field_labels( $type );
 	$out = '<dl class="rp-submission-details">';
 	foreach ( $labels as $key => $label ) {
@@ -1806,6 +1842,27 @@ function rp_opportunities_submission_details_html( $type, $row ) {
 	$out .= '</dl>';
 	return $out;
 }
+
+function rp_opportunities_ajax_filter_submissions() {
+	$type = isset( $_POST['type'] ) ? sanitize_key( wp_unslash( $_POST['type'] ) ) : '';
+	$opportunity_id = isset( $_POST['opportunity_id'] ) ? absint( $_POST['opportunity_id'] ) : 0;
+	if ( ! in_array( $type, array( 'job', 'bid' ), true ) || ! $opportunity_id || ! rp_opportunities_user_can_manage_submission_type( $type ) ) {
+		wp_send_json_error( array( 'message' => __( 'Unauthorized request.', 'rp-resource-hub' ) ), 403 );
+	}
+
+	foreach ( $_POST as $key => $value ) {
+		if ( 0 === strpos( $key, 'filter_' ) ) {
+			$_GET[ $key ] = wp_unslash( $value );
+		}
+	}
+
+	wp_send_json_success(
+		array(
+			'html' => rp_opportunities_render_submission_table( $type, $opportunity_id ),
+		)
+	);
+}
+add_action( 'wp_ajax_rp_filter_opportunity_submissions', 'rp_opportunities_ajax_filter_submissions' );
 
 function rp_opportunities_submission_attachment_links( $type, $row ) {
 	$ids = json_decode( $row->attachment_ids ? $row->attachment_ids : '{}', true );
@@ -1962,14 +2019,38 @@ function rp_opportunities_handle_export() {
 	global $wpdb;
 	$table = 'job' === $type ? $wpdb->prefix . 'rp_job_applications' : $wpdb->prefix . 'rp_bid_submissions';
 	$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $table WHERE opportunity_id = %d ORDER BY submitted_at DESC", $opportunity_id ), ARRAY_A );
+	$labels = rp_opportunities_submission_field_labels( $type );
 	nocache_headers();
 	header( 'Content-Type: text/csv; charset=utf-8' );
 	header( 'Content-Disposition: attachment; filename="' . $type . '-submissions-' . $opportunity_id . '-' . gmdate( 'Y-m-d' ) . '.csv"' );
 	$out = fopen( 'php://output', 'w' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 	if ( $rows ) {
-		fputcsv( $out, array_keys( $rows[0] ) );
+		$headings = array( 'id', 'opportunity_id', 'name' );
+		if ( 'bid' === $type ) {
+			$headings[] = 'contact_person';
+		}
+		$headings = array_merge( $headings, array( 'email', 'phone' ), array_values( $labels ), array( 'status', 'submitted_at', 'updated_at' ) );
+		fputcsv( $out, $headings );
 		foreach ( $rows as $row ) {
-			fputcsv( $out, $row );
+			$field_row = (object) $row;
+			$fields = rp_opportunities_submission_flat_fields( $type, $field_row );
+			$csv_row = array(
+				$row['id'],
+				$row['opportunity_id'],
+				'job' === $type ? $row['full_name'] : $row['company_name'],
+			);
+			if ( 'bid' === $type ) {
+				$csv_row[] = $row['contact_person'];
+			}
+			$csv_row[] = $row['email'];
+			$csv_row[] = $row['phone'];
+			foreach ( array_keys( $labels ) as $key ) {
+				$csv_row[] = isset( $fields[ $key ] ) ? $fields[ $key ] : '';
+			}
+			$csv_row[] = $row['status'];
+			$csv_row[] = $row['submitted_at'];
+			$csv_row[] = $row['updated_at'];
+			fputcsv( $out, $csv_row );
 		}
 	} else {
 		fputcsv( $out, array( 'No submissions' ) );
