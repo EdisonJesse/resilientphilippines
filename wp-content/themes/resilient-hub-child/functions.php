@@ -900,7 +900,7 @@ function rp_child_consolidate_navigation_menu() {
 
 		wp_update_nav_menu_item( $menu_id, 0, array(
 			'menu-item-title'     => __( 'Galleries', 'resilient-hub' ),
-			'menu-item-url'       => home_url( '/galleries/' ),
+			'menu-item-url'       => home_url( '/photo-gallery/' ),
 			'menu-item-type'      => 'custom',
 			'menu-item-status'    => 'publish',
 			'menu-item-position'  => ++$position,
@@ -993,6 +993,43 @@ function rp_child_consolidate_navigation_menu() {
 	update_option( 'rp_nav_consolidated_v11', true );
 }
 add_action( 'init', 'rp_child_consolidate_navigation_menu', 20 );
+
+function rp_child_fix_gallery_menu_link() {
+	$locations = get_nav_menu_locations();
+	if ( empty( $locations['main-navigation'] ) ) {
+		return;
+	}
+
+	$items = wp_get_nav_menu_items( $locations['main-navigation'] );
+	if ( ! $items ) {
+		return;
+	}
+
+	foreach ( $items as $item ) {
+		if ( 'Galleries' !== $item->title ) {
+			continue;
+		}
+
+		$item_url = untrailingslashit( (string) $item->url );
+		if ( false === strpos( $item_url, '/galleries' ) ) {
+			continue;
+		}
+
+		wp_update_nav_menu_item(
+			$locations['main-navigation'],
+			$item->ID,
+			array(
+				'menu-item-title'     => $item->title,
+				'menu-item-url'       => home_url( '/photo-gallery/' ),
+				'menu-item-type'      => 'custom',
+				'menu-item-status'    => 'publish',
+				'menu-item-parent-id' => (int) $item->menu_item_parent,
+				'menu-item-position'  => (int) $item->menu_order,
+			)
+		);
+	}
+}
+add_action( 'init', 'rp_child_fix_gallery_menu_link', 30 );
 
 function rp_child_menu_has_tinig_link( $menu_id ) {
 	$items = wp_get_nav_menu_items( $menu_id );
