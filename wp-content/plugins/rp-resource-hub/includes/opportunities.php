@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_OPPORTUNITIES_VERSION', '1.0.9' );
+define( 'RP_OPPORTUNITIES_VERSION', '1.0.10' );
 define( 'RP_JOB_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_JOB_MAX_ATTACHMENTS', 5 );
 define( 'RP_BID_MAX_ATTACHMENT_BYTES', 25 * 1024 * 1024 );
@@ -1110,6 +1110,26 @@ function rp_opportunities_notice_html() {
 	}
 }
 
+function rp_opportunities_render_job_consent_fields() {
+	?>
+	<div class="rp-opportunity-consent-statement">
+		<h3><?php esc_html_e( 'Consent Statement', 'rp-resource-hub' ); ?></h3>
+		<div class="rp-opportunity-consent-body">
+			<p><?php echo wp_kses_post( __( 'ACCORD Incorporated upholds a <strong>zero-tolerance policy</strong> toward any form of abuse and we commit to the protection from sexual harassment, exploitation, and abuse, neglect, physical and emotional abuse of vulnerable adults and children, involving our employees and related personnel. All employees and associated personnel are expected to uphold these principles and contribute to a respectful and supportive environment.', 'rp-resource-hub' ) ); ?></p>
+			<p><?php esc_html_e( 'Job applicants will undergo screening, including checks with former employers for any history of misconduct or abuse, and employment offers are subject to satisfactory references and successful screening results. By submitting an application, the job applicant confirms his/her understanding of these recruitment procedures.', 'rp-resource-hub' ); ?></p>
+			<label class="rp-checkbox-line"><input type="checkbox" name="safeguarding_acknowledgement" value="1" required> <?php esc_html_e( 'Yes, I understand', 'rp-resource-hub' ); ?></label>
+		</div>
+	</div>
+	<div class="rp-opportunity-consent-statement">
+		<div class="rp-opportunity-consent-body">
+			<p><?php esc_html_e( 'I hereby give my consent to ACCORD Incorporated and its designated representatives to obtain my personal and sensitive information for the purpose of evaluating my job application. I acknowledge that such information may be collected, stored, used, processed, and shared with other teams within Accord to further assess my suitability for the applied role, and it will be treated with the utmost confidentiality in accordance with Data Protection Laws and Policies.', 'rp-resource-hub' ); ?> <span aria-hidden="true">*</span></p>
+			<p><?php esc_html_e( 'I confirm that all the information provided in my curriculum vitae and any other submitted documents, and may be required to be submitted are true and correct.', 'rp-resource-hub' ); ?></p>
+			<label class="rp-checkbox-line"><input type="checkbox" name="data_privacy_acknowledgement" value="1" required> <?php esc_html_e( 'Yes, I understand.', 'rp-resource-hub' ); ?></label>
+		</div>
+	</div>
+	<?php
+}
+
 function rp_opportunities_render_job_form( $post_id ) {
 	$hiring_type = rp_opportunities_get_hiring_type( $post_id );
 	rp_opportunities_notice_html();
@@ -1157,7 +1177,7 @@ function rp_opportunities_render_job_form( $post_id ) {
 				<?php rp_opportunities_file_field( 'resume', __( 'Detailed and updated resume', 'rp-resource-hub' ), true ); ?>
 				<?php rp_opportunities_file_field( 'cover_letter', __( 'Cover letter', 'rp-resource-hub' ), true ); ?>
 			<?php endif; ?>
-			<label class="rp-checkbox-line"><input type="checkbox" name="consent" value="1" required> <?php esc_html_e( 'I certify that the information I provided is true and I agree that ACCORD may process this application for recruitment purposes.', 'rp-resource-hub' ); ?></label>
+			<?php rp_opportunities_render_job_consent_fields(); ?>
 			<button class="rp-button" type="submit"><?php esc_html_e( 'Submit Application', 'rp-resource-hub' ); ?></button>
 		</form>
 	</section>
@@ -1245,7 +1265,7 @@ function rp_opportunities_handle_job_submit() {
 	$full_name   = rp_opportunities_sanitize_text_post( 'full_name' );
 	$phone       = rp_opportunities_sanitize_text_post( 'phone' );
 
-	if ( ! $full_name || ! is_email( $email ) || empty( $_POST['consent'] ) ) {
+	if ( ! $full_name || ! is_email( $email ) || empty( $_POST['safeguarding_acknowledgement'] ) || empty( $_POST['data_privacy_acknowledgement'] ) ) {
 		wp_safe_redirect( add_query_arg( 'rp_opp_notice', 'error', $redirect ) );
 		exit;
 	}
