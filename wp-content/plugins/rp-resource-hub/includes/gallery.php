@@ -732,9 +732,12 @@ function rp_gallery_create_public_image( $source_path, $post_id, $submission_id,
 		return $editor;
 	}
 
-	$resized = $editor->resize( 1800, 1800, false );
-	if ( is_wp_error( $resized ) ) {
-		return $resized;
+	$size = $editor->get_size();
+	if ( ! empty( $size['width'] ) && ! empty( $size['height'] ) && ( $size['width'] > 1800 || $size['height'] > 1800 ) ) {
+		$resized = $editor->resize( 1800, 1800, false );
+		if ( is_wp_error( $resized ) ) {
+			return $resized;
+		}
 	}
 	$editor->set_quality( 82 );
 	$saved = $editor->save( $target_path, 'image/jpeg' );
