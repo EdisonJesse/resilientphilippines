@@ -994,6 +994,9 @@ function rp_opportunities_append_single_content( $content ) {
 	$post_id = get_the_ID();
 	ob_start();
 	echo wp_kses_post( $content );
+	if ( 'job' === rp_opportunities_get_type( $post_id ) ) {
+		rp_opportunities_render_job_intro();
+	}
 	rp_opportunities_render_single_details( $post_id );
 	if ( rp_opportunities_is_open( $post_id ) ) {
 		if ( 'job' === rp_opportunities_get_type( $post_id ) ) {
@@ -1007,6 +1010,23 @@ function rp_opportunities_append_single_content( $content ) {
 	return ob_get_clean();
 }
 add_filter( 'the_content', 'rp_opportunities_append_single_content', 20 );
+
+function rp_opportunities_render_job_intro() {
+	?>
+	<section class="rp-opportunity-job-intro" aria-label="<?php esc_attr_e( 'ACCORD application information', 'rp-resource-hub' ); ?>">
+		<div class="rp-opportunity-job-banner">
+			<div class="rp-opportunity-job-brand"><?php esc_html_e( 'ACCORD', 'rp-resource-hub' ); ?></div>
+			<p><?php esc_html_e( 'Join our team to help build resilient communities!', 'rp-resource-hub' ); ?></p>
+		</div>
+		<div class="rp-opportunity-job-intro-card">
+			<h2><?php esc_html_e( "ACCORD's Application Form", 'rp-resource-hub' ); ?></h2>
+			<p><?php esc_html_e( 'Assistance and Cooperation for Community Resilience and Development (ACCORD) Incorporated is one of the leading national organizations promoting and implementing the integration of disaster risk reduction, climate change adaptation, and ecosystem management and restoration as an approach to strengthening community resilience; working in partnership with the least-served, most vulnerable communities and applying innovative practices in humanitarian action and development programs towards inclusive resilience building.', 'rp-resource-hub' ); ?> <?php esc_html_e( 'Visit our website at', 'rp-resource-hub' ); ?> <a href="https://www.resilientphilippines.com">https://www.resilientphilippines.com</a> <?php esc_html_e( 'and our Facebook page at', 'rp-resource-hub' ); ?> <a href="https://www.facebook.com/accordinc">https://www.facebook.com/accordinc</a> <?php esc_html_e( 'to know more about us.', 'rp-resource-hub' ); ?></p>
+			<p><em><?php esc_html_e( 'ACCORD is an', 'rp-resource-hub' ); ?> <strong><?php esc_html_e( 'equal-opportunity employer.', 'rp-resource-hub' ); ?></strong> <?php esc_html_e( 'We encourage all qualified applicants, regardless of race, gender, sexual orientation, religion, political views, ethnicity, disability, or other statuses to apply.', 'rp-resource-hub' ); ?></em></p>
+			<p><em><?php esc_html_e( 'We uphold a', 'rp-resource-hub' ); ?> <strong><?php esc_html_e( 'zero-tolerance policy', 'rp-resource-hub' ); ?></strong> <?php esc_html_e( 'toward any form of abuse and we commit to the protection from sexual harassment, exploitation, and abuse, neglect, physical and emotional abuse of vulnerable adults and children, involving our employees and related personnel. All employees and associated personnel are expected to uphold these principles and contribute to a respectful and supportive environment. Job applicants will undergo screening, including checks with former employers for any history of misconduct or abuse, and employment offers are subject to satisfactory references and successful screening results. By submitting an application, the job applicant confirms his/her understanding of these recruitment procedures.', 'rp-resource-hub' ); ?></em></p>
+		</div>
+	</section>
+	<?php
+}
 
 function rp_opportunities_render_single_details( $post_id ) {
 	$type        = rp_opportunities_get_type( $post_id );
