@@ -256,3 +256,41 @@ Path: `app/public/wp-content/themes/resilient-hub-child/`
     - `rp_opportunities_version = 1.0.6`
     - `rp_resource_hub_version = 1.10.6`
   - Removed temporary test post and revision rows.
+
+---
+
+## 11. Latest Session Record - Editable Opportunity Postings
+
+- **Date**: June 18, 2026
+- **Purpose**: Let HR and Procurement manage posting details from their dashboards and refine the Submit Job Posting form.
+- **Changed files**:
+  - `wp-content/plugins/rp-resource-hub/rp-resource-hub.php`
+  - `wp-content/plugins/rp-resource-hub/includes/opportunities.php`
+  - `wp-content/themes/resilient-hub-child/style.css`
+  - `handoff.md`
+- **What changed**:
+  - Bumped Resource Hub plugin version to `1.10.7`.
+  - Bumped Opportunities module version to `1.0.7`.
+  - Bumped child theme version to `1.1.19`.
+  - Job and ITB dashboard posting names now link to the public posting page.
+  - Dashboard rows now include an `Edit Job Posting` or `Edit ITB Posting` action.
+  - Added front-end edit forms for authorized HR/Procurement users.
+  - Edit forms can update title, deadline, description, scope/deliverables, documents, and posting status override.
+  - Posting status is controlled through the edit form:
+    - `Automatic by deadline`
+    - `Force Open`
+    - `Force Closed`
+  - Submit Job Posting form updates:
+    - Removed Employment Type.
+    - Removed Contact Email.
+    - Deadline is now a date picker and stores the selected date as `23:59`.
+    - Consultant duration only appears when Hiring Type is `Consultant`.
+  - Public job details no longer show Employment Type.
+- **Local verification**:
+  - PHP lint passed for changed plugin files.
+  - Temporary ACCORD HR user confirmed Submit Job Posting form changes.
+  - Temporary HR job post stored deadline as `YYYY-MM-DD 23:59`, with empty employment/contact meta.
+  - Job dashboard showed clickable posting title and edit action.
+  - Job edit form saved title, deadline, consultant duration, and `Force Closed` status.
+  - Temporary ACCORD Procurement user confirmed ITB dashboard clickable title and edit action.
+  - Temporary test users and postings were removed.
