@@ -1438,6 +1438,52 @@ img {
   box-shadow: 0 0 0 3px rgba(23, 107, 82, 0.12);
 }
 
+.rp-auth-password-wrap {
+  position: relative;
+}
+
+.rp-auth-password-wrap input[type="password"],
+.rp-auth-password-wrap input[type="text"] {
+  padding-right: 48px;
+}
+
+.rp-auth-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--rp-color-muted);
+  background: transparent;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.rp-auth-password-toggle:hover,
+.rp-auth-password-toggle:focus-visible,
+.rp-auth-password-toggle.is-visible {
+  color: var(--rp-color-green);
+  background: rgba(23, 107, 82, 0.08);
+  outline: none;
+}
+
+.rp-auth-password-toggle svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
 .rp-auth-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

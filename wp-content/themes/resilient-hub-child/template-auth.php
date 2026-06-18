@@ -152,7 +152,7 @@ get_header();
 					<?php if ( ! empty( $login_errors ) ) : ?>
 						<div class="rp-auth-errors" role="alert">
 							<?php foreach ( $login_errors as $err ) : ?>
-								<p><?php echo esc_html( $err ); ?></p>
+								<p><?php echo wp_kses_post( $err ); ?></p>
 							<?php endforeach; ?>
 						</div>
 					<?php endif; ?>
@@ -165,7 +165,12 @@ get_header();
 						</div>
 						<div class="rp-auth-field">
 							<label for="pwd"><?php esc_html_e( 'Password', 'resilient-hub' ); ?></label>
-							<input type="password" name="pwd" id="pwd" class="input" required autocomplete="current-password">
+							<div class="rp-auth-password-wrap">
+								<input type="password" name="pwd" id="pwd" class="input" required autocomplete="current-password">
+								<button type="button" class="rp-auth-password-toggle" aria-label="<?php esc_attr_e( 'Show password', 'resilient-hub' ); ?>" aria-pressed="false" data-show-label="<?php esc_attr_e( 'Show password', 'resilient-hub' ); ?>" data-hide-label="<?php esc_attr_e( 'Hide password', 'resilient-hub' ); ?>">
+									<svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6z"/><circle cx="12" cy="12" r="3"/></svg>
+								</button>
+							</div>
 						</div>
 						<div class="rp-auth-options">
 							<label for="rememberme">
@@ -215,11 +220,21 @@ get_header();
 							<div class="rp-auth-row">
 								<div class="rp-auth-field">
 									<label for="user_password"><?php esc_html_e( 'Password', 'resilient-hub' ); ?></label>
-									<input type="password" name="user_password" id="user_password" class="input" required autocomplete="new-password">
+									<div class="rp-auth-password-wrap">
+										<input type="password" name="user_password" id="user_password" class="input" required autocomplete="new-password">
+										<button type="button" class="rp-auth-password-toggle" aria-label="<?php esc_attr_e( 'Show password', 'resilient-hub' ); ?>" aria-pressed="false" data-show-label="<?php esc_attr_e( 'Show password', 'resilient-hub' ); ?>" data-hide-label="<?php esc_attr_e( 'Hide password', 'resilient-hub' ); ?>">
+											<svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6z"/><circle cx="12" cy="12" r="3"/></svg>
+										</button>
+									</div>
 								</div>
 								<div class="rp-auth-field">
 									<label for="confirm_password"><?php esc_html_e( 'Confirm Password', 'resilient-hub' ); ?></label>
-									<input type="password" name="confirm_password" id="confirm_password" class="input" required autocomplete="new-password">
+									<div class="rp-auth-password-wrap">
+										<input type="password" name="confirm_password" id="confirm_password" class="input" required autocomplete="new-password">
+										<button type="button" class="rp-auth-password-toggle" aria-label="<?php esc_attr_e( 'Show password', 'resilient-hub' ); ?>" aria-pressed="false" data-show-label="<?php esc_attr_e( 'Show password', 'resilient-hub' ); ?>" data-hide-label="<?php esc_attr_e( 'Hide password', 'resilient-hub' ); ?>">
+											<svg aria-hidden="true" viewBox="0 0 24 24" focusable="false"><path d="M2.1 12s3.6-6 9.9-6 9.9 6 9.9 6-3.6 6-9.9 6-9.9-6-9.9-6z"/><circle cx="12" cy="12" r="3"/></svg>
+										</button>
+									</div>
 								</div>
 							</div>
 							
@@ -273,6 +288,18 @@ document.addEventListener('DOMContentLoaded', function() {
 			regBtn.click();
 		}
 	}
+
+	document.querySelectorAll('.rp-auth-password-toggle').forEach(btn => {
+		btn.addEventListener('click', function() {
+			const input = this.closest('.rp-auth-password-wrap').querySelector('input');
+			const isPassword = input.type === 'password';
+
+			input.type = isPassword ? 'text' : 'password';
+			this.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+			this.setAttribute('aria-label', isPassword ? this.dataset.hideLabel : this.dataset.showLabel);
+			this.classList.toggle('is-visible', isPassword);
+		});
+	});
 });
 </script>
 
