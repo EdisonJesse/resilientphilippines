@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_OPPORTUNITIES_VERSION', '1.0.0' );
+define( 'RP_OPPORTUNITIES_VERSION', '1.0.1' );
 define( 'RP_JOB_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_JOB_MAX_ATTACHMENTS', 5 );
 define( 'RP_BID_MAX_ATTACHMENT_BYTES', 25 * 1024 * 1024 );
@@ -64,6 +64,24 @@ function rp_opportunities_user_can_manage_bids() {
 
 function rp_opportunities_user_can_manage_submission_type( $type ) {
 	return 'job' === $type ? rp_opportunities_user_can_manage_jobs() : rp_opportunities_user_can_manage_bids();
+}
+
+function rp_opportunities_user_can_submit() {
+	return is_user_logged_in() && ( current_user_can( 'manage_opportunities' ) || current_user_can( 'manage_job_applications' ) || current_user_can( 'manage_bid_submissions' ) || current_user_can( 'manage_options' ) );
+}
+
+function rp_opportunities_allowed_submit_types() {
+	$types = array();
+	if ( current_user_can( 'manage_options' ) || current_user_can( 'manage_opportunities' ) ) {
+		return array_keys( rp_opportunities_type_options() );
+	}
+	if ( current_user_can( 'manage_job_applications' ) ) {
+		$types[] = 'job';
+	}
+	if ( current_user_can( 'manage_bid_submissions' ) ) {
+		$types[] = 'itb';
+	}
+	return $types;
 }
 
 function rp_opportunities_register_post_type() {
@@ -237,6 +255,10 @@ function rp_opportunities_create_pages() {
 			'title'   => __( 'Opportunities', 'rp-resource-hub' ),
 			'content' => '[rp_opportunities]',
 		),
+		'submit-opportunity'          => array(
+			'title'   => __( 'Submit Opportunity', 'rp-resource-hub' ),
+			'content' => '[rp_submit_opportunity]',
+		),
 		'job-applications-dashboard'  => array(
 			'title'   => __( 'Job Applications Dashboard', 'rp-resource-hub' ),
 			'content' => '[rp_job_applications_dashboard]',
@@ -284,7 +306,7 @@ function rp_opportunities_activate() {
 register_activation_hook( RP_RESOURCE_HUB_FILE, 'rp_opportunities_activate' );
 
 function rp_opportunities_maybe_upgrade() {
-	if ( RP_OPPORTUNITIES_VERSION === get_option( 'rp_opportunities_version' ) && get_page_by_path( 'opportunities' ) && get_page_by_path( 'job-applications-dashboard' ) && get_page_by_path( 'bid-submissions-dashboard' ) ) {
+	if ( RP_OPPORTUNITIES_VERSION === get_option( 'rp_opportunities_version' ) && get_page_by_path( 'opportunities' ) && get_page_by_path( 'submit-opportunity' ) && get_page_by_path( 'job-applications-dashboard' ) && get_page_by_path( 'bid-submissions-dashboard' ) ) {
 		return;
 	}
 
@@ -468,6 +490,147 @@ function rp_opportunities_save_admin_file( $post_id, $field, $meta_key ) {
 		update_post_meta( $post_id, $meta_key, absint( $attachment_id ) );
 	}
 }
+
+function rp_opportunities_submit_notice_html() {
+	if ( empty( $_GET['rp_opp_submit_notice'] ) ) {
+		return;
+	}
+	$key = sanitize_key( wp_unslash( $_GET['rp_opp_submit_notice'] ) );
+	$messages = array(
+		'submitted' => __( 'Your opportunity was submitted for administrator review.', 'rp-resource-hub' ),
+		'error'     => __( 'The opportunity could not be submitted. Please check the required fields and try again.', 'rp-resource-hub' ),
+	);
+	if ( isset( $messages[ $key ] ) ) {
+		echo '<div class="rp-form-success">' . esc_html( $messages[ $key ] ) . '</div>';
+	}
+}
+
+function rp_opportunities_submit_shortcode() {
+	if ( ! rp_opportunities_user_can_submit() ) {
+		return '<div class="rp-empty-state"><p>' . esc_html__( 'You must be authorized to submit opportunities.', 'rp-resource-hub' ) . '</p><p><a class="rp-button" href="' . esc_url( wp_login_url( home_url( '/submit-opportunity/' ) ) ) . '">' . esc_html__( 'Log in', 'rp-resource-hub' ) . '</a></p></div>';
+	}
+
+	$allowed_types = rp_opportunities_allowed_submit_types();
+	if ( ! $allowed_types ) {
+		return '<div class="rp-empty-state"><p>' . esc_html__( 'Your account does not have an opportunity submission role.', 'rp-resource-hub' ) . '</p></div>';
+	}
+
+	ob_start();
+	?>
+	<div class="rp-submit-opportunity-shell">
+		<div class="rp-dashboard-header">
+			<h2 class="rp-dashboard-title"><?php esc_html_e( 'Submit Opportunity', 'rp-resource-hub' ); ?></h2>
+			<p class="rp-dashboard-subtitle"><?php esc_html_e( 'Create a job ad or invitation to bid for administrator review and publishing.', 'rp-resource-hub' ); ?></p>
+		</div>
+		<?php rp_opportunities_submit_notice_html(); ?>
+		<form class="rp-upload-form rp-opportunity-form rp-submit-opportunity-form" method="post" action="<?php echo esc_url( home_url( '/submit-opportunity/' ) ); ?>" enctype="multipart/form-data">
+			<input type="hidden" name="rp_submit_opportunity_action" value="1">
+			<?php wp_nonce_field( 'rp_submit_opportunity', 'rp_submit_opportunity_nonce' ); ?>
+			<?php rp_opportunities_text_field( 'opportunity_title', __( 'Posting title', 'rp-resource-hub' ), true ); ?>
+			<div class="rp-field">
+				<label for="opportunity_type"><?php esc_html_e( 'Posting type', 'rp-resource-hub' ); ?> <span aria-hidden="true">*</span></label>
+				<?php if ( 1 === count( $allowed_types ) ) : ?>
+					<input type="hidden" name="opportunity_type" value="<?php echo esc_attr( $allowed_types[0] ); ?>">
+					<input type="text" value="<?php echo esc_attr( rp_opportunities_type_options()[ $allowed_types[0] ] ); ?>" readonly>
+				<?php else : ?>
+					<select id="opportunity_type" name="opportunity_type" required>
+						<?php foreach ( $allowed_types as $type ) : ?>
+							<option value="<?php echo esc_attr( $type ); ?>"><?php echo esc_html( rp_opportunities_type_options()[ $type ] ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				<?php endif; ?>
+			</div>
+			<?php rp_opportunities_select_field( 'hiring_type', __( 'Hiring type, for job ads', 'rp-resource-hub' ), rp_opportunities_hiring_type_options(), false ); ?>
+			<?php rp_opportunities_text_field( 'deadline', __( 'Deadline, YYYY-MM-DD HH:MM', 'rp-resource-hub' ), true ); ?>
+			<?php rp_opportunities_text_field( 'location', __( 'Location / duty station', 'rp-resource-hub' ), false ); ?>
+			<?php rp_opportunities_text_field( 'employment_type', __( 'Employment type, for job ads', 'rp-resource-hub' ), false ); ?>
+			<?php rp_opportunities_text_field( 'reference_number', __( 'ITB reference number', 'rp-resource-hub' ), false ); ?>
+			<?php rp_opportunities_email_field( 'contact_email', __( 'Contact email', 'rp-resource-hub' ), false ); ?>
+			<?php rp_opportunities_text_field( 'bid_opening_date', __( 'Bid opening date, for ITBs', 'rp-resource-hub' ), false ); ?>
+			<?php rp_opportunities_text_field( 'clarification_period', __( 'Clarification period, for ITBs', 'rp-resource-hub' ), false ); ?>
+			<?php rp_opportunities_text_field( 'duration', __( 'Duration of engagement, for consultants', 'rp-resource-hub' ), false ); ?>
+			<?php rp_opportunities_textarea_field( 'description', __( 'Posting description', 'rp-resource-hub' ), true ); ?>
+			<?php rp_opportunities_textarea_field( 'deliverables', __( 'Expected deliverables / scope notes', 'rp-resource-hub' ), false ); ?>
+			<label class="rp-checkbox-line"><input type="checkbox" name="require_portfolio" value="1"> <?php esc_html_e( 'Require portfolio/proof of work for consultant applications', 'rp-resource-hub' ); ?></label>
+			<?php rp_opportunities_file_field( 'opportunity_tor', __( 'Terms of Reference document, for job postings', 'rp-resource-hub' ), false ); ?>
+			<?php rp_opportunities_file_field( 'opportunity_document', __( 'Additional posting document', 'rp-resource-hub' ), false, 'bid' ); ?>
+			<button class="rp-button" type="submit"><?php esc_html_e( 'Submit for Review', 'rp-resource-hub' ); ?></button>
+		</form>
+	</div>
+	<?php
+	return ob_get_clean();
+}
+add_shortcode( 'rp_submit_opportunity', 'rp_opportunities_submit_shortcode' );
+
+function rp_opportunities_handle_frontend_submit() {
+	$redirect = home_url( '/submit-opportunity/' );
+	if ( ! rp_opportunities_user_can_submit() || ! isset( $_POST['rp_submit_opportunity_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['rp_submit_opportunity_nonce'] ) ), 'rp_submit_opportunity' ) ) {
+		wp_safe_redirect( add_query_arg( 'rp_opp_submit_notice', 'error', $redirect ) );
+		exit;
+	}
+
+	$allowed_types = rp_opportunities_allowed_submit_types();
+	$type          = isset( $_POST['opportunity_type'] ) ? sanitize_key( wp_unslash( $_POST['opportunity_type'] ) ) : '';
+	if ( ! in_array( $type, $allowed_types, true ) ) {
+		wp_safe_redirect( add_query_arg( 'rp_opp_submit_notice', 'error', $redirect ) );
+		exit;
+	}
+
+	$title       = rp_opportunities_sanitize_text_post( 'opportunity_title' );
+	$description = rp_opportunities_sanitize_textarea_post( 'description' );
+	if ( ! $title || ! $description ) {
+		wp_safe_redirect( add_query_arg( 'rp_opp_submit_notice', 'error', $redirect ) );
+		exit;
+	}
+
+	$post_id = wp_insert_post(
+		array(
+			'post_type'    => 'rp_opportunity',
+			'post_status'  => 'pending',
+			'post_title'   => $title,
+			'post_content' => $description,
+			'post_author'  => get_current_user_id(),
+		)
+	);
+
+	if ( ! $post_id || is_wp_error( $post_id ) ) {
+		wp_safe_redirect( add_query_arg( 'rp_opp_submit_notice', 'error', $redirect ) );
+		exit;
+	}
+
+	$meta = array(
+		'_rp_opportunity_type'                 => $type,
+		'_rp_opportunity_hiring_type'          => isset( $_POST['hiring_type'] ) && isset( rp_opportunities_hiring_type_options()[ sanitize_key( wp_unslash( $_POST['hiring_type'] ) ) ] ) ? sanitize_key( wp_unslash( $_POST['hiring_type'] ) ) : 'full_time',
+		'_rp_opportunity_deadline'             => rp_opportunities_sanitize_text_post( 'deadline' ),
+		'_rp_opportunity_location'             => rp_opportunities_sanitize_text_post( 'location' ),
+		'_rp_opportunity_employment_type'      => rp_opportunities_sanitize_text_post( 'employment_type' ),
+		'_rp_opportunity_reference_number'     => rp_opportunities_sanitize_text_post( 'reference_number' ),
+		'_rp_opportunity_contact_email'        => sanitize_email( rp_opportunities_sanitize_text_post( 'contact_email' ) ),
+		'_rp_opportunity_bid_opening_date'     => rp_opportunities_sanitize_text_post( 'bid_opening_date' ),
+		'_rp_opportunity_clarification_period' => rp_opportunities_sanitize_text_post( 'clarification_period' ),
+		'_rp_opportunity_duration'             => rp_opportunities_sanitize_text_post( 'duration' ),
+		'_rp_opportunity_deliverables'         => rp_opportunities_sanitize_textarea_post( 'deliverables' ),
+		'_rp_opportunity_require_portfolio'    => ! empty( $_POST['require_portfolio'] ) ? '1' : '0',
+	);
+
+	foreach ( $meta as $key => $value ) {
+		update_post_meta( $post_id, $key, $value );
+	}
+
+	rp_opportunities_save_admin_file( $post_id, 'opportunity_tor', '_rp_opportunity_tor_id' );
+	rp_opportunities_save_admin_file( $post_id, 'opportunity_document', '_rp_opportunity_document_id' );
+
+	wp_safe_redirect( add_query_arg( 'rp_opp_submit_notice', 'submitted', $redirect ) );
+	exit;
+}
+add_action( 'admin_post_rp_submit_opportunity', 'rp_opportunities_handle_frontend_submit' );
+
+function rp_opportunities_maybe_handle_frontend_submit() {
+	if ( 'POST' === $_SERVER['REQUEST_METHOD'] && ! empty( $_POST['rp_submit_opportunity_action'] ) ) {
+		rp_opportunities_handle_frontend_submit();
+	}
+}
+add_action( 'template_redirect', 'rp_opportunities_maybe_handle_frontend_submit', 1 );
 
 function rp_opportunities_get_type( $post_id ) {
 	$type = get_post_meta( $post_id, '_rp_opportunity_type', true );

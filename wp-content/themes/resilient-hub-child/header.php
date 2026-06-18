@@ -79,7 +79,8 @@
 							$can_manage_jobs = current_user_can( 'manage_options' ) || current_user_can( 'manage_job_applications' );
 							$can_manage_bids = current_user_can( 'manage_options' ) || current_user_can( 'manage_bid_submissions' );
 							$can_manage_opportunities = current_user_can( 'manage_options' ) || current_user_can( 'manage_opportunities' );
-							$has_admin_links = $can_moderate || $can_manage_tinig || $can_manage_jobs || $can_manage_bids || $can_manage_opportunities;
+							$can_submit_opportunities = $can_manage_opportunities || $can_manage_jobs || $can_manage_bids;
+							$has_admin_links = $can_moderate || $can_manage_tinig || $can_manage_jobs || $can_manage_bids || $can_submit_opportunities;
 							if ( $has_admin_links ) : ?>
 								<li class="rp-dropdown-divider" aria-hidden="true"></li>
 								<li class="rp-dropdown-section-label"><?php esc_html_e( 'Admin', 'resilient-hub' ); ?></li>
@@ -96,8 +97,8 @@
 								<?php if ( $can_manage_bids ) : ?>
 									<li><a href="<?php echo esc_url( home_url( '/bid-submissions-dashboard/' ) ); ?>"><?php esc_html_e( 'Bid Submissions Dashboard', 'resilient-hub' ); ?></a></li>
 								<?php endif; ?>
-								<?php if ( $can_manage_opportunities ) : ?>
-									<li><a href="<?php echo esc_url( admin_url( 'edit.php?post_type=rp_opportunity' ) ); ?>"><?php esc_html_e( 'Manage Opportunities', 'resilient-hub' ); ?></a></li>
+								<?php if ( $can_submit_opportunities ) : ?>
+									<li><a href="<?php echo esc_url( home_url( '/submit-opportunity/' ) ); ?>"><?php esc_html_e( 'Submit Opportunity', 'resilient-hub' ); ?></a></li>
 								<?php endif; ?>
 								<?php if ( current_user_can( 'manage_options' ) ) : ?>
 									<li><a href="<?php echo esc_url( home_url( '/user-management/' ) ); ?>"><?php esc_html_e( 'User Management', 'resilient-hub' ); ?></a></li>
