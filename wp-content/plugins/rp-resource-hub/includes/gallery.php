@@ -427,7 +427,13 @@ function rp_gallery_sharepoint_upload( $file_path, $file_name, $submission_id, $
 
 	$year        = gmdate( 'Y' );
 	$month       = gmdate( 'Y-m' );
-	$remote_path = ltrim( trim( RP_GALLERY_SP_UPLOAD_ROOT, '/' ) . '/' . $year . '/' . $month . '/' . $submission_id . '/' . $file_name, '/' );
+	$folder_path = ltrim( trim( RP_GALLERY_SP_UPLOAD_ROOT, '/' ) . '/' . $year . '/' . $month . '/' . $submission_id, '/' );
+	$folder      = rp_gallery_sharepoint_ensure_folder_path( $token, $folder_path );
+	if ( is_wp_error( $folder ) ) {
+		return $folder;
+	}
+
+	$remote_path = $folder_path . '/' . $file_name;
 	$url         = 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( RP_GALLERY_SP_DRIVE_ID ) . '/root:/' . str_replace( '%2F', '/', rawurlencode( $remote_path ) ) . ':/content';
 
 	$response = wp_remote_request(
@@ -450,12 +456,80 @@ function rp_gallery_sharepoint_upload( $file_path, $file_name, $submission_id, $
 	$code = wp_remote_retrieve_response_code( $response );
 	$body = json_decode( wp_remote_retrieve_body( $response ), true );
 	if ( $code < 200 || $code > 299 || empty( $body['id'] ) ) {
-		return new WP_Error( 'sharepoint_upload_failed', __( 'Original photo could not be uploaded to SharePoint.', 'rp-resource-hub' ) );
+		return new WP_Error( 'sharepoint_upload_failed', rp_gallery_sharepoint_error_message( $response, __( 'Original photo could not be uploaded to SharePoint.', 'rp-resource-hub' ) ) );
 	}
 
 	rp_gallery_sharepoint_update_metadata( $token, $body['id'], $submission_id, $metadata );
 
 	return $body;
+}
+
+function rp_gallery_sharepoint_ensure_folder_path( $token, $folder_path ) {
+	$segments = array_filter( explode( '/', trim( $folder_path, '/' ) ) );
+	$current = '';
+
+	foreach ( $segments as $segment ) {
+		$parent_path = $current;
+		$current     = $current ? $current . '/' . $segment : $segment;
+		$get_url     = 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( RP_GALLERY_SP_DRIVE_ID ) . '/root:/' . str_replace( '%2F', '/', rawurlencode( $current ) );
+		$get         = wp_remote_get(
+			$get_url,
+			array(
+				'timeout' => 30,
+				'headers' => array(
+					'Authorization' => 'Bearer ' . $token,
+				),
+			)
+		);
+
+		if ( ! is_wp_error( $get ) && 200 === wp_remote_retrieve_response_code( $get ) ) {
+			continue;
+		}
+
+		$parent_url = $parent_path
+			? 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( RP_GALLERY_SP_DRIVE_ID ) . '/root:/' . str_replace( '%2F', '/', rawurlencode( $parent_path ) ) . ':/children'
+			: 'https://graph.microsoft.com/v1.0/drives/' . rawurlencode( RP_GALLERY_SP_DRIVE_ID ) . '/root/children';
+
+		$create = wp_remote_post(
+			$parent_url,
+			array(
+				'timeout' => 30,
+				'headers' => array(
+					'Authorization' => 'Bearer ' . $token,
+					'Content-Type'  => 'application/json',
+				),
+				'body'    => wp_json_encode(
+					array(
+						'name'                                => $segment,
+						'folder'                              => new stdClass(),
+						'@microsoft.graph.conflictBehavior'   => 'replace',
+					)
+				),
+			)
+		);
+
+		if ( is_wp_error( $create ) ) {
+			return $create;
+		}
+
+		$code = wp_remote_retrieve_response_code( $create );
+		if ( $code < 200 || $code > 299 ) {
+			return new WP_Error( 'sharepoint_folder_failed', rp_gallery_sharepoint_error_message( $create, __( 'SharePoint upload folder could not be created.', 'rp-resource-hub' ) ) );
+		}
+	}
+
+	return true;
+}
+
+function rp_gallery_sharepoint_error_message( $response, $fallback ) {
+	$code = wp_remote_retrieve_response_code( $response );
+	$body = json_decode( wp_remote_retrieve_body( $response ), true );
+
+	if ( ! empty( $body['error']['message'] ) ) {
+		return sprintf( '%s Graph returned %d: %s', $fallback, $code, sanitize_text_field( $body['error']['message'] ) );
+	}
+
+	return sprintf( '%s Graph returned HTTP %d.', $fallback, $code );
 }
 
 function rp_gallery_graph_token() {
