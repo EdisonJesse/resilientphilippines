@@ -411,6 +411,75 @@ function rp_opportunities_meta_fields() {
 	);
 }
 
+function rp_opportunities_bid_document_options() {
+	return array(
+		'quotation'                => __( 'Quotation or proposal', 'rp-resource-hub' ),
+		'business_permit'          => __( "Copy of valid business or mayor's permit", 'rp-resource-hub' ),
+		'registration_certificate' => __( 'Certificate of Registration/SEC or DTI', 'rp-resource-hub' ),
+		'bir_2303'                 => __( 'BIR 2303', 'rp-resource-hub' ),
+		'receipt_sample'           => __( 'Sample of official receipt/sales invoice', 'rp-resource-hub' ),
+		'fire_safety_certificate'  => __( 'Fire Safety Inspection Certificate', 'rp-resource-hub' ),
+		'sanitation_permit'        => __( 'Sanitation Permit/Clearance', 'rp-resource-hub' ),
+	);
+}
+
+function rp_opportunities_default_bid_document_statuses() {
+	return array(
+		'quotation'                => 'required',
+		'business_permit'          => 'required',
+		'registration_certificate' => 'optional',
+		'bir_2303'                 => 'required',
+		'receipt_sample'           => 'required',
+		'fire_safety_certificate'  => 'excluded',
+		'sanitation_permit'        => 'excluded',
+	);
+}
+
+function rp_opportunities_get_bid_document_statuses( $post_id = 0 ) {
+	$statuses = rp_opportunities_default_bid_document_statuses();
+	$saved    = $post_id ? json_decode( (string) get_post_meta( $post_id, '_rp_opportunity_bid_documents', true ), true ) : array();
+	if ( is_array( $saved ) ) {
+		foreach ( rp_opportunities_bid_document_options() as $key => $label ) {
+			if ( isset( $saved[ $key ] ) && in_array( $saved[ $key ], array( 'required', 'optional', 'excluded' ), true ) ) {
+				$statuses[ $key ] = $saved[ $key ];
+			}
+		}
+	}
+	return $statuses;
+}
+
+function rp_opportunities_bid_document_statuses_from_post( $field_name ) {
+	$posted   = isset( $_POST[ $field_name ] ) && is_array( $_POST[ $field_name ] ) ? wp_unslash( $_POST[ $field_name ] ) : array();
+	$statuses = rp_opportunities_default_bid_document_statuses();
+	foreach ( rp_opportunities_bid_document_options() as $key => $label ) {
+		$value            = isset( $posted[ $key ] ) ? sanitize_key( $posted[ $key ] ) : 'excluded';
+		$statuses[ $key ] = in_array( $value, array( 'required', 'optional', 'excluded' ), true ) ? $value : 'excluded';
+	}
+	return $statuses;
+}
+
+function rp_opportunities_render_bid_document_controls( $post_id = 0, $field_name = 'bid_documents' ) {
+	$statuses       = rp_opportunities_get_bid_document_statuses( $post_id );
+	$status_options = array(
+		'required' => __( 'Required', 'rp-resource-hub' ),
+		'optional' => __( 'Optional', 'rp-resource-hub' ),
+		'excluded' => __( 'Not requested', 'rp-resource-hub' ),
+	);
+	?>
+	<fieldset class="rp-field">
+		<legend><?php esc_html_e( 'ITB submission documents', 'rp-resource-hub' ); ?></legend>
+		<?php foreach ( rp_opportunities_bid_document_options() as $key => $label ) : ?>
+			<label for="<?php echo esc_attr( $field_name . '_' . $key ); ?>"><?php echo esc_html( $label ); ?></label>
+			<select id="<?php echo esc_attr( $field_name . '_' . $key ); ?>" name="<?php echo esc_attr( $field_name ); ?>[<?php echo esc_attr( $key ); ?>]">
+				<?php foreach ( $status_options as $status => $status_label ) : ?>
+					<option value="<?php echo esc_attr( $status ); ?>" <?php selected( $statuses[ $key ], $status ); ?>><?php echo esc_html( $status_label ); ?></option>
+				<?php endforeach; ?>
+			</select>
+		<?php endforeach; ?>
+	</fieldset>
+	<?php
+}
+
 function rp_opportunities_render_meta_box( $post ) {
 	wp_nonce_field( 'rp_opportunity_save_meta', 'rp_opportunity_meta_nonce' );
 	$type          = get_post_meta( $post->ID, '_rp_opportunity_type', true );
@@ -484,6 +553,7 @@ function rp_opportunities_render_meta_box( $post ) {
 		<p>
 			<label><input type="checkbox" name="_rp_opportunity_require_portfolio" value="1" <?php checked( get_post_meta( $post->ID, '_rp_opportunity_require_portfolio', true ), '1' ); ?>> <?php esc_html_e( 'Require portfolio/proof of work for consultant applications', 'rp-resource-hub' ); ?></label>
 		</p>
+		<?php rp_opportunities_render_bid_document_controls( $post->ID, '_rp_opportunity_bid_documents' ); ?>
 		<p>
 			<label for="rp_opportunity_tor"><strong><?php esc_html_e( 'Terms of Reference document', 'rp-resource-hub' ); ?></strong></label><br>
 			<input id="rp_opportunity_tor" type="file" name="rp_opportunity_tor" accept=".pdf,.doc,.docx">
@@ -535,6 +605,7 @@ function rp_opportunities_save_meta( $post_id ) {
 		}
 		update_post_meta( $post_id, $field, $value );
 	}
+	update_post_meta( $post_id, '_rp_opportunity_bid_documents', wp_json_encode( rp_opportunities_bid_document_statuses_from_post( '_rp_opportunity_bid_documents' ) ) );
 
 	rp_opportunities_save_admin_file( $post_id, 'rp_opportunity_tor', '_rp_opportunity_tor_id' );
 	rp_opportunities_save_admin_file( $post_id, 'rp_opportunity_document', '_rp_opportunity_document_id' );
@@ -663,6 +734,9 @@ function rp_opportunities_submit_shortcode( $atts = array() ) {
 			<?php endif; ?>
 			<?php rp_opportunities_textarea_field( 'description', __( 'Posting description', 'rp-resource-hub' ), true ); ?>
 			<?php rp_opportunities_textarea_field( 'deliverables', 'itb' === $single_type ? __( 'Procurement scope / requirements notes', 'rp-resource-hub' ) : __( 'Expected deliverables / scope notes', 'rp-resource-hub' ), false ); ?>
+			<?php if ( 'job' !== $single_type ) : ?>
+				<?php rp_opportunities_render_bid_document_controls(); ?>
+			<?php endif; ?>
 			<?php if ( 'itb' !== $single_type ) : ?>
 				<?php rp_opportunities_file_field( 'opportunity_tor', __( 'Terms of Reference document', 'rp-resource-hub' ), false ); ?>
 			<?php endif; ?>
@@ -755,6 +829,9 @@ function rp_opportunities_handle_frontend_submit() {
 	foreach ( $meta as $key => $value ) {
 		update_post_meta( $post_id, $key, $value );
 	}
+	if ( 'itb' === $type ) {
+		update_post_meta( $post_id, '_rp_opportunity_bid_documents', wp_json_encode( rp_opportunities_bid_document_statuses_from_post( 'bid_documents' ) ) );
+	}
 
 	rp_opportunities_save_admin_file( $post_id, 'opportunity_tor', '_rp_opportunity_tor_id' );
 	rp_opportunities_save_admin_file( $post_id, 'opportunity_document', '_rp_opportunity_document_id' );
@@ -832,6 +909,9 @@ function rp_opportunities_handle_frontend_update() {
 	);
 	foreach ( $meta as $key => $value ) {
 		update_post_meta( $post_id, $key, $value );
+	}
+	if ( 'itb' === $type ) {
+		update_post_meta( $post_id, '_rp_opportunity_bid_documents', wp_json_encode( rp_opportunities_bid_document_statuses_from_post( 'bid_documents' ) ) );
 	}
 
 	rp_opportunities_save_admin_file( $post_id, 'opportunity_tor', '_rp_opportunity_tor_id' );
@@ -1071,13 +1151,14 @@ function rp_opportunities_render_single_details( $post_id ) {
 		<?php endif; ?>
 		<?php if ( 'itb' === $type ) : ?>
 			<div class="rp-opportunity-note">
-				<h3><?php esc_html_e( 'Required ITB documents', 'rp-resource-hub' ); ?></h3>
+				<?php $bid_document_statuses = rp_opportunities_get_bid_document_statuses( $post_id ); ?>
+				<h3><?php esc_html_e( 'ITB submission documents', 'rp-resource-hub' ); ?></h3>
 				<ul>
-					<li><?php esc_html_e( 'Quotation or proposal', 'rp-resource-hub' ); ?></li>
-					<li><?php esc_html_e( "Copy of valid business or mayor's permit", 'rp-resource-hub' ); ?></li>
-					<li><?php esc_html_e( 'Certificate of registration, if applicable', 'rp-resource-hub' ); ?></li>
-					<li><?php esc_html_e( 'BIR 2303', 'rp-resource-hub' ); ?></li>
-					<li><?php esc_html_e( 'Sample of official receipt/sales invoice', 'rp-resource-hub' ); ?></li>
+					<?php foreach ( rp_opportunities_bid_document_options() as $key => $label ) : ?>
+						<?php if ( 'excluded' !== $bid_document_statuses[ $key ] ) : ?>
+							<li><?php echo esc_html( $label ); ?> (<?php echo esc_html( 'required' === $bid_document_statuses[ $key ] ? __( 'Required', 'rp-resource-hub' ) : __( 'Optional', 'rp-resource-hub' ) ); ?>)</li>
+						<?php endif; ?>
+					<?php endforeach; ?>
 				</ul>
 			</div>
 		<?php endif; ?>
@@ -1186,6 +1267,7 @@ function rp_opportunities_render_job_form( $post_id ) {
 
 function rp_opportunities_render_bid_form( $post_id ) {
 	rp_opportunities_notice_html();
+	$bid_document_statuses = rp_opportunities_get_bid_document_statuses( $post_id );
 	?>
 	<section class="rp-opportunity-form-section">
 		<h2><?php esc_html_e( 'Submit Bid', 'rp-resource-hub' ); ?></h2>
@@ -1198,11 +1280,11 @@ function rp_opportunities_render_bid_form( $post_id ) {
 			<?php rp_opportunities_email_field( 'email', __( 'Email address', 'rp-resource-hub' ), true ); ?>
 			<?php rp_opportunities_text_field( 'phone', __( 'Phone number', 'rp-resource-hub' ), true ); ?>
 			<?php rp_opportunities_textarea_field( 'message', __( 'Message or remarks', 'rp-resource-hub' ), false ); ?>
-			<?php rp_opportunities_file_field( 'quotation', __( 'Quotation or proposal', 'rp-resource-hub' ), true, 'bid' ); ?>
-			<?php rp_opportunities_file_field( 'business_permit', __( "Copy of valid business or mayor's permit", 'rp-resource-hub' ), true, 'bid' ); ?>
-			<?php rp_opportunities_file_field( 'registration_certificate', __( 'Certificate of registration, if applicable', 'rp-resource-hub' ), false, 'bid' ); ?>
-			<?php rp_opportunities_file_field( 'bir_2303', __( 'BIR 2303', 'rp-resource-hub' ), true, 'bid' ); ?>
-			<?php rp_opportunities_file_field( 'receipt_sample', __( 'Sample of official receipt/sales invoice', 'rp-resource-hub' ), true, 'bid' ); ?>
+			<?php foreach ( rp_opportunities_bid_document_options() as $key => $label ) : ?>
+				<?php if ( 'excluded' !== $bid_document_statuses[ $key ] ) : ?>
+					<?php rp_opportunities_file_field( $key, $label, 'required' === $bid_document_statuses[ $key ], 'bid' ); ?>
+				<?php endif; ?>
+			<?php endforeach; ?>
 			<label class="rp-checkbox-line"><input type="checkbox" name="consent" value="1" required> <?php esc_html_e( 'I certify that the information and documents submitted are true and I agree that ACCORD may process this submission for procurement purposes.', 'rp-resource-hub' ); ?></label>
 			<button class="rp-button" type="submit"><?php esc_html_e( 'Submit Bid', 'rp-resource-hub' ); ?></button>
 		</form>
@@ -1339,7 +1421,11 @@ function rp_opportunities_handle_bid_submit() {
 		exit;
 	}
 
-	if ( ! rp_opportunities_required_files_present( array( 'quotation', 'business_permit', 'bir_2303', 'receipt_sample' ) ) ) {
+	$bid_document_statuses = rp_opportunities_get_bid_document_statuses( $opportunity_id );
+	$required_files        = array_keys( array_filter( $bid_document_statuses, function( $status ) {
+		return 'required' === $status;
+	} ) );
+	if ( ! rp_opportunities_required_files_present( $required_files ) ) {
 		wp_safe_redirect( add_query_arg( 'rp_opp_notice', 'error', $redirect ) );
 		exit;
 	}
@@ -1373,7 +1459,10 @@ function rp_opportunities_handle_bid_submit() {
 		exit;
 	}
 
-	$attachment_ids = rp_opportunities_upload_submission_files( array( 'quotation', 'business_permit', 'registration_certificate', 'bir_2303', 'receipt_sample' ), 'bid', $submission_id, RP_BID_MAX_ATTACHMENT_BYTES );
+	$file_fields = array_keys( array_filter( $bid_document_statuses, function( $status ) {
+		return 'excluded' !== $status;
+	} ) );
+	$attachment_ids = rp_opportunities_upload_submission_files( $file_fields, 'bid', $submission_id, RP_BID_MAX_ATTACHMENT_BYTES );
 	$wpdb->update( $table, array( 'attachment_ids' => wp_json_encode( $attachment_ids ) ), array( 'id' => $submission_id ), array( '%s' ), array( '%d' ) );
 
 	rp_opportunities_add_note( 'bid', $submission_id, 0, 'system', '', 'received', '', __( 'Bid submitted through the public Opportunities form.', 'rp-resource-hub' ) );
@@ -1670,6 +1759,9 @@ function rp_opportunities_render_edit_posting( $type, $post_id ) {
 			<?php endif; ?>
 			<?php rp_opportunities_textarea_field( 'description', __( 'Posting description', 'rp-resource-hub' ), true, $post->post_content ); ?>
 			<?php rp_opportunities_textarea_field( 'deliverables', 'job' === $type ? __( 'Expected deliverables / scope notes', 'rp-resource-hub' ) : __( 'Procurement scope / requirements notes', 'rp-resource-hub' ), false, get_post_meta( $post_id, '_rp_opportunity_deliverables', true ) ); ?>
+			<?php if ( 'bid' === $type ) : ?>
+				<?php rp_opportunities_render_bid_document_controls( $post_id ); ?>
+			<?php endif; ?>
 			<?php if ( 'job' === $type ) : ?>
 				<?php rp_opportunities_file_field( 'opportunity_tor', __( 'Replace Terms of Reference document', 'rp-resource-hub' ), false ); ?>
 				<?php echo wp_kses_post( rp_opportunities_admin_attachment_link( get_post_meta( $post_id, '_rp_opportunity_tor_id', true ) ) ); ?>
@@ -1984,10 +2076,20 @@ function rp_opportunities_submission_attachment_links( $type, $row ) {
 	foreach ( $ids as $field => $attachment_id ) {
 		$attachment_id = absint( $attachment_id );
 		$url = wp_nonce_url( admin_url( 'admin-post.php?action=rp_opportunity_download_attachment&type=' . $type . '&submission_id=' . absint( $row->id ) . '&attachment_id=' . $attachment_id ), 'rp_opportunity_download_' . $type . '_' . absint( $row->id ) . '_' . $attachment_id );
-		$out .= '<li><a href="' . esc_url( $url ) . '">' . esc_html( ucwords( str_replace( '_', ' ', $field ) ) ) . '</a></li>';
+		$out .= '<li><a href="' . esc_url( $url ) . '">' . esc_html( rp_opportunities_submission_file_label( $type, $field ) ) . '</a></li>';
 	}
 	$out .= '</ul>';
 	return $out;
+}
+
+function rp_opportunities_submission_file_label( $type, $field ) {
+	if ( 'bid' === $type ) {
+		$bid_documents = rp_opportunities_bid_document_options();
+		if ( isset( $bid_documents[ $field ] ) ) {
+			return $bid_documents[ $field ];
+		}
+	}
+	return ucwords( str_replace( '_', ' ', $field ) );
 }
 
 function rp_opportunities_render_status_form( $type, $row, $statuses ) {
