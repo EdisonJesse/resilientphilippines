@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_OPPORTUNITIES_VERSION', '1.0.7' );
+define( 'RP_OPPORTUNITIES_VERSION', '1.0.8' );
 define( 'RP_JOB_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_JOB_MAX_ATTACHMENTS', 5 );
 define( 'RP_BID_MAX_ATTACHMENT_BYTES', 25 * 1024 * 1024 );
@@ -665,12 +665,12 @@ function rp_opportunities_submit_shortcode( $atts = array() ) {
 			<?php if ( 'itb' !== $single_type ) : ?>
 				<div class="rp-consultant-only-field">
 					<?php rp_opportunities_text_field( 'duration', __( 'Duration of engagement', 'rp-resource-hub' ), false ); ?>
+					<label class="rp-checkbox-line"><input type="checkbox" name="require_portfolio" value="1"> <?php esc_html_e( 'Require portfolio/proof of work for consultant applications', 'rp-resource-hub' ); ?></label>
 				</div>
 			<?php endif; ?>
 			<?php rp_opportunities_textarea_field( 'description', __( 'Posting description', 'rp-resource-hub' ), true ); ?>
 			<?php rp_opportunities_textarea_field( 'deliverables', 'itb' === $single_type ? __( 'Procurement scope / requirements notes', 'rp-resource-hub' ) : __( 'Expected deliverables / scope notes', 'rp-resource-hub' ), false ); ?>
 			<?php if ( 'itb' !== $single_type ) : ?>
-				<label class="rp-checkbox-line"><input type="checkbox" name="require_portfolio" value="1"> <?php esc_html_e( 'Require portfolio/proof of work for consultant applications', 'rp-resource-hub' ); ?></label>
 				<?php rp_opportunities_file_field( 'opportunity_tor', __( 'Terms of Reference document', 'rp-resource-hub' ), false ); ?>
 			<?php endif; ?>
 			<?php rp_opportunities_file_field( 'opportunity_document', 'itb' === $single_type ? __( 'Bid / procurement document', 'rp-resource-hub' ) : __( 'Additional posting document', 'rp-resource-hub' ), false, 'bid' ); ?>
@@ -1610,6 +1610,7 @@ function rp_opportunities_render_edit_posting( $type, $post_id ) {
 				<?php rp_opportunities_text_field( 'location', __( 'Location / duty station', 'rp-resource-hub' ), false, get_post_meta( $post_id, '_rp_opportunity_location', true ) ); ?>
 				<div class="rp-consultant-only-field">
 					<?php rp_opportunities_text_field( 'duration', __( 'Duration of engagement', 'rp-resource-hub' ), false, get_post_meta( $post_id, '_rp_opportunity_duration', true ) ); ?>
+					<label class="rp-checkbox-line"><input type="checkbox" name="require_portfolio" value="1" <?php checked( get_post_meta( $post_id, '_rp_opportunity_require_portfolio', true ), '1' ); ?>> <?php esc_html_e( 'Require portfolio/proof of work for consultant applications', 'rp-resource-hub' ); ?></label>
 				</div>
 			<?php else : ?>
 				<?php rp_opportunities_text_field( 'reference_number', __( 'ITB reference number', 'rp-resource-hub' ), false, get_post_meta( $post_id, '_rp_opportunity_reference_number', true ) ); ?>
@@ -1620,7 +1621,6 @@ function rp_opportunities_render_edit_posting( $type, $post_id ) {
 			<?php rp_opportunities_textarea_field( 'description', __( 'Posting description', 'rp-resource-hub' ), true, $post->post_content ); ?>
 			<?php rp_opportunities_textarea_field( 'deliverables', 'job' === $type ? __( 'Expected deliverables / scope notes', 'rp-resource-hub' ) : __( 'Procurement scope / requirements notes', 'rp-resource-hub' ), false, get_post_meta( $post_id, '_rp_opportunity_deliverables', true ) ); ?>
 			<?php if ( 'job' === $type ) : ?>
-				<label class="rp-checkbox-line"><input type="checkbox" name="require_portfolio" value="1" <?php checked( get_post_meta( $post_id, '_rp_opportunity_require_portfolio', true ), '1' ); ?>> <?php esc_html_e( 'Require portfolio/proof of work for consultant applications', 'rp-resource-hub' ); ?></label>
 				<?php rp_opportunities_file_field( 'opportunity_tor', __( 'Replace Terms of Reference document', 'rp-resource-hub' ), false ); ?>
 			<?php endif; ?>
 			<?php rp_opportunities_file_field( 'opportunity_document', 'job' === $type ? __( 'Replace additional posting document', 'rp-resource-hub' ) : __( 'Replace bid / procurement document', 'rp-resource-hub' ), false, 'bid' ); ?>

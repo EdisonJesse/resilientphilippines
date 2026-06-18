@@ -294,3 +294,25 @@ Path: `app/public/wp-content/themes/resilient-hub-child/`
   - Job edit form saved title, deadline, consultant duration, and `Force Closed` status.
   - Temporary ACCORD Procurement user confirmed ITB dashboard clickable title and edit action.
   - Temporary test users and postings were removed.
+
+---
+
+## 12. Latest Session Record - Consultant Portfolio Toggle Visibility
+
+- **Date**: June 18, 2026
+- **Purpose**: Make `Require portfolio/proof of work for consultant applications` behave like `Duration of engagement`.
+- **Changed files**:
+  - `wp-content/plugins/rp-resource-hub/rp-resource-hub.php`
+  - `wp-content/plugins/rp-resource-hub/includes/opportunities.php`
+  - `handoff.md`
+- **What changed**:
+  - Bumped Resource Hub plugin version to `1.10.8`.
+  - Bumped Opportunities module version to `1.0.8`.
+  - Moved the portfolio/proof-of-work checkbox into the consultant-only section on Submit Job Posting.
+  - Moved the same checkbox into the consultant-only section on Edit Job Posting.
+- **Local verification**:
+  - PHP lint passed for changed plugin files.
+  - Temporary ACCORD HR user loaded `/submit-job-opportunity/`.
+  - Confirmed `Duration of engagement` and `Require portfolio/proof of work` appear in the same consultant-only region.
+  - Confirmed the portfolio label appears only once.
+  - Temporary test user was removed.
