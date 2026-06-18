@@ -1076,7 +1076,7 @@ function rp_opportunities_append_single_content( $content ) {
 	if ( 'job' === rp_opportunities_get_type( $post_id ) ) {
 		rp_opportunities_render_job_intro( $post_id, $content );
 	} else {
-		echo wp_kses_post( $content );
+		rp_opportunities_render_itb_intro( $post_id, $content );
 	}
 	rp_opportunities_render_single_details( $post_id );
 	if ( rp_opportunities_is_open( $post_id ) ) {
@@ -1118,6 +1118,29 @@ function rp_opportunities_render_job_intro( $post_id, $content ) {
 	<?php
 }
 
+function rp_opportunities_render_itb_intro( $post_id, $content ) {
+	$deliverables = get_post_meta( $post_id, '_rp_opportunity_deliverables', true );
+	?>
+	<section class="rp-opportunity-job-intro" aria-label="<?php esc_attr_e( 'ACCORD invitation to bid information', 'rp-resource-hub' ); ?>">
+		<div class="rp-opportunity-job-intro-card">
+			<?php if ( trim( wp_strip_all_tags( $content ) ) ) : ?>
+				<div class="rp-opportunity-job-posting-copy">
+					<h2><?php esc_html_e( 'Posting description', 'rp-resource-hub' ); ?></h2>
+					<?php echo wp_kses_post( $content ); ?>
+				</div>
+			<?php endif; ?>
+			<?php if ( $deliverables ) : ?>
+				<div class="rp-opportunity-job-posting-copy">
+					<h2><?php esc_html_e( 'Procurement scope / requirements notes', 'rp-resource-hub' ); ?></h2>
+					<?php echo wpautop( wp_kses_post( $deliverables ) ); ?>
+				</div>
+			<?php endif; ?>
+		</div>
+		<hr class="rp-opportunity-job-divider">
+	</section>
+	<?php
+}
+
 function rp_opportunities_render_single_details( $post_id ) {
 	$type        = rp_opportunities_get_type( $post_id );
 	$deadline    = get_post_meta( $post_id, '_rp_opportunity_deadline', true );
@@ -1139,9 +1162,6 @@ function rp_opportunities_render_single_details( $post_id ) {
 				<?php if ( get_post_meta( $post_id, '_rp_opportunity_reference_number', true ) ) : ?><div><dt><?php esc_html_e( 'Reference number', 'rp-resource-hub' ); ?></dt><dd><?php echo esc_html( get_post_meta( $post_id, '_rp_opportunity_reference_number', true ) ); ?></dd></div><?php endif; ?>
 			<?php endif; ?>
 		</dl>
-		<?php if ( 'job' !== $type && get_post_meta( $post_id, '_rp_opportunity_deliverables', true ) ) : ?>
-			<div class="rp-opportunity-note"><?php echo wpautop( wp_kses_post( get_post_meta( $post_id, '_rp_opportunity_deliverables', true ) ) ); ?></div>
-		<?php endif; ?>
 		<?php if ( $tor_id || $document_id ) : ?>
 			<div class="rp-opportunity-downloads">
 				<h3><?php esc_html_e( 'Documents', 'rp-resource-hub' ); ?></h3>
