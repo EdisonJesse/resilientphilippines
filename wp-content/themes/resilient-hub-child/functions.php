@@ -662,14 +662,13 @@ function rp_child_create_compliance_pages() {
 add_action( 'init', 'rp_child_create_compliance_pages' );
 
 /**
- * One-time migration: Rebuild the primary navigation menu to consolidate
- * overlapping items (Posts, Stories, Library, Resource Hub) into a single
- * "Resources" parent with sub-items.
+ * One-time migration: Rebuild the primary navigation menu around fewer
+ * audience-facing categories so future content can fit into dropdowns.
  *
  * Runs once, controlled by an option flag.
  */
 function rp_child_consolidate_navigation_menu() {
-	if ( get_option( 'rp_nav_consolidated_v10' ) ) {
+	if ( get_option( 'rp_nav_consolidated_v11' ) ) {
 		return;
 	}
 
@@ -769,6 +768,20 @@ function rp_child_consolidate_navigation_menu() {
 				'menu-item-parent-id' => $about_parent_id,
 			) );
 		}
+
+		// Donors
+		$donors_page = get_page_by_path( 'donors' );
+		if ( $donors_page ) {
+			wp_update_nav_menu_item( $menu_id, 0, array(
+				'menu-item-title'     => __( 'Donors', 'resilient-hub' ),
+				'menu-item-object'    => 'page',
+				'menu-item-object-id' => $donors_page->ID,
+				'menu-item-type'      => 'post_type',
+				'menu-item-status'    => 'publish',
+				'menu-item-position'  => ++$position,
+				'menu-item-parent-id' => $about_parent_id,
+			) );
+		}
 	}
 
 	// ── Programmes (parent) ────────────────────────────────────────────────
@@ -847,24 +860,55 @@ function rp_child_consolidate_navigation_menu() {
 		}
 	}
 
-	// ── News & Stories ────────────────────────────────────────────────────
+	// ── Stories & Updates (parent) ────────────────────────────────────────
+	$stories_parent_id = wp_update_nav_menu_item( $menu_id, 0, array(
+		'menu-item-title'    => __( 'Stories & Updates', 'resilient-hub' ),
+		'menu-item-url'      => home_url( '/news-stories/' ),
+		'menu-item-type'     => 'custom',
+		'menu-item-status'   => 'publish',
+		'menu-item-position' => ++$position,
+	) );
+
+	// ── Stories & Updates > Sub-items ─────────────────────────────────────
 	$news_stories_page = get_page_by_path( 'news-stories' );
-	if ( $news_stories_page ) {
+	if ( ! is_wp_error( $stories_parent_id ) ) {
+		if ( $news_stories_page ) {
+			wp_update_nav_menu_item( $menu_id, 0, array(
+				'menu-item-title'     => __( 'News & Stories', 'resilient-hub' ),
+				'menu-item-object'    => 'page',
+				'menu-item-object-id' => $news_stories_page->ID,
+				'menu-item-type'      => 'post_type',
+				'menu-item-status'    => 'publish',
+				'menu-item-position'  => ++$position,
+				'menu-item-parent-id' => $stories_parent_id,
+			) );
+		} else {
+			wp_update_nav_menu_item( $menu_id, 0, array(
+				'menu-item-title'     => __( 'News & Stories', 'resilient-hub' ),
+				'menu-item-url'       => home_url( '/news-stories/' ),
+				'menu-item-type'      => 'custom',
+				'menu-item-status'    => 'publish',
+				'menu-item-position'  => ++$position,
+				'menu-item-parent-id' => $stories_parent_id,
+			) );
+		}
+
 		wp_update_nav_menu_item( $menu_id, 0, array(
-			'menu-item-title'     => __( 'News & Stories', 'resilient-hub' ),
-			'menu-item-object'    => 'page',
-			'menu-item-object-id' => $news_stories_page->ID,
-			'menu-item-type'      => 'post_type',
-			'menu-item-status'    => 'publish',
-			'menu-item-position'  => ++$position,
-		) );
-	} else {
-		wp_update_nav_menu_item( $menu_id, 0, array(
-			'menu-item-title'     => __( 'News & Stories', 'resilient-hub' ),
-			'menu-item-url'       => home_url( '/news-stories/' ),
+			'menu-item-title'     => __( 'Galleries', 'resilient-hub' ),
+			'menu-item-url'       => home_url( '/galleries/' ),
 			'menu-item-type'      => 'custom',
 			'menu-item-status'    => 'publish',
 			'menu-item-position'  => ++$position,
+			'menu-item-parent-id' => $stories_parent_id,
+		) );
+
+		wp_update_nav_menu_item( $menu_id, 0, array(
+			'menu-item-title'     => __( 'Situation Reports', 'resilient-hub' ),
+			'menu-item-url'       => home_url( '/sitrep-dashboard/' ),
+			'menu-item-type'      => 'custom',
+			'menu-item-status'    => 'publish',
+			'menu-item-position'  => ++$position,
+			'menu-item-parent-id' => $stories_parent_id,
 		) );
 	}
 
@@ -890,83 +934,50 @@ function rp_child_consolidate_navigation_menu() {
 			'menu-item-parent-id' => $resources_parent_id,
 		) );
 
-		// Situation Reports
-		wp_update_nav_menu_item( $menu_id, 0, array(
-			'menu-item-title'     => __( 'Situation Reports', 'resilient-hub' ),
-			'menu-item-url'       => home_url( '/sitrep-dashboard/' ),
-			'menu-item-type'      => 'custom',
-			'menu-item-status'    => 'publish',
-			'menu-item-position'  => ++$position,
-			'menu-item-parent-id' => $resources_parent_id,
-		) );
-
-		// Submit a Resource
-		$submit_page = get_page_by_path( 'submit-resource' );
-		if ( $submit_page ) {
-			wp_update_nav_menu_item( $menu_id, 0, array(
-				'menu-item-title'     => __( 'Submit a Resource', 'resilient-hub' ),
-				'menu-item-object'    => 'page',
-				'menu-item-object-id' => $submit_page->ID,
-				'menu-item-type'      => 'post_type',
-				'menu-item-status'    => 'publish',
-				'menu-item-position'  => ++$position,
-				'menu-item-parent-id' => $resources_parent_id,
-			) );
-		}
-
-		// Submit a SitRep
-		$submit_sitrep_page = get_page_by_path( 'submit-sitrep' );
-		if ( $submit_sitrep_page ) {
-			wp_update_nav_menu_item( $menu_id, 0, array(
-				'menu-item-title'     => __( 'Submit a SitRep', 'resilient-hub' ),
-				'menu-item-object'    => 'page',
-				'menu-item-object-id' => $submit_sitrep_page->ID,
-				'menu-item-type'      => 'post_type',
-				'menu-item-status'    => 'publish',
-				'menu-item-position'  => ++$position,
-				'menu-item-parent-id' => $resources_parent_id,
-			) );
-		}
-
-		// Moderation Dashboard
-		$mod_page = get_page_by_path( 'moderation-dashboard' );
-		if ( $mod_page ) {
-			wp_update_nav_menu_item( $menu_id, 0, array(
-				'menu-item-title'     => __( 'Moderation Dashboard', 'resilient-hub' ),
-				'menu-item-object'    => 'page',
-				'menu-item-object-id' => $mod_page->ID,
-				'menu-item-type'      => 'post_type',
-				'menu-item-status'    => 'publish',
-				'menu-item-position'  => ++$position,
-				'menu-item-parent-id' => $resources_parent_id,
-			) );
-		}
 	}
 
-	// ── Donors ────────────────────────────────────────────────────────────
-	$donors_page = get_page_by_path( 'donors' );
-	if ( $donors_page ) {
-		wp_update_nav_menu_item( $menu_id, 0, array(
-			'menu-item-title'     => __( 'Donors', 'resilient-hub' ),
-			'menu-item-object'    => 'page',
-			'menu-item-object-id' => $donors_page->ID,
-			'menu-item-type'      => 'post_type',
-			'menu-item-status'    => 'publish',
-			'menu-item-position'  => ++$position,
-		) );
-	}
+	// ── Opportunities ─────────────────────────────────────────────────────
+	wp_update_nav_menu_item( $menu_id, 0, array(
+		'menu-item-title'    => __( 'Opportunities', 'resilient-hub' ),
+		'menu-item-url'      => home_url( '/opportunities/' ),
+		'menu-item-type'     => 'custom',
+		'menu-item-status'   => 'publish',
+		'menu-item-position' => ++$position,
+	) );
 
-	// ── Contact Us ────────────────────────────────────────────────────────
-	$contact_page = get_page_by_path( 'contact-us' );
-	if ( $contact_page ) {
-		wp_update_nav_menu_item( $menu_id, 0, array(
-			'menu-item-title'     => __( 'Contact Us', 'resilient-hub' ),
-			'menu-item-object'    => 'page',
-			'menu-item-object-id' => $contact_page->ID,
-			'menu-item-type'      => 'post_type',
-			'menu-item-status'    => 'publish',
-			'menu-item-position'  => ++$position,
-		) );
+	// ── Get Involved (parent) ─────────────────────────────────────────────
+	$get_involved_parent_id = wp_update_nav_menu_item( $menu_id, 0, array(
+		'menu-item-title'    => __( 'Get Involved', 'resilient-hub' ),
+		'menu-item-url'      => home_url( '/contact-us/' ),
+		'menu-item-type'     => 'custom',
+		'menu-item-status'   => 'publish',
+		'menu-item-position' => ++$position,
+	) );
+
+	if ( ! is_wp_error( $get_involved_parent_id ) ) {
+		$contact_page = get_page_by_path( 'contact-us' );
+		if ( $contact_page ) {
+			wp_update_nav_menu_item( $menu_id, 0, array(
+				'menu-item-title'     => __( 'Contact Us', 'resilient-hub' ),
+				'menu-item-object'    => 'page',
+				'menu-item-object-id' => $contact_page->ID,
+				'menu-item-type'      => 'post_type',
+				'menu-item-status'    => 'publish',
+				'menu-item-position'  => ++$position,
+				'menu-item-parent-id' => $get_involved_parent_id,
+			) );
+		}
+
+		if ( get_page_by_path( 'tinig' ) ) {
+			wp_update_nav_menu_item( $menu_id, 0, array(
+				'menu-item-title'     => __( 'Tinig Feedback', 'resilient-hub' ),
+				'menu-item-url'       => home_url( '/tinig/' ),
+				'menu-item-type'      => 'custom',
+				'menu-item-status'    => 'publish',
+				'menu-item-position'  => ++$position,
+				'menu-item-parent-id' => $get_involved_parent_id,
+			) );
+		}
 	}
 
 	// Assign the menu to the theme location.
@@ -974,7 +985,7 @@ function rp_child_consolidate_navigation_menu() {
 	$locations[ $menu_location ]  = $menu_id;
 	set_theme_mod( 'nav_menu_locations', $locations );
 
-	update_option( 'rp_nav_consolidated_v10', true );
+	update_option( 'rp_nav_consolidated_v11', true );
 }
 add_action( 'admin_init', 'rp_child_consolidate_navigation_menu' );
 
