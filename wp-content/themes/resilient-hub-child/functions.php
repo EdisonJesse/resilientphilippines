@@ -987,7 +987,7 @@ function rp_child_consolidate_navigation_menu() {
 
 	update_option( 'rp_nav_consolidated_v11', true );
 }
-add_action( 'admin_init', 'rp_child_consolidate_navigation_menu' );
+add_action( 'init', 'rp_child_consolidate_navigation_menu', 20 );
 
 function rp_child_menu_has_tinig_link( $menu_id ) {
 	$items = wp_get_nav_menu_items( $menu_id );
