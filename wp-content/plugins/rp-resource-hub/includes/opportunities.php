@@ -35,6 +35,7 @@ function rp_opportunities_job_status_options() {
 		'under_review' => __( 'Under Review', 'rp-resource-hub' ),
 		'shortlisted'  => __( 'Shortlisted', 'rp-resource-hub' ),
 		'interview'    => __( 'Interview', 'rp-resource-hub' ),
+		'future_reference' => __( 'For Future Reference', 'rp-resource-hub' ),
 		'successful'   => __( 'Successful', 'rp-resource-hub' ),
 		'unsuccessful' => __( 'Unsuccessful', 'rp-resource-hub' ),
 		'withdrawn'    => __( 'Withdrawn', 'rp-resource-hub' ),
@@ -1692,7 +1693,7 @@ function rp_opportunities_render_opening_layer( $type ) {
 		</div>
 		<div class="rp-table-responsive">
 			<table class="rp-moderation-table rp-opportunity-dashboard-table">
-				<thead><tr><th><?php esc_html_e( 'Posting', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Deadline', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Total', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Under Review', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Successful', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Unsuccessful', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Last Submission', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Action', 'rp-resource-hub' ); ?></th></tr></thead>
+				<thead><tr><th><?php esc_html_e( 'Posting', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Deadline', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Status', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Total', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Under Review', 'rp-resource-hub' ); ?></th><?php if ( 'job' === $type ) : ?><th><?php esc_html_e( 'For Future Reference', 'rp-resource-hub' ); ?></th><?php endif; ?><th><?php esc_html_e( 'Successful', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Unsuccessful', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Last Submission', 'rp-resource-hub' ); ?></th><th><?php esc_html_e( 'Action', 'rp-resource-hub' ); ?></th></tr></thead>
 				<tbody>
 					<?php while ( $query->have_posts() ) : $query->the_post(); $post_id = get_the_ID(); $counts = rp_opportunities_submission_counts( $table, $post_id ); ?>
 						<tr>
@@ -1701,6 +1702,7 @@ function rp_opportunities_render_opening_layer( $type ) {
 							<td><span class="rp-status-badge <?php echo rp_opportunities_is_open( $post_id ) ? 'rp-opportunity-open' : 'rp-opportunity-closed'; ?>"><?php echo esc_html( rp_opportunities_is_open( $post_id ) ? __( 'Open', 'rp-resource-hub' ) : __( 'Closed', 'rp-resource-hub' ) ); ?></span></td>
 							<td><?php echo esc_html( $counts['total'] ); ?></td>
 							<td><?php echo esc_html( $counts['under_review'] ); ?></td>
+							<?php if ( 'job' === $type ) : ?><td><?php echo esc_html( $counts['future_reference'] ); ?></td><?php endif; ?>
 							<td><?php echo esc_html( $counts['successful'] ); ?></td>
 							<td><?php echo esc_html( $counts['unsuccessful'] ); ?></td>
 							<td><?php echo esc_html( $counts['last_submission'] ); ?></td>
@@ -1718,7 +1720,7 @@ function rp_opportunities_render_opening_layer( $type ) {
 function rp_opportunities_submission_counts( $table, $opportunity_id ) {
 	global $wpdb;
 	$rows = $wpdb->get_results( $wpdb->prepare( "SELECT status, COUNT(*) AS total FROM $table WHERE opportunity_id = %d GROUP BY status", $opportunity_id ) );
-	$data = array( 'total' => 0, 'under_review' => 0, 'successful' => 0, 'unsuccessful' => 0, 'last_submission' => '' );
+	$data = array( 'total' => 0, 'under_review' => 0, 'future_reference' => 0, 'successful' => 0, 'unsuccessful' => 0, 'last_submission' => '' );
 	foreach ( $rows as $row ) {
 		$data['total'] += absint( $row->total );
 		if ( isset( $data[ $row->status ] ) ) {
@@ -2197,6 +2199,7 @@ function rp_opportunities_send_status_notice( $type, $submission_id, $status ) {
 		'under_review'         => __( 'is currently under review.', 'rp-resource-hub' ),
 		'shortlisted'          => __( 'has been shortlisted for the next stage.', 'rp-resource-hub' ),
 		'interview'            => __( 'has been moved to the interview stage. HR will contact you with details when applicable.', 'rp-resource-hub' ),
+		'future_reference'     => __( 'has been tagged for future reference.', 'rp-resource-hub' ),
 		'clarification_needed' => __( 'requires clarification. Procurement will contact you if additional information is needed.', 'rp-resource-hub' ),
 		'responsive'           => __( 'has been marked responsive after review.', 'rp-resource-hub' ),
 		'non_responsive'       => __( 'has been marked non-responsive after review.', 'rp-resource-hub' ),
