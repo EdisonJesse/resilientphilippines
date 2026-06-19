@@ -1585,3 +1585,79 @@ function rp_child_resource_excerpt_more( $more ) {
 	return $more;
 }
 add_filter( 'excerpt_more', 'rp_child_resource_excerpt_more', 100 );
+
+/**
+ * Prevent spam submissions through Contact Form 7.
+ */
+
+// 1. Dynamically append an invisible honeypot field inside the CF7 forms.
+function rp_child_append_cf7_honeypot( $content ) {
+	$honeypot_html = '
+	<div class="cf7-hp-wrapper" style="display:none !important; visibility:hidden !important; position:absolute !important; left:-9999px !important; width:1px !important; height:1px !important; overflow:hidden !important;">
+		<label for="cf7_hp_field">Please leave this field empty:</label>
+		<input type="text" id="cf7_hp_field" name="cf7_hp_field" tabindex="-1" autocomplete="new-password" value="" />
+	</div>';
+	return $content . $honeypot_html;
+}
+add_filter( 'wpcf7_form_elements', 'rp_child_append_cf7_honeypot' );
+
+// 2. Validate submissions using the honeypot field, link count, and spam keywords.
+function rp_child_cf7_spam_verification( $spam, $submission ) {
+	if ( $spam ) {
+		return $spam;
+	}
+
+	// Case 1: Check if the honeypot field was filled out.
+	$honeypot_val = isset( $_POST['cf7_hp_field'] ) ? sanitize_text_field( wp_unslash( $_POST['cf7_hp_field'] ) ) : '';
+	if ( ! empty( $honeypot_val ) ) {
+		return true; // Mark as spam.
+	}
+
+	// Get form submission data.
+	$posted_data = $submission->get_posted_data();
+
+	// Combine all text fields to inspect for spam patterns.
+	$text_content = '';
+	if ( is_array( $posted_data ) ) {
+		foreach ( $posted_data as $key => $value ) {
+			if ( is_string( $value ) ) {
+				$text_content .= ' ' . $value;
+			}
+		}
+	}
+
+	// Case 2: Block if there are excessive links (more than 2 links is highly suspicious for a contact message).
+	$link_count = preg_match_all( '/https?:\/\/[^\s]+/i', $text_content );
+	if ( $link_count > 2 ) {
+		return true; // Mark as spam.
+	}
+
+	// Case 3: Block common SEO spam keywords.
+	$spam_keywords = array(
+		'dr30',
+		'dr40',
+		'dr50',
+		'dr60',
+		'domain rating',
+		'domain authority',
+		'backlink',
+		'guest post',
+		'search engine optimization',
+		'seo services',
+		'get featured on',
+		'increase traffic',
+		'link building',
+		'ranking on google',
+	);
+
+	$lower_text_content = strtolower( $text_content );
+	foreach ( $spam_keywords as $keyword ) {
+		if ( false !== strpos( $lower_text_content, $keyword ) ) {
+			return true; // Mark as spam.
+		}
+	}
+
+	return $spam;
+}
+add_filter( 'wpcf7_spam', 'rp_child_cf7_spam_verification', 10, 2 );
+
