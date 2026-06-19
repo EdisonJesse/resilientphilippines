@@ -1598,7 +1598,9 @@ img {
 }
 
 .rp-user-nav li:hover .rp-chevron,
-.rp-user-nav li:focus-within .rp-chevron {
+.rp-user-nav li:focus-within .rp-chevron,
+.rp-nav li:hover .rp-chevron,
+.rp-nav li:focus-within .rp-chevron {
   transform: rotate(225deg) translateY(-2px);
   margin-top: 3px;
 }

@@ -45,7 +45,13 @@
 				<ul id="rp-primary-menu">
 					<li><a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php esc_html_e( 'Home', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/resource-hub/' ) ); ?>"><?php esc_html_e( 'Resources', 'resilient-hub' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/opportunities/' ) ); ?>"><?php esc_html_e( 'Opportunities', 'resilient-hub' ); ?></a></li>
+					<li class="menu-item-has-children">
+						<a href="<?php echo esc_url( home_url( '/opportunities/' ) ); ?>"><?php esc_html_e( 'Opportunities', 'resilient-hub' ); ?> <span class="rp-chevron" aria-hidden="true"></span></a>
+						<ul class="sub-menu">
+							<li><a href="<?php echo esc_url( home_url( '/job-ads/' ) ); ?>"><?php esc_html_e( 'Job Ads', 'resilient-hub' ); ?></a></li>
+							<li><a href="<?php echo esc_url( home_url( '/invitations-to-bid/' ) ); ?>"><?php esc_html_e( 'Invitations to Bid', 'resilient-hub' ); ?></a></li>
+						</ul>
+					</li>
 					<li><a href="<?php echo esc_url( home_url( '/sitrep-dashboard/' ) ); ?>"><?php esc_html_e( 'Situation Reports', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/tinig/' ) ); ?>"><?php esc_html_e( 'Tinig', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>"><?php esc_html_e( 'Submit', 'resilient-hub' ); ?></a></li>

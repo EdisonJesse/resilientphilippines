@@ -1334,6 +1334,88 @@ function rp_child_filter_primary_nav_menu( $items, $args ) {
 add_filter( 'wp_nav_menu_objects', 'rp_child_filter_primary_nav_menu', 10, 2 );
 
 /**
+ * Dynamically inject Job Ads and Invitations to Bid submenus under the Opportunities main nav link.
+ */
+function rp_child_add_opportunities_submenus( $items, $args ) {
+	if ( 'main-navigation' !== $args->theme_location ) {
+		return $items;
+	}
+
+	$opportunities_item = null;
+	$has_job_ads        = false;
+	$has_itb            = false;
+
+	// 1. Find parent Opportunities item and check if submenus already exist
+	foreach ( $items as $item ) {
+		$item_url = untrailingslashit( (string) $item->url );
+		if ( false !== strpos( $item_url, '/opportunities' ) ) {
+			$opportunities_item = $item;
+		}
+		if ( false !== strpos( $item_url, '/job-ads' ) ) {
+			$has_job_ads = true;
+		}
+		if ( false !== strpos( $item_url, '/invitations-to-bid' ) ) {
+			$has_itb = true;
+		}
+	}
+
+	// 2. Inject submenus if parent is present and submenus are not already registered
+	if ( $opportunities_item ) {
+		$opportunities_item->classes[] = 'menu-item-has-children';
+
+		$parent_id = $opportunities_item->ID;
+		$new_items = array();
+
+		if ( ! $has_job_ads ) {
+			$job_ads_item = new stdClass();
+			$job_ads_item->ID = -1001;
+			$job_ads_item->db_id = -1001;
+			$job_ads_item->title = __( 'Job Ads', 'resilient-hub' );
+			$job_ads_item->url = home_url( '/job-ads/' );
+			$job_ads_item->menu_item_parent = $parent_id;
+			$job_ads_item->classes = array( 'menu-item', 'menu-item-type-custom', 'menu-item-object-custom' );
+			$job_ads_item->post_parent = 0;
+			$job_ads_item->type = 'custom';
+			$job_ads_item->object = 'custom';
+			$job_ads_item->type_label = __( 'Custom Link', 'resilient-hub' );
+			$job_ads_item->target = '';
+			$job_ads_item->attr_title = '';
+			$job_ads_item->description = '';
+			$job_ads_item->xfn = '';
+			
+			$new_items[] = $job_ads_item;
+		}
+
+		if ( ! $has_itb ) {
+			$itb_item = new stdClass();
+			$itb_item->ID = -1002;
+			$itb_item->db_id = -1002;
+			$itb_item->title = __( 'Invitations to Bid', 'resilient-hub' );
+			$itb_item->url = home_url( '/invitations-to-bid/' );
+			$itb_item->menu_item_parent = $parent_id;
+			$itb_item->classes = array( 'menu-item', 'menu-item-type-custom', 'menu-item-object-custom' );
+			$itb_item->post_parent = 0;
+			$itb_item->type = 'custom';
+			$itb_item->object = 'custom';
+			$itb_item->type_label = __( 'Custom Link', 'resilient-hub' );
+			$itb_item->target = '';
+			$itb_item->attr_title = '';
+			$itb_item->description = '';
+			$itb_item->xfn = '';
+			
+			$new_items[] = $itb_item;
+		}
+
+		foreach ( $new_items as $new_item ) {
+			$items[] = $new_item;
+		}
+	}
+
+	return $items;
+}
+add_filter( 'wp_nav_menu_objects', 'rp_child_add_opportunities_submenus', 15, 2 );
+
+/**
  * Intercept Data Portability JSON Exports
  */
 function rp_handle_user_data_export() {
