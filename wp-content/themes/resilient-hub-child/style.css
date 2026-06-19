@@ -2599,15 +2599,16 @@ input[type="submit"].give-submit:focus {
 }
 
 .rp-reject-btn {
-  background: #ffffff;
-  border-color: #b91c1c;
-  color: #b91c1c;
+  background: #b91c1c;
+  border: 1px solid #b91c1c;
+  color: #ffffff !important;
 }
 
 .rp-reject-btn:hover:not(:disabled),
 .rp-reject-btn:focus:not(:disabled) {
-  background: #b91c1c;
-  color: #ffffff;
+  background: #991b1b;
+  border-color: #991b1b;
+  color: #ffffff !important;
 }
 
 .rp-approve-btn.processing,
