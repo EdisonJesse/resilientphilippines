@@ -1836,19 +1836,52 @@ img {
 /* Header CTA Button styling */
 .rp-button-donate,
 .rp-button-donate:visited {
-  background: var(--rp-color-amber) !important;
-  color: #ffffff !important;
+  background: #9ca3af !important;
+  color: #f9fafb !important;
+  cursor: not-allowed;
   font-weight: 800;
-  box-shadow: 0 4px 12px rgba(184, 95, 18, 0.18);
-  transition: all 160ms ease;
+  box-shadow: none;
 }
 
 .rp-button-donate:hover,
 .rp-button-donate:focus {
-  background: #a3500d !important;
-  box-shadow: 0 6px 18px rgba(184, 95, 18, 0.28);
-  color: #ffffff !important;
-  transform: translateY(-1px);
+  background: #9ca3af !important;
+  box-shadow: none;
+  color: #f9fafb !important;
+  transform: none;
+}
+
+.rp-button-donate {
+  position: relative;
+}
+
+.rp-button-donate::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  z-index: 20;
+  padding: 6px 9px;
+  border-radius: 4px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity 120ms ease;
+}
+
+.rp-button-donate:hover::after,
+.rp-button-donate:focus::after {
+  opacity: 1;
+}
+
+.rp-footer-social-links {
+  margin-top: 16px;
 }
 
 /* Page Banner/Layout adjustment for /donate/ */

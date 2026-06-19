@@ -53,7 +53,7 @@
 				<?php
 			}
 			?>
-			<a class="rp-button rp-button-donate" href="<?php echo esc_url( home_url( '/donate/' ) ); ?>"><?php esc_html_e( 'Donate', 'resilient-hub' ); ?></a>
+			<span class="rp-button rp-button-donate" aria-disabled="true" tabindex="0" data-tooltip="<?php esc_attr_e( 'Coming soon', 'resilient-hub' ); ?>"><?php esc_html_e( 'Donate', 'resilient-hub' ); ?></span>
 			<?php if ( is_user_logged_in() ) : 
 				$current_user = wp_get_current_user();
 				$first_name   = $current_user->first_name ? $current_user->first_name : $current_user->display_name;

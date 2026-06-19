@@ -901,20 +901,6 @@ function rp_child_consolidate_navigation_menu() {
 			) );
 		}
 
-		// Our Team
-		$team_page = get_page_by_path( 'about-us-our-team' );
-		if ( $team_page ) {
-			wp_update_nav_menu_item( $menu_id, 0, array(
-				'menu-item-title'     => __( 'Our Team', 'resilient-hub' ),
-				'menu-item-object'    => 'page',
-				'menu-item-object-id' => $team_page->ID,
-				'menu-item-type'      => 'post_type',
-				'menu-item-status'    => 'publish',
-				'menu-item-position'  => ++$position,
-				'menu-item-parent-id' => $about_parent_id,
-			) );
-		}
-
 		// Our Partners
 		$partners_page = get_page_by_path( 'about-us-partners' );
 		if ( $partners_page ) {
@@ -1148,6 +1134,35 @@ function rp_child_consolidate_navigation_menu() {
 	update_option( 'rp_nav_consolidated_v11', true );
 }
 add_action( 'init', 'rp_child_consolidate_navigation_menu', 20 );
+
+function rp_child_remove_our_team_page() {
+	if ( get_option( 'rp_our_team_removed_v1' ) ) {
+		return;
+	}
+
+	$menu_items = get_posts(
+		array(
+			'post_type'   => 'nav_menu_item',
+			'post_status' => 'any',
+			'numberposts' => -1,
+		)
+	);
+
+	foreach ( $menu_items as $menu_item ) {
+		$url = get_post_meta( $menu_item->ID, '_menu_item_url', true );
+		if ( 'Our Team' === $menu_item->post_title || false !== strpos( $url, '/about-us-our-team' ) ) {
+			wp_delete_post( $menu_item->ID, true );
+		}
+	}
+
+	$team_page = get_page_by_path( 'about-us-our-team', OBJECT, 'page' );
+	if ( $team_page ) {
+		wp_delete_post( $team_page->ID, true );
+	}
+
+	update_option( 'rp_our_team_removed_v1', true );
+}
+add_action( 'init', 'rp_child_remove_our_team_page', 25 );
 
 function rp_child_fix_gallery_menu_link() {
 	$locations = get_nav_menu_locations();

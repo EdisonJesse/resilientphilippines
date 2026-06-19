@@ -45,6 +45,12 @@
 					<?php
 				}
 				?>
+				<ul class="rp-footer-list rp-footer-social-links" aria-label="<?php esc_attr_e( 'Social media', 'resilient-hub' ); ?>">
+					<li><a href="https://x.com/ACCORD_inc" target="_blank" rel="noopener noreferrer">X</a></li>
+					<li><a href="https://www.linkedin.com/in/accord-inc-588a7a146/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+					<li><a href="https://www.instagram.com/resilientphilippines" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+					<li><a href="https://www.facebook.com/accordinc" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+				</ul>
 			</div>
 		</div>
 	</div>
