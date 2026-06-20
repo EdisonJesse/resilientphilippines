@@ -3390,22 +3390,47 @@ input[type="submit"].give-submit:focus {
 
   .rp-nav.is-open {
     border: 1px solid var(--rp-color-border);
-    border-radius: var(--rp-radius);
-    box-shadow: 0 12px 30px rgba(16, 32, 39, 0.08);
+    border-radius: 10px;
+    box-shadow: 0 14px 36px rgba(16, 32, 39, 0.12);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    align-items: stretch;
+    gap: 0;
     margin-top: 2px;
     max-height: calc(100vh - 112px);
     max-height: calc(100dvh - 112px);
     overflow: hidden;
-    padding: 12px;
+    padding: 8px 10px 10px;
   }
 
   .rp-nav.is-open > ul {
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
+    padding-right: 4px;
+    scrollbar-color: var(--rp-color-border) transparent;
+    scrollbar-width: thin;
+  }
+
+  .rp-nav.is-open > ul > li {
+    border-bottom: 1px solid #e7ece9;
+    display: block;
+    margin: 0;
+    text-align: left;
+    width: 100%;
+  }
+
+  .rp-nav.is-open > ul > li:last-child {
+    border-bottom: 0;
+  }
+
+  .rp-nav.is-open > ul > li > a {
+    color: var(--rp-color-navy);
+    font-size: 0.94rem;
+    font-weight: 800;
+    padding: 11px 10px;
+    text-align: left;
   }
 
   .rp-nav a,
@@ -3428,12 +3453,43 @@ input[type="submit"].give-submit:focus {
     width: 100%;
   }
 
+  .rp-nav.is-open > .rp-button,
+  .rp-nav.is-open > .rp-user-menu-container {
+    flex: 0 0 auto;
+    margin-top: 8px;
+  }
+
+  .rp-nav.is-open > .rp-button-donate {
+    margin-top: 10px;
+  }
+
   .rp-nav .sub-menu {
-    background: var(--rp-color-soft);
-    border-radius: 6px;
+    background: transparent;
+    border-left: 2px solid rgba(39, 122, 93, 0.28);
+    border-radius: 0;
     box-sizing: border-box;
-    margin-left: 0;
-    padding: 6px;
+    margin: 0 0 8px 10px;
+    padding: 0 0 0 8px;
+    width: auto !important;
+  }
+
+  .rp-nav .sub-menu li + li {
+    margin-top: 0;
+  }
+
+  .rp-nav .sub-menu a {
+    border-radius: 5px;
+    color: var(--rp-color-muted);
+    font-size: 0.87rem;
+    font-weight: 650;
+    padding: 7px 9px;
+    text-align: left;
+  }
+
+  .rp-nav .sub-menu a:hover,
+  .rp-nav .sub-menu a:focus {
+    background: var(--rp-color-soft);
+    color: var(--rp-color-navy);
   }
 
   .rp-section-header > .rp-button {
