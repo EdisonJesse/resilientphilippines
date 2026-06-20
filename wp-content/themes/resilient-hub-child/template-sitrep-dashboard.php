@@ -18,15 +18,16 @@ $db_metrics = $wpdb->get_row( "
     SELECT 
         SUM(households) as total_households,
         SUM(individuals) as total_individuals,
-        SUM(displaced_total) as total_displaced
+        SUM(displaced_total) as total_displaced,
+        SUM(displaced_households) as total_displaced_households
     FROM $table_name 
     WHERE record_status = 'publish'
 " );
 
 $total_families   = intval( $db_metrics->total_households );
+$total_individuals = intval( $db_metrics->total_individuals );
 $total_displaced  = intval( $db_metrics->total_displaced );
-$total_casualties = 0;
-$total_houses     = 0;
+$total_displaced_households = intval( $db_metrics->total_displaced_households );
 
 $province_impacts = array();
 $db_provinces = $wpdb->get_results( "
@@ -61,9 +62,6 @@ if ( $sitreps_query->have_posts() ) {
 
         $families  = intval( get_post_meta( $pid, '_sitrep_affected_families', true ) );
         $displaced = intval( get_post_meta( $pid, '_sitrep_displaced_persons', true ) );
-        $cas       = intval( get_post_meta( $pid, '_sitrep_casualties', true ) );
-        $h_total   = intval( get_post_meta( $pid, '_sitrep_houses_damaged_total', true ) );
-        $h_partial = intval( get_post_meta( $pid, '_sitrep_houses_damaged_partial', true ) );
         $prov      = get_post_meta( $pid, '_sitrep_province', true );
 
         // If legacy (no database locations), add to totals
@@ -79,10 +77,6 @@ if ( $sitreps_query->have_posts() ) {
                 $province_impacts[ $prov_clean ] += $families;
             }
         }
-
-        // Casualties and houses are post meta only
-        $total_casualties += $cas;
-        $total_houses     += ( $h_total + $h_partial );
 
         // Determine family count and province string to show in recent reports list
         $display_families = 0;
@@ -229,23 +223,23 @@ if ( $incidents_query->have_posts() ) {
                     </div>
                 </div>
 
-                <!-- Stat Card: Casualties -->
+                <!-- Stat Card: Affected Individuals -->
                 <div class="rp-stat-card" style="background: #fff; border: 1px solid #e2e8f0; border-top: 4px solid #3b82f6; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
                     <div style="font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
-                        <?php esc_html_e( 'Total Casualties', 'resilient-hub' ); ?>
+                        <?php esc_html_e( 'Total Affected Individuals', 'resilient-hub' ); ?>
                     </div>
                     <div style="font-size: 36px; font-weight: 800; color: #3b82f6; font-family: 'Outfit', sans-serif; line-height: 1;">
-                        <?php echo esc_html( number_format( $total_casualties ) ); ?>
+                        <?php echo esc_html( number_format( $total_individuals ) ); ?>
                     </div>
                 </div>
 
-                <!-- Stat Card: Damaged Houses -->
+                <!-- Stat Card: Displaced Households -->
                 <div class="rp-stat-card" style="background: #fff; border: 1px solid #e2e8f0; border-top: 4px solid #10b981; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
                     <div style="font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
-                        <?php esc_html_e( 'Total Damaged Houses', 'resilient-hub' ); ?>
+                        <?php esc_html_e( 'Total Displaced Households', 'resilient-hub' ); ?>
                     </div>
                     <div style="font-size: 36px; font-weight: 800; color: #10b981; font-family: 'Outfit', sans-serif; line-height: 1;">
-                        <?php echo esc_html( number_format( $total_houses ) ); ?>
+                        <?php echo esc_html( number_format( $total_displaced_households ) ); ?>
                     </div>
                 </div>
             </div>
