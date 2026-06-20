@@ -213,33 +213,33 @@ if ( $incidents_query->have_posts() ) {
                     </div>
                 </div>
 
-                <!-- Stat Card: Displaced Persons -->
-                <div class="rp-stat-card" style="background: #fff; border: 1px solid #e2e8f0; border-top: 4px solid #f97316; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                    <div style="font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
-                        <?php esc_html_e( 'Total Displaced Persons', 'resilient-hub' ); ?>
-                    </div>
-                    <div style="font-size: 36px; font-weight: 800; color: #f97316; font-family: 'Outfit', sans-serif; line-height: 1;">
-                        <?php echo esc_html( number_format( $total_displaced ) ); ?>
-                    </div>
-                </div>
-
                 <!-- Stat Card: Affected Individuals -->
-                <div class="rp-stat-card" style="background: #fff; border: 1px solid #e2e8f0; border-top: 4px solid #3b82f6; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <div class="rp-stat-card" style="background: #fff; border: 1px solid #e2e8f0; border-top: 4px solid #f97316; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
                     <div style="font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
                         <?php esc_html_e( 'Total Affected Individuals', 'resilient-hub' ); ?>
                     </div>
-                    <div style="font-size: 36px; font-weight: 800; color: #3b82f6; font-family: 'Outfit', sans-serif; line-height: 1;">
+                    <div style="font-size: 36px; font-weight: 800; color: #f97316; font-family: 'Outfit', sans-serif; line-height: 1;">
                         <?php echo esc_html( number_format( $total_individuals ) ); ?>
                     </div>
                 </div>
 
-                <!-- Stat Card: Displaced Households -->
+                <!-- Stat Card: Displaced Families -->
+                <div class="rp-stat-card" style="background: #fff; border: 1px solid #e2e8f0; border-top: 4px solid #3b82f6; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <div style="font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+                        <?php esc_html_e( 'Total Displaced Families', 'resilient-hub' ); ?>
+                    </div>
+                    <div style="font-size: 36px; font-weight: 800; color: #3b82f6; font-family: 'Outfit', sans-serif; line-height: 1;">
+                        <?php echo esc_html( number_format( $total_displaced_households ) ); ?>
+                    </div>
+                </div>
+
+                <!-- Stat Card: Displaced Individuals -->
                 <div class="rp-stat-card" style="background: #fff; border: 1px solid #e2e8f0; border-top: 4px solid #10b981; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
                     <div style="font-size: 12px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
-                        <?php esc_html_e( 'Total Displaced Households', 'resilient-hub' ); ?>
+                        <?php esc_html_e( 'Total Displaced Individuals', 'resilient-hub' ); ?>
                     </div>
                     <div style="font-size: 36px; font-weight: 800; color: #10b981; font-family: 'Outfit', sans-serif; line-height: 1;">
-                        <?php echo esc_html( number_format( $total_displaced_households ) ); ?>
+                        <?php echo esc_html( number_format( $total_displaced ) ); ?>
                     </div>
                 </div>
             </div>
