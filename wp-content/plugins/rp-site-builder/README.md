@@ -4,7 +4,7 @@ Custom WordPress plugin prototype for editing page layouts, reusable components,
 
 ## Current Status
 
-This plugin is a developed prototype. It features a custom YOOtheme-style page builder with a clean light WordPress-native user interface, a live WYSIWYG editor inside the preview iframe, visual layout structure, responsive canvas outlines, inline text editing directly on the frontend page layout, page content import mapping, reusable site components with recursion prevention, and native drag-and-drop section reordering. The plugin is fully tracked in Git.
+This plugin is a developed prototype. It features a custom YOOtheme-style page builder with a premium light YOOtheme Pro user interface, a live WYSIWYG editor inside the preview iframe, visual layout structure, responsive canvas outlines, inline text editing directly on the frontend page layout, page content import mapping, reusable site components with recursion prevention, and native drag-and-drop section reordering. The plugin is fully tracked in Git.
 
 ## Plugin Files
 
@@ -74,7 +74,11 @@ Current section types:
 
 ## Visual Builder Capabilities
 
-- **WordPress-Native Light UI**: A clean, light-themed sidebar, topbar, and inspector integrating seamlessly with standard WordPress dashboard styles.
+- **Premium YOOtheme Pro Light UI**: A beautiful, customizer-style sidebar layout, with elegant border lines, clean typography, visual category grids, and dynamic hover indicators in a clean light theme.
+- **Grouped Settings**: Sidebar settings are neatly grouped into Content and Style/Layout sections for ease of editing.
+- **Sidebar Action Shortcuts**: Edit, duplicate, and delete sections directly from the layout structure list items with hover action buttons.
+- **Position-Specific Add triggers**: Click the visual divider floating `+` buttons on the canvas to insert sections exactly where you want in the layout.
+- **Floating WYSIWYG formatting toolbar**: Highlight text inside the preview iframe to format selections as **Bold**, *Italic*, or insert **Links** inline using a floating menu bar.
 - **Drag-and-Drop Reordering**: Drag and drop sections in the layout structure panel to instantly sort them.
 - **Canvas Hover & Select Overlays**: Sections show custom border outlines and floating type labels (e.g. "Hero", "Cards") on hover.
 - **Click-to-Edit Tab Focus**: Clicking any section on the canvas selects it and automatically shifts the sidebar to the "Edit" settings panel.

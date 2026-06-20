@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Site Builder
  * Description: Dashboard layout builder for pages, reusable site components, and optional custom header/footer controls.
- * Version: 0.2.7
+ * Version: 0.2.8
  * Author: ACCORD
  * Text Domain: rp-site-builder
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RPSB_VERSION', '0.2.7' );
+define( 'RPSB_VERSION', '0.2.8' );
 define( 'RPSB_FILE', __FILE__ );
 define( 'RPSB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RPSB_URL', plugin_dir_url( __FILE__ ) );
@@ -708,18 +708,29 @@ function rpsb_render_visual_builder() {
 						<button type="button" data-rpsb-tab="layout"><?php esc_html_e( 'Layout', 'rp-site-builder' ); ?></button>
 					</div>
 					<div class="rpsb-vb-panel is-active" data-rpsb-panel="add">
-						<button type="button" class="rpsb-add-block" data-rpsb-add="hero">Hero</button>
-						<button type="button" class="rpsb-add-block" data-rpsb-add="text">Text</button>
-						<button type="button" class="rpsb-add-block" data-rpsb-add="image_text">Image + Text</button>
-						<button type="button" class="rpsb-add-block" data-rpsb-add="image">Image</button>
-						<button type="button" class="rpsb-add-block" data-rpsb-add="cards">Cards</button>
-						<button type="button" class="rpsb-add-block" data-rpsb-add="cta">CTA</button>
-		<button type="button" class="rpsb-add-block" data-rpsb-add="shortcode">Shortcode</button>
-						<button type="button" class="rpsb-add-block" data-rpsb-add="html">HTML</button>
-						<button type="button" class="rpsb-add-block" data-rpsb-add="component">Component</button>
-						<hr>
-						<button type="button" class="button" data-rpsb-template="landing"><?php esc_html_e( 'Insert Landing Template', 'rp-site-builder' ); ?></button>
-						<button type="button" class="button" data-rpsb-template="content"><?php esc_html_e( 'Insert Content Template', 'rp-site-builder' ); ?></button>
+						<div class="rpsb-add-category"><?php esc_html_e( 'Layout Sections', 'rp-site-builder' ); ?></div>
+						<div class="rpsb-add-grid">
+							<button type="button" class="rpsb-add-block" data-rpsb-add="hero">Hero</button>
+							<button type="button" class="rpsb-add-block" data-rpsb-add="image_text">Image + Text</button>
+							<button type="button" class="rpsb-add-block" data-rpsb-add="cta">CTA</button>
+						</div>
+						<div class="rpsb-add-category"><?php esc_html_e( 'Content Blocks', 'rp-site-builder' ); ?></div>
+						<div class="rpsb-add-grid">
+							<button type="button" class="rpsb-add-block" data-rpsb-add="text">Text</button>
+							<button type="button" class="rpsb-add-block" data-rpsb-add="image">Image</button>
+							<button type="button" class="rpsb-add-block" data-rpsb-add="cards">Cards</button>
+						</div>
+						<div class="rpsb-add-category"><?php esc_html_e( 'Integrations', 'rp-site-builder' ); ?></div>
+						<div class="rpsb-add-grid">
+							<button type="button" class="rpsb-add-block" data-rpsb-add="shortcode">Shortcode</button>
+							<button type="button" class="rpsb-add-block" data-rpsb-add="html">HTML</button>
+							<button type="button" class="rpsb-add-block" data-rpsb-add="component">Component</button>
+						</div>
+						<div class="rpsb-add-category"><?php esc_html_e( 'Templates', 'rp-site-builder' ); ?></div>
+						<div class="rpsb-template-actions">
+							<button type="button" class="button" data-rpsb-template="landing"><?php esc_html_e( 'Insert Landing Template', 'rp-site-builder' ); ?></button>
+							<button type="button" class="button" data-rpsb-template="content"><?php esc_html_e( 'Insert Content Template', 'rp-site-builder' ); ?></button>
+						</div>
 					</div>
 					<div class="rpsb-vb-panel" data-rpsb-panel="edit">
 						<div data-rpsb-inspector><?php esc_html_e( 'Select a section on the canvas.', 'rp-site-builder' ); ?></div>

@@ -131,47 +131,77 @@
       select('Alignment', 'align', section.align || 'left', [['left', 'Left'], ['center', 'Center'], ['right', 'Right']]);
   }
 
+  function group(title, fields) {
+    return '<div class="rpsb-inspector-group">' +
+      '<div class="rpsb-inspector-group-title">' + html(title) + '</div>' +
+      '<div class="rpsb-inspector-group-content">' + fields + '</div>' +
+      '</div>';
+  }
+
   function inspector(section, components) {
     if (!section) {
       return '<p>Select a section on the canvas.</p>';
     }
 
-    var controls = '<div class="rpsb-inspector-fields">' + input('Admin label', 'title', section.title);
+    var contentFields = input('Admin label', 'title', section.title);
+    var designFields = '';
 
     if (section.type === 'hero') {
-      controls += input('Eyebrow', 'eyebrow', section.eyebrow) + textarea('Intro text', 'text', section.text) + input('Button label', 'button_label', section.button_label) + input('Button URL', 'button_url', section.button_url, 'url') +
-        input('Image URL', 'image_url', section.image_url, 'url') + '<button type="button" class="button" data-rpsb-media="image_url">Choose Image</button>' +
-        input('Image alt', 'image_alt', section.image_alt) + select('Theme', 'theme', section.theme || 'navy', [['navy', 'Navy'], ['green', 'Green'], ['white', 'White']]) + commonControls(section);
+      contentFields += input('Eyebrow', 'eyebrow', section.eyebrow) +
+        textarea('Intro text', 'text', section.text) +
+        input('Button label', 'button_label', section.button_label) +
+        input('Button URL', 'button_url', section.button_url, 'url') +
+        input('Image URL', 'image_url', section.image_url, 'url') +
+        '<button type="button" class="button" data-rpsb-media="image_url">Choose Image</button>' +
+        input('Image alt', 'image_alt', section.image_alt);
+      designFields += select('Theme', 'theme', section.theme || 'navy', [['navy', 'Navy'], ['green', 'Green'], ['white', 'White']]) + commonControls(section);
     } else if (section.type === 'text') {
-      controls += textarea('Body copy', 'text', section.text) + select('Background', 'background', section.background || 'white', [['white', 'White'], ['soft', 'Soft'], ['navy', 'Navy'], ['green', 'Green']]) +
+      contentFields += textarea('Body copy', 'text', section.text);
+      designFields += select('Background', 'background', section.background || 'white', [['white', 'White'], ['soft', 'Soft'], ['navy', 'Navy'], ['green', 'Green']]) +
         select('Width', 'width', section.width || 'contained', [['contained', 'Contained'], ['wide', 'Wide'], ['full', 'Full']]) + commonControls(section);
     } else if (section.type === 'image_text') {
-      controls += input('Kicker', 'kicker', section.kicker) + textarea('Body copy', 'text', section.text) + input('Button label', 'button_label', section.button_label) + input('Button URL', 'button_url', section.button_url, 'url') +
-        input('Image URL', 'image_url', section.image_url, 'url') + '<button type="button" class="button" data-rpsb-media="image_url">Choose Image</button>' +
-        input('Image alt', 'image_alt', section.image_alt) + select('Background', 'background', section.background || 'white', [['white', 'White'], ['soft', 'Soft']]) + commonControls(section);
+      contentFields += input('Kicker', 'kicker', section.kicker) +
+        textarea('Body copy', 'text', section.text) +
+        input('Button label', 'button_label', section.button_label) +
+        input('Button URL', 'button_url', section.button_url, 'url') +
+        input('Image URL', 'image_url', section.image_url, 'url') +
+        '<button type="button" class="button" data-rpsb-media="image_url">Choose Image</button>' +
+        input('Image alt', 'image_alt', section.image_alt);
+      designFields += select('Background', 'background', section.background || 'white', [['white', 'White'], ['soft', 'Soft']]) + commonControls(section);
     } else if (section.type === 'image') {
-      controls += input('Image URL', 'image_url', section.image_url, 'url') + '<button type="button" class="button" data-rpsb-media="image_url">Choose Image</button>' +
-        input('Image alt', 'image_alt', section.image_alt) + input('Caption', 'caption', section.caption) +
-        select('Background', 'background', section.background || 'white', [['white', 'White'], ['soft', 'Soft']]) +
+      contentFields += input('Image URL', 'image_url', section.image_url, 'url') +
+        '<button type="button" class="button" data-rpsb-media="image_url">Choose Image</button>' +
+        input('Image alt', 'image_alt', section.image_alt) +
+        input('Caption', 'caption', section.caption);
+      designFields += select('Background', 'background', section.background || 'white', [['white', 'White'], ['soft', 'Soft']]) +
         select('Width', 'width', section.width || 'wide', [['contained', 'Contained'], ['wide', 'Wide'], ['full', 'Full']]) + commonControls(section);
     } else if (section.type === 'cards') {
-      controls += textarea('Cards: Title|Description', 'text', section.text) + input('Columns', 'columns', section.columns || 3, 'number') +
+      contentFields += textarea('Cards: Title|Description', 'text', section.text);
+      designFields += input('Columns', 'columns', section.columns || 3, 'number') +
         select('Background', 'background', section.background || 'soft', [['white', 'White'], ['soft', 'Soft']]) + commonControls(section);
     } else if (section.type === 'cta') {
-      controls += textarea('Text', 'text', section.text) + input('Button label', 'button_label', section.button_label) + input('Button URL', 'button_url', section.button_url, 'url') +
-        select('Theme', 'theme', section.theme || 'navy', [['navy', 'Navy'], ['green', 'Green']]) + commonControls(section);
+      contentFields += textarea('Text', 'text', section.text) +
+        input('Button label', 'button_label', section.button_label) +
+        input('Button URL', 'button_url', section.button_url, 'url');
+      designFields += select('Theme', 'theme', section.theme || 'navy', [['navy', 'Navy'], ['green', 'Green']]) + commonControls(section);
     } else if (section.type === 'shortcode') {
-      controls += textarea('Shortcode', 'shortcode', section.shortcode);
+      contentFields += textarea('Shortcode', 'shortcode', section.shortcode);
     } else if (section.type === 'html') {
-      controls += textarea('HTML', 'html', section.html);
+      contentFields += textarea('HTML', 'html', section.html);
     } else if (section.type === 'component') {
       var choices = [['0', 'Choose component']].concat((components || []).map(function (component) {
         return [String(component.id), component.title];
       }));
-      controls += select('Component', 'component_id', String(section.component_id || 0), choices);
+      contentFields += select('Component', 'component_id', String(section.component_id || 0), choices);
     }
 
-    return controls + '</div>';
+    var htmlContent = '<div class="rpsb-inspector-fields">' + group('Content Settings', contentFields);
+    if (designFields) {
+      htmlContent += group('Style & Layout Settings', designFields);
+    }
+    htmlContent += '</div>';
+
+    return htmlContent;
   }
 
   function structure(layout, selected) {
@@ -180,12 +210,16 @@
     }
     return layout.map(function (section, index) {
       var title = section.title || (section.type.charAt(0).toUpperCase() + section.type.slice(1));
-      return '<div class="rpsb-structure-item-wrap" draggable="true" data-rpsb-structure-index="' + index + '">' +
-        '<button type="button" class="rpsb-structure-btn ' + (selected === index ? 'is-active' : '') + '" data-rpsb-structure-item="' + index + '">' +
+      var activeClass = selected === index ? ' is-active' : '';
+      return '<div class="rpsb-structure-item-wrap' + activeClass + '" draggable="true" data-rpsb-structure-index="' + index + '" data-rpsb-structure-item="' + index + '">' +
         '<span class="dashicons dashicons-menu rpsb-drag-handle"></span>' +
         '<span class="rpsb-structure-num">' + (index + 1) + '.</span> ' +
         '<span class="rpsb-structure-title">' + html(title) + '</span>' +
-        '</button>' +
+        '<div class="rpsb-structure-actions">' +
+          '<button type="button" class="rpsb-action-icon" data-rpsb-edit-btn="' + index + '" title="Edit settings"><span class="dashicons dashicons-admin-generic"></span></button>' +
+          '<button type="button" class="rpsb-action-icon" data-rpsb-dup-btn="' + index + '" title="Duplicate"><span class="dashicons dashicons-admin-page"></span></button>' +
+          '<button type="button" class="rpsb-action-icon" data-rpsb-del-btn="' + index + '" title="Delete"><span class="dashicons dashicons-trash"></span></button>' +
+        '</div>' +
         '</div>';
     }).join('');
   }
@@ -198,6 +232,7 @@
     var pageId = builder.dataset.pageId;
     var layout = [];
     var selected = 0;
+    var insertTargetIndex = null;
     var canvas = builder.querySelector('[data-rpsb-canvas]');
     var inspectorNode = builder.querySelector('[data-rpsb-inspector]');
     var structureNode = builder.querySelector('[data-rpsb-structure]');
@@ -249,6 +284,140 @@
       });
     }
 
+    function initIframeFloatingToolbar() {
+      var doc = liveDocument();
+      if (!doc) return;
+
+      var toolbar = doc.getElementById('rpsb-wysiwyg-toolbar');
+      if (!toolbar) {
+        toolbar = doc.createElement('div');
+        toolbar.id = 'rpsb-wysiwyg-toolbar';
+        toolbar.style.position = 'absolute';
+        toolbar.style.display = 'none';
+        toolbar.style.background = '#222';
+        toolbar.style.color = '#fff';
+        toolbar.style.padding = '5px 8px';
+        toolbar.style.borderRadius = '6px';
+        toolbar.style.boxShadow = '0 4px 10px rgba(0,0,0,0.15)';
+        toolbar.style.zIndex = '99999';
+        toolbar.style.fontFamily = 'sans-serif';
+        toolbar.style.fontSize = '12px';
+        toolbar.style.gap = '4px';
+        toolbar.style.alignItems = 'center';
+        
+        var bBtn = doc.createElement('button');
+        bBtn.type = 'button';
+        bBtn.innerHTML = '<b>B</b>';
+        bBtn.style.background = 'transparent';
+        bBtn.style.border = '0';
+        bBtn.style.color = '#fff';
+        bBtn.style.cursor = 'pointer';
+        bBtn.style.padding = '4px 8px';
+        bBtn.style.fontWeight = 'bold';
+        bBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          doc.execCommand('bold', false, null);
+          triggerInlineUpdate();
+        });
+        
+        var iBtn = doc.createElement('button');
+        iBtn.type = 'button';
+        iBtn.innerHTML = '<i>I</i>';
+        iBtn.style.background = 'transparent';
+        iBtn.style.border = '0';
+        iBtn.style.color = '#fff';
+        iBtn.style.cursor = 'pointer';
+        iBtn.style.padding = '4px 8px';
+        iBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          doc.execCommand('italic', false, null);
+          triggerInlineUpdate();
+        });
+
+        var linkBtn = doc.createElement('button');
+        linkBtn.type = 'button';
+        linkBtn.textContent = 'Link';
+        linkBtn.style.background = 'transparent';
+        linkBtn.style.border = '0';
+        linkBtn.style.color = '#fff';
+        linkBtn.style.cursor = 'pointer';
+        linkBtn.style.padding = '4px 8px';
+        linkBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          var url = prompt('Enter link URL:');
+          if (url) {
+            doc.execCommand('createLink', false, url);
+            triggerInlineUpdate();
+          }
+        });
+        
+        var unlinkBtn = doc.createElement('button');
+        unlinkBtn.type = 'button';
+        unlinkBtn.textContent = 'Unlink';
+        unlinkBtn.style.background = 'transparent';
+        unlinkBtn.style.border = '0';
+        unlinkBtn.style.color = '#fff';
+        unlinkBtn.style.cursor = 'pointer';
+        unlinkBtn.style.padding = '4px 8px';
+        unlinkBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          doc.execCommand('unlink', false, null);
+          triggerInlineUpdate();
+        });
+
+        toolbar.appendChild(bBtn);
+        toolbar.appendChild(iBtn);
+        toolbar.appendChild(linkBtn);
+        toolbar.appendChild(unlinkBtn);
+        doc.body.appendChild(toolbar);
+      }
+
+      function triggerInlineUpdate() {
+        var activeEl = doc.activeElement;
+        if (activeEl && activeEl.hasAttribute('contenteditable')) {
+          var event = new Event('input', { bubbles: true });
+          activeEl.dispatchEvent(event);
+        }
+      }
+
+      doc.addEventListener('selectionchange', function() {
+        var selection = doc.defaultView.getSelection();
+        if (!selection || selection.isCollapsed) {
+          toolbar.style.display = 'none';
+          return;
+        }
+
+        var activeEl = doc.activeElement;
+        if (!activeEl || !activeEl.hasAttribute('contenteditable')) {
+          toolbar.style.display = 'none';
+          return;
+        }
+
+        var range = selection.getRangeAt(0);
+        var rect = range.getBoundingClientRect();
+        
+        var scrollTop = doc.documentElement.scrollTop || doc.body.scrollTop;
+        var scrollLeft = doc.documentElement.scrollLeft || doc.body.scrollLeft;
+        
+        toolbar.style.display = 'flex';
+        var topPos = rect.top + scrollTop - toolbar.offsetHeight - 8;
+        var leftPos = rect.left + scrollLeft + (rect.width / 2) - (toolbar.offsetWidth / 2);
+        
+        toolbar.style.top = Math.max(0, topPos) + 'px';
+        toolbar.style.left = Math.max(0, leftPos) + 'px';
+      });
+      
+      doc.addEventListener('mousedown', function(e) {
+        if (e.target.closest('#rpsb-wysiwyg-toolbar')) {
+          return;
+        }
+        var selection = doc.defaultView.getSelection();
+        if (!selection || selection.isCollapsed) {
+          toolbar.style.display = 'none';
+        }
+      });
+    }
+
     function initIframeEditing() {
       var doc = liveDocument();
       if (!doc) {
@@ -260,14 +429,16 @@
         style.id = 'rpsb-iframe-styles';
         style.textContent = 
           '[data-rpsb-section-index] { outline: 2px solid transparent !important; position: relative !important; transition: outline-color 0.2s ease !important; } ' +
-          '[data-rpsb-section-index]:hover { outline: 2px dashed rgba(34, 113, 177, 0.6) !important; cursor: pointer !important; } ' +
-          '[data-rpsb-section-index].is-selected { outline: 2px solid #2271b1 !important; } ' +
-          '[data-rpsb-section-index]::after { content: attr(data-rpsb-type); position: absolute; left: 10px; top: 10px; background: #2271b1; color: #fff; font-size: 10px; font-weight: bold; padding: 3px 6px; text-transform: uppercase; border-radius: 3px; display: none; z-index: 9999; pointer-events: none; } ' +
+          '[data-rpsb-section-index]:hover { outline: 2px dashed rgba(30, 135, 240, 0.6) !important; cursor: pointer !important; } ' +
+          '[data-rpsb-section-index].is-selected { outline: 2px solid #1e87f0 !important; } ' +
+          '[data-rpsb-section-index]::after { content: attr(data-rpsb-type); position: absolute; left: 10px; top: 10px; background: #1e87f0; color: #fff; font-size: 10px; font-weight: bold; padding: 3px 6px; text-transform: uppercase; border-radius: 3px; display: none; z-index: 9999; pointer-events: none; } ' +
           '[data-rpsb-section-index]:hover::after, [data-rpsb-section-index].is-selected::after { display: block; } ' +
-          '[contenteditable] { outline: 1px dashed rgba(34, 113, 177, 0.4); } ' +
-          '[contenteditable]:focus { background: rgba(34, 113, 177, 0.08); outline-color: #72aee6; }';
+          '[contenteditable] { outline: 1px dashed rgba(30, 135, 240, 0.4); } ' +
+          '[contenteditable]:focus { background: rgba(30, 135, 240, 0.06); outline-color: #1e87f0; }';
         doc.head.appendChild(style);
       }
+      
+      initIframeFloatingToolbar();
 
       var sections = doc.querySelectorAll('[data-rpsb-section-index]');
       sections.forEach(function (secNode) {
@@ -348,12 +519,27 @@
       if (!layout.length) {
         canvas.innerHTML = '<div class="rpsb-vb-empty"><strong>This page has no builder sections yet.</strong><p>Use Live Page to see the current page, import the existing content, or add a new section/template.</p><button type="button" class="button button-primary" data-rpsb-import-current>Import Current Content</button></div>';
       } else {
-        canvas.innerHTML = layout.map(function (section, index) {
-          return renderPreview(section, index, selected === index);
-        }).join('');
+        var htmlContent = '';
+        htmlContent += '<div class="rpsb-canvas-divider" data-rpsb-insert-index="0"><button type="button" class="rpsb-canvas-add-btn" title="Add section here"><span class="dashicons dashicons-plus-alt"></span></button></div>';
+        
+        layout.forEach(function (section, index) {
+          htmlContent += renderPreview(section, index, selected === index);
+          htmlContent += '<div class="rpsb-canvas-divider" data-rpsb-insert-index="' + (index + 1) + '"><button type="button" class="rpsb-canvas-add-btn" title="Add section here"><span class="dashicons dashicons-plus-alt"></span></button></div>';
+        });
+        canvas.innerHTML = htmlContent;
       }
       inspectorNode.innerHTML = inspector(layout[selected], window.rpsbAdmin.components);
       structureNode.innerHTML = structure(layout, selected);
+
+      var dividers = canvas.querySelectorAll('[data-rpsb-insert-index]');
+      dividers.forEach(function(div) {
+        var divIdx = parseInt(div.dataset.rpsbInsertIndex, 10);
+        if (insertTargetIndex !== null && divIdx === insertTargetIndex) {
+          div.classList.add('is-active');
+        } else {
+          div.classList.remove('is-active');
+        }
+      });
     }
 
     function addBlock(type) {
@@ -361,8 +547,14 @@
       if (!block) {
         return;
       }
-      layout.splice(selected + 1, 0, clone(block));
-      selected = Math.min(selected + 1, layout.length - 1);
+      if (insertTargetIndex !== null) {
+        layout.splice(insertTargetIndex, 0, clone(block));
+        selected = insertTargetIndex;
+        insertTargetIndex = null;
+      } else {
+        layout.splice(selected + 1, 0, clone(block));
+        selected = Math.min(selected + 1, layout.length - 1);
+      }
       markDirty();
       draw();
       refreshIframe();
@@ -636,8 +828,16 @@
       var next = type === 'content'
         ? [clone(blocks.hero), clone(blocks.text), clone(blocks.image), clone(blocks.cta)]
         : [clone(blocks.hero), clone(blocks.image_text), clone(blocks.cards), clone(blocks.cta)];
-      layout = layout.concat(next);
-      selected = layout.length - next.length;
+      if (insertTargetIndex !== null) {
+        for (var i = 0; i < next.length; i++) {
+          layout.splice(insertTargetIndex + i, 0, next[i]);
+        }
+        selected = insertTargetIndex;
+        insertTargetIndex = null;
+      } else {
+        layout = layout.concat(next);
+        selected = layout.length - next.length;
+      }
       markDirty();
       draw();
       refreshIframe();
@@ -718,6 +918,74 @@
         return;
       }
 
+      var editBtn = event.target.closest('[data-rpsb-edit-btn]');
+      if (editBtn) {
+        selected = parseInt(editBtn.dataset.rpsbEditBtn, 10);
+        builder.querySelectorAll('[data-rpsb-tab], [data-rpsb-panel]').forEach(function (node) {
+          node.classList.remove('is-active');
+        });
+        var editTab = builder.querySelector('[data-rpsb-tab="edit"]');
+        var editPanel = builder.querySelector('[data-rpsb-panel="edit"]');
+        if (editTab && editPanel) {
+          editTab.classList.add('is-active');
+          editPanel.classList.add('is-active');
+        }
+        draw();
+        return;
+      }
+
+      var dupBtn = event.target.closest('[data-rpsb-dup-btn]');
+      if (dupBtn) {
+        var idx = parseInt(dupBtn.dataset.rpsbDupBtn, 10);
+        layout.splice(idx + 1, 0, clone(layout[idx]));
+        selected = idx + 1;
+        markDirty();
+        draw();
+        refreshIframe();
+        return;
+      }
+
+      var delBtn = event.target.closest('[data-rpsb-del-btn]');
+      if (delBtn) {
+        var idx = parseInt(delBtn.dataset.rpsbDelBtn, 10);
+        layout.splice(idx, 1);
+        selected = Math.max(0, idx - 1);
+        markDirty();
+        draw();
+        refreshIframe();
+        return;
+      }
+
+      var structureItem = event.target.closest('[data-rpsb-structure-item]');
+      if (structureItem) {
+        selected = parseInt(structureItem.dataset.rpsbStructureItem, 10);
+        draw();
+        return;
+      }
+
+      var canvasDivider = event.target.closest('[data-rpsb-insert-index]');
+      if (canvasDivider) {
+        var targetIdx = parseInt(canvasDivider.dataset.rpsbInsertIndex, 10);
+        if (insertTargetIndex === targetIdx) {
+          insertTargetIndex = null;
+        } else {
+          insertTargetIndex = targetIdx;
+        }
+        
+        builder.querySelectorAll('[data-rpsb-tab], [data-rpsb-panel]').forEach(function (node) {
+          node.classList.remove('is-active');
+        });
+        var addTab = builder.querySelector('[data-rpsb-tab="add"]');
+        var addPanel = builder.querySelector('[data-rpsb-panel="add"]');
+        if (addTab && addPanel) {
+          addTab.classList.add('is-active');
+          addPanel.classList.add('is-active');
+        }
+        
+        draw();
+        return;
+      }
+
       var add = event.target.closest('[data-rpsb-add]');
       if (add) {
         addBlock(add.dataset.rpsbAdd);
@@ -752,13 +1020,6 @@
 
       if (event.target.closest('[data-rpsb-import-current]')) {
         importCurrentContent();
-        return;
-      }
-
-      var structureButton = event.target.closest('[data-rpsb-structure-item]');
-      if (structureButton) {
-        selected = parseInt(structureButton.dataset.rpsbStructureItem, 10);
-        draw();
         return;
       }
 
