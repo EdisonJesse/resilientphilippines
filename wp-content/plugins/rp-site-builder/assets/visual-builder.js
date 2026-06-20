@@ -82,14 +82,22 @@
     }
 
     if (section.type === 'cards') {
-      var rows = String(section.text || '').split(/\r?\n/).filter(Boolean);
-      var cards = rows.map(function (row) {
-        var parts = row.split('|');
-        return '<article class="rp-card rpsb-card"><h3>' + html(parts[0]) + '</h3><p>' + html(parts.slice(1).join('|')) + '</p></article>';
+      var cardsList = [];
+      if (section.cards && section.cards.length) {
+        cardsList = section.cards;
+      } else {
+        var rows = String(section.text || '').split(/\r?\n/).filter(Boolean);
+        cardsList = rows.map(function (row) {
+          var parts = row.split('|');
+          return { title: parts[0] || '', text: parts.slice(1).join('|') || '' };
+        });
+      }
+      var cardsHTML = cardsList.map(function (card) {
+        return '<article class="rp-card rpsb-card"><h3>' + html(card.title) + '</h3><p>' + html(card.text) + '</p></article>';
       }).join('');
       return '<section' + data + ' class="' + sectionClasses('rpsb-vb-section rpsb-section rpsb-cards-section', section) + selectedClass + '">' + tools +
         '<div class="rp-section-inner"><h2 contenteditable data-rpsb-inline="title">' + html(section.title || 'Cards') + '</h2>' +
-        '<div class="rpsb-card-grid" style="--rpsb-columns:' + html(section.columns || 3) + '">' + cards + '</div></div></section>';
+        '<div class="rpsb-card-grid" style="--rpsb-columns:' + html(section.columns || 3) + '">' + cardsHTML + '</div></div></section>';
     }
 
     if (section.type === 'cta') {
@@ -128,7 +136,9 @@
 
   function commonControls(section) {
     return select('Padding', 'padding', section.padding || 'default', [['compact', 'Compact'], ['default', 'Default'], ['spacious', 'Spacious']]) +
-      select('Alignment', 'align', section.align || 'left', [['left', 'Left'], ['center', 'Center'], ['right', 'Right']]);
+      select('Alignment', 'align', section.align || 'left', [['left', 'Left'], ['center', 'Center'], ['right', 'Right']]) +
+      input('Custom CSS ID', 'css_id', section.css_id) +
+      input('Custom CSS Class', 'css_class', section.css_class);
   }
 
   function group(title, fields) {
@@ -136,6 +146,43 @@
       '<div class="rpsb-inspector-group-title">' + html(title) + '</div>' +
       '<div class="rpsb-inspector-group-content">' + fields + '</div>' +
       '</div>';
+  }
+
+  function cardsEditor(section) {
+    var cards = section.cards || [];
+    if (!cards.length && section.text) {
+      var rows = String(section.text).split(/\r?\n/).filter(Boolean);
+      rows.forEach(function (row) {
+        var parts = row.split('|');
+        if (parts[0]) {
+          cards.push({
+            title: parts[0],
+            text: parts.slice(1).join('|')
+          });
+        }
+      });
+      section.cards = cards;
+    }
+
+    var htmlContent = '<div class="rpsb-cards-editor" data-rpsb-cards-editor-container>';
+    cards.forEach(function (card, index) {
+      htmlContent += '<div class="rpsb-card-item" style="border: 1px solid #e5e5e5; border-radius: 6px; padding: 10px; margin-bottom: 8px; background: #fafafa; position: relative;">' +
+        '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">' +
+          '<strong style="font-size: 11px; text-transform: uppercase; color: #666;">Card #' + (index + 1) + '</strong>' +
+          '<div style="display: flex; gap: 4px;">' +
+            '<button type="button" class="rpsb-action-icon" data-rpsb-card-move-up="' + index + '" title="Move Up"><span class="dashicons dashicons-arrow-up-alt2"></span></button>' +
+            '<button type="button" class="rpsb-action-icon" data-rpsb-card-move-down="' + index + '" title="Move Down"><span class="dashicons dashicons-arrow-down-alt2"></span></button>' +
+            '<button type="button" class="rpsb-action-icon" data-rpsb-card-del="' + index + '" title="Delete Card"><span class="dashicons dashicons-trash"></span></button>' +
+          '</div>' +
+        '</div>' +
+        '<label style="display: grid; gap: 4px; margin-bottom: 6px;"><span style="font-size:11px; font-weight:600;">Title</span><input type="text" data-rpsb-card-title-field="' + index + '" value="' + html(card.title || '') + '" style="font-size:12px; padding: 6px;"></label>' +
+        '<label style="display: grid; gap: 4px;"><span style="font-size:11px; font-weight:600;">Text</span><textarea data-rpsb-card-text-field="' + index + '" rows="2" style="font-size:12px; padding: 6px;">' + html(card.text || '') + '</textarea></label>' +
+        '</div>';
+    });
+
+    htmlContent += '<button type="button" class="button" data-rpsb-card-add style="width: 100%; border-style: dashed; justify-content: center; font-size:12px; min-height: 32px;"><span class="dashicons dashicons-plus" style="font-size: 14px; margin-top:2px;"></span> Add Card</button>';
+    htmlContent += '</div>';
+    return htmlContent;
   }
 
   function inspector(section, components) {
@@ -176,7 +223,7 @@
       designFields += select('Background', 'background', section.background || 'white', [['white', 'White'], ['soft', 'Soft']]) +
         select('Width', 'width', section.width || 'wide', [['contained', 'Contained'], ['wide', 'Wide'], ['full', 'Full']]) + commonControls(section);
     } else if (section.type === 'cards') {
-      contentFields += textarea('Cards: Title|Description', 'text', section.text);
+      contentFields += cardsEditor(section);
       designFields += input('Columns', 'columns', section.columns || 3, 'number') +
         select('Background', 'background', section.background || 'soft', [['white', 'White'], ['soft', 'Soft']]) + commonControls(section);
     } else if (section.type === 'cta') {
@@ -254,6 +301,29 @@
       pageSource = {};
     }
 
+    var historyStack = [];
+    var historyIndex = -1;
+
+    function pushHistory() {
+      if (historyIndex < historyStack.length - 1) {
+        historyStack = historyStack.slice(0, historyIndex + 1);
+      }
+      historyStack.push(clone(layout));
+      historyIndex = historyStack.length - 1;
+      updateHistoryButtons();
+    }
+
+    function updateHistoryButtons() {
+      var undoBtn = builder.querySelector('[data-rpsb-undo]');
+      var redoBtn = builder.querySelector('[data-rpsb-redo]');
+      if (undoBtn) {
+        undoBtn.disabled = historyIndex <= 0;
+      }
+      if (redoBtn) {
+        redoBtn.disabled = historyIndex >= historyStack.length - 1;
+      }
+    }
+
     function refreshIframe() {
       if (liveFrame && canvasWrap.classList.contains('is-live-mode')) {
         try {
@@ -281,6 +351,9 @@
         }
 
         inspectorNode.innerHTML = inspector(layout[selected], window.rpsbAdmin.components);
+      });
+      el.addEventListener('blur', function () {
+        pushHistory();
       });
     }
 
@@ -556,6 +629,7 @@
         selected = Math.min(selected + 1, layout.length - 1);
       }
       markDirty();
+      pushHistory();
       draw();
       refreshIframe();
     }
@@ -566,6 +640,7 @@
         layout = raw;
         selected = 0;
         markDirty();
+        pushHistory();
         draw();
         refreshIframe();
         return;
@@ -576,6 +651,7 @@
         layout = rendered;
         selected = 0;
         markDirty();
+        pushHistory();
         draw();
         refreshIframe();
         return;
@@ -595,6 +671,7 @@
       }
       selected = 0;
       markDirty();
+      pushHistory();
       draw();
       refreshIframe();
     }
@@ -839,6 +916,7 @@
         selected = layout.length - next.length;
       }
       markDirty();
+      pushHistory();
       draw();
       refreshIframe();
     }
@@ -851,6 +929,7 @@
       layout.splice(next, 0, layout.splice(selected, 1)[0]);
       selected = next;
       markDirty();
+      pushHistory();
       draw();
       refreshIframe();
     }
@@ -908,6 +987,121 @@
     });
 
     builder.addEventListener('click', function (event) {
+      // Undo/Redo click handlers
+      var undoBtn = event.target.closest('[data-rpsb-undo]');
+      if (undoBtn) {
+        if (historyIndex > 0) {
+          historyIndex--;
+          layout = clone(historyStack[historyIndex]);
+          selected = Math.min(selected, layout.length - 1);
+          if (layout.length && selected < 0) {
+            selected = 0;
+          }
+          markDirty();
+          updateHistoryButtons();
+          draw();
+          refreshIframe();
+        }
+        return;
+      }
+
+      var redoBtn = event.target.closest('[data-rpsb-redo]');
+      if (redoBtn) {
+        if (historyIndex < historyStack.length - 1) {
+          historyIndex++;
+          layout = clone(historyStack[historyIndex]);
+          selected = Math.min(selected, layout.length - 1);
+          if (layout.length && selected < 0) {
+            selected = 0;
+          }
+          markDirty();
+          updateHistoryButtons();
+          draw();
+          refreshIframe();
+        }
+        return;
+      }
+
+      // JSON Export/Import click handlers
+      var exportBtn = event.target.closest('[data-rpsb-export]');
+      if (exportBtn) {
+        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(layout, null, 2));
+        var downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        var pageTitle = pageSource.title ? pageSource.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : 'layout';
+        downloadAnchor.setAttribute("download", "rpsb-layout-" + pageTitle + "-" + pageId + ".json");
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        return;
+      }
+
+      var importBtn = event.target.closest('[data-rpsb-import-btn]');
+      if (importBtn) {
+        var fileInput = builder.querySelector('#rpsb-import-file');
+        if (fileInput) {
+          fileInput.click();
+        }
+        return;
+      }
+
+      // Cards Editor click handlers
+      var cardAdd = event.target.closest('[data-rpsb-card-add]');
+      if (cardAdd && layout[selected]) {
+        if (!layout[selected].cards) {
+          layout[selected].cards = [];
+        }
+        layout[selected].cards.push({ title: 'New Card', text: '' });
+        markDirty();
+        pushHistory();
+        draw();
+        refreshIframe();
+        return;
+      }
+
+      var cardDel = event.target.closest('[data-rpsb-card-del]');
+      if (cardDel && layout[selected]) {
+        var cardIdx = parseInt(cardDel.dataset.rpsbCardDel, 10);
+        if (layout[selected].cards && layout[selected].cards[cardIdx]) {
+          layout[selected].cards.splice(cardIdx, 1);
+          markDirty();
+          pushHistory();
+          draw();
+          refreshIframe();
+        }
+        return;
+      }
+
+      var cardUp = event.target.closest('[data-rpsb-card-move-up]');
+      if (cardUp && layout[selected]) {
+        var cardIdx = parseInt(cardUp.dataset.rpsbCardMoveUp, 10);
+        if (cardIdx > 0 && layout[selected].cards) {
+          var temp = layout[selected].cards[cardIdx];
+          layout[selected].cards[cardIdx] = layout[selected].cards[cardIdx - 1];
+          layout[selected].cards[cardIdx - 1] = temp;
+          markDirty();
+          pushHistory();
+          draw();
+          refreshIframe();
+        }
+        return;
+      }
+
+      var cardDown = event.target.closest('[data-rpsb-card-move-down]');
+      if (cardDown && layout[selected]) {
+        var cardIdx = parseInt(cardDown.dataset.rpsbCardMoveDown, 10);
+        if (layout[selected].cards && cardIdx < layout[selected].cards.length - 1) {
+          var temp = layout[selected].cards[cardIdx];
+          layout[selected].cards[cardIdx] = layout[selected].cards[cardIdx + 1];
+          layout[selected].cards[cardIdx + 1] = temp;
+          markDirty();
+          pushHistory();
+          draw();
+          refreshIframe();
+        }
+        return;
+      }
+
       var tab = event.target.closest('[data-rpsb-tab]');
       if (tab) {
         builder.querySelectorAll('[data-rpsb-tab], [data-rpsb-panel]').forEach(function (node) {
@@ -1092,6 +1286,37 @@
         inspectorNode.innerHTML = inspector(layout[selected], window.rpsbAdmin.components);
         structureNode.innerHTML = structure(layout, selected);
       }
+
+      var cardTitleField = event.target.closest('[data-rpsb-card-title-field]');
+      if (cardTitleField && layout[selected]) {
+        var cardIdx = parseInt(cardTitleField.dataset.rpsbCardTitleField, 10);
+        if (layout[selected].cards && layout[selected].cards[cardIdx]) {
+          layout[selected].cards[cardIdx].title = cardTitleField.value;
+          markDirty();
+          canvas.innerHTML = layout.map(function (section, index) {
+            return renderPreview(section, index, selected === index);
+          }).join('');
+        }
+      }
+
+      var cardTextField = event.target.closest('[data-rpsb-card-text-field]');
+      if (cardTextField && layout[selected]) {
+        var cardIdx = parseInt(cardTextField.dataset.rpsbCardTextField, 10);
+        if (layout[selected].cards && layout[selected].cards[cardIdx]) {
+          layout[selected].cards[cardIdx].text = cardTextField.value;
+          markDirty();
+          canvas.innerHTML = layout.map(function (section, index) {
+            return renderPreview(section, index, selected === index);
+          }).join('');
+        }
+      }
+    });
+
+    builder.addEventListener('focusout', function (event) {
+      var inline = event.target.closest('[data-rpsb-inline]');
+      if (inline && layout[selected]) {
+        pushHistory();
+      }
     });
 
     builder.addEventListener('change', function (event) {
@@ -1099,7 +1324,18 @@
       if (field && layout[selected]) {
         layout[selected][field.dataset.rpsbField] = field.value;
         markDirty();
+        pushHistory();
         draw();
+        return;
+      }
+
+      var cardTitleField = event.target.closest('[data-rpsb-card-title-field]');
+      var cardTextField = event.target.closest('[data-rpsb-card-text-field]');
+      if ((cardTitleField || cardTextField) && layout[selected]) {
+        markDirty();
+        pushHistory();
+        draw();
+        refreshIframe();
       }
     });
 
@@ -1141,9 +1377,43 @@
       });
     });
 
+    var fileInput = builder.querySelector('#rpsb-import-file');
+    if (fileInput) {
+      fileInput.addEventListener('change', function (e) {
+        var file = e.target.files[0];
+        if (!file) return;
+
+        var reader = new FileReader();
+        reader.onload = function (evt) {
+          try {
+            var importedLayout = JSON.parse(evt.target.result);
+            if (Array.isArray(importedLayout)) {
+              layout = importedLayout;
+              selected = 0;
+              markDirty();
+              pushHistory();
+              draw();
+              refreshIframe();
+            } else {
+              alert('Invalid layout file format.');
+            }
+          } catch (err) {
+            alert('Failed to parse JSON file.');
+          }
+          fileInput.value = '';
+        };
+        reader.readAsText(file);
+      });
+    }
+
     if (liveFrame) {
       liveFrame.addEventListener('load', initIframeEditing);
     }
+
+    // Seed initial history
+    historyStack.push(clone(layout));
+    historyIndex = 0;
+    updateHistoryButtons();
 
     setMode('builder');
     draw();

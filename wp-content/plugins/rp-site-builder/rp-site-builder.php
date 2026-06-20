@@ -238,7 +238,9 @@ function rpsb_sanitize_layout_json( $json ) {
 
 		$type = sanitize_key( $section['type'] );
 		$item = array( 'type' => $type );
-		foreach ( array( 'eyebrow', 'title', 'text', 'html', 'button_label', 'button_url', 'image_url', 'image_alt', 'caption', 'background', 'columns', 'shortcode', 'component_id', 'align', 'width', 'padding', 'theme', 'kicker', 'meta' ) as $key ) {
+		
+		$keys = array( 'eyebrow', 'title', 'text', 'html', 'button_label', 'button_url', 'image_url', 'image_alt', 'caption', 'background', 'columns', 'shortcode', 'component_id', 'align', 'width', 'padding', 'theme', 'kicker', 'meta', 'css_id', 'css_class' );
+		foreach ( $keys as $key ) {
 			if ( ! isset( $section[ $key ] ) ) {
 				continue;
 			}
@@ -251,12 +253,26 @@ function rpsb_sanitize_layout_json( $json ) {
 				$item[ $key ] = max( 1, min( 4, absint( $value ) ) );
 			} elseif ( in_array( $key, array( 'text', 'html' ), true ) ) {
 				$item[ $key ] = wp_kses_post( $value );
-			} elseif ( in_array( $key, array( 'background', 'align', 'width', 'padding', 'theme' ), true ) ) {
+			} elseif ( in_array( $key, array( 'background', 'align', 'width', 'padding', 'theme', 'css_id' ), true ) ) {
 				$item[ $key ] = sanitize_key( $value );
 			} else {
 				$item[ $key ] = sanitize_text_field( $value );
 			}
 		}
+
+		if ( isset( $section['cards'] ) && is_array( $section['cards'] ) ) {
+			$clean_cards = array();
+			foreach ( $section['cards'] as $card ) {
+				if ( is_array( $card ) ) {
+					$clean_cards[] = array(
+						'title' => isset( $card['title'] ) ? sanitize_text_field( $card['title'] ) : '',
+						'text'  => isset( $card['text'] ) ? sanitize_text_field( $card['text'] ) : '',
+					);
+				}
+			}
+			$item['cards'] = $clean_cards;
+		}
+
 		$clean[] = $item;
 	}
 
@@ -405,11 +421,16 @@ function rpsb_render_section( $section ) {
 	}
 }
 
+function rpsb_section_id_attr( $section ) {
+	return ! empty( $section['css_id'] ) ? ' id="' . esc_attr( sanitize_key( $section['css_id'] ) ) . '"' : '';
+}
+
 function rpsb_render_hero_section( $section, $index_attr = '' ) {
 	$image = ! empty( $section['image_url'] ) ? esc_url( $section['image_url'] ) : '';
 	$classes = rpsb_section_classes( 'rpsb-hero', $section );
+	$id_attr = rpsb_section_id_attr( $section );
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?>>
+	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?><?php echo $id_attr; ?>>
 		<?php if ( $image ) : ?>
 			<img src="<?php echo $image; ?>" alt="<?php echo esc_attr( isset( $section['image_alt'] ) ? $section['image_alt'] : '' ); ?>">
 		<?php endif; ?>
@@ -429,8 +450,9 @@ function rpsb_render_hero_section( $section, $index_attr = '' ) {
 
 function rpsb_render_text_section( $section, $index_attr = '' ) {
 	$classes = rpsb_section_classes( 'rpsb-section rpsb-cards-section', $section );
+	$id_attr = rpsb_section_id_attr( $section );
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?>>
+	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?><?php echo $id_attr; ?>>
 		<div class="rp-section-inner">
 			<?php if ( ! empty( $section['title'] ) ) : ?><h2><?php echo esc_html( $section['title'] ); ?></h2><?php endif; ?>
 			<?php if ( ! empty( $section['text'] ) ) : ?><div class="rpsb-rich-text"><?php echo wpautop( wp_kses_post( $section['text'] ) ); ?></div><?php endif; ?>
@@ -445,8 +467,9 @@ function rpsb_render_image_section( $section, $index_attr = '' ) {
 		return;
 	}
 	$classes = rpsb_section_classes( 'rpsb-section rpsb-image-section', $section );
+	$id_attr = rpsb_section_id_attr( $section );
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?>>
+	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?><?php echo $id_attr; ?>>
 		<div class="rp-section-inner">
 			<figure class="rpsb-image-figure">
 				<img src="<?php echo $image; ?>" alt="<?php echo esc_attr( isset( $section['image_alt'] ) ? $section['image_alt'] : '' ); ?>">
@@ -462,8 +485,9 @@ function rpsb_render_image_section( $section, $index_attr = '' ) {
 function rpsb_render_image_text_section( $section, $index_attr = '' ) {
 	$classes = rpsb_section_classes( 'rpsb-section rpsb-image-text-section', $section );
 	$image   = ! empty( $section['image_url'] ) ? esc_url( $section['image_url'] ) : '';
+	$id_attr = rpsb_section_id_attr( $section );
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?>>
+	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?><?php echo $id_attr; ?>>
 		<div class="rp-section-inner rpsb-image-text">
 			<div class="rpsb-image-text-media">
 				<?php if ( $image ) : ?>
@@ -485,23 +509,40 @@ function rpsb_render_image_text_section( $section, $index_attr = '' ) {
 
 function rpsb_render_cards_section( $section, $index_attr = '' ) {
 	$columns = isset( $section['columns'] ) ? max( 1, min( 4, absint( $section['columns'] ) ) ) : 3;
-	$rows    = ! empty( $section['text'] ) ? preg_split( '/\r\n|\r|\n/', $section['text'] ) : array();
 	$classes = rpsb_section_classes( 'rpsb-section', $section );
+	$id_attr = rpsb_section_id_attr( $section );
+
+	$cards_list = array();
+	if ( ! empty( $section['cards'] ) && is_array( $section['cards'] ) ) {
+		foreach ( $section['cards'] as $card ) {
+			if ( ! empty( $card['title'] ) || ! empty( $card['text'] ) ) {
+				$cards_list[] = array(
+					'title' => isset( $card['title'] ) ? $card['title'] : '',
+					'text'  => isset( $card['text'] ) ? $card['text'] : '',
+				);
+			}
+		}
+	} else {
+		$rows = ! empty( $section['text'] ) ? preg_split( '/\r\n|\r|\n/', $section['text'] ) : array();
+		foreach ( $rows as $row ) {
+			$parts = array_map( 'trim', explode( '|', $row, 2 ) );
+			if ( ! empty( $parts[0] ) ) {
+				$cards_list[] = array(
+					'title' => $parts[0],
+					'text'  => isset( $parts[1] ) ? $parts[1] : '',
+				);
+			}
+		}
+	}
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?>>
+	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?><?php echo $id_attr; ?>>
 		<div class="rp-section-inner">
 			<?php if ( ! empty( $section['title'] ) ) : ?><h2><?php echo esc_html( $section['title'] ); ?></h2><?php endif; ?>
 			<div class="rpsb-card-grid" style="--rpsb-columns: <?php echo absint( $columns ); ?>;">
-				<?php foreach ( $rows as $row ) : ?>
-					<?php
-					$parts = array_map( 'trim', explode( '|', $row, 2 ) );
-					if ( empty( $parts[0] ) ) {
-						continue;
-					}
-					?>
+				<?php foreach ( $cards_list as $card ) : ?>
 					<article class="rp-card rpsb-card">
-						<h3><?php echo esc_html( $parts[0] ); ?></h3>
-						<?php if ( ! empty( $parts[1] ) ) : ?><p><?php echo esc_html( $parts[1] ); ?></p><?php endif; ?>
+						<h3><?php echo esc_html( $card['title'] ); ?></h3>
+						<?php if ( ! empty( $card['text'] ) ) : ?><p><?php echo esc_html( $card['text'] ); ?></p><?php endif; ?>
 					</article>
 				<?php endforeach; ?>
 			</div>
@@ -512,8 +553,9 @@ function rpsb_render_cards_section( $section, $index_attr = '' ) {
 
 function rpsb_render_cta_section( $section, $index_attr = '' ) {
 	$classes = rpsb_section_classes( 'rpsb-cta', $section );
+	$id_attr = rpsb_section_id_attr( $section );
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?>>
+	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?><?php echo $id_attr; ?>>
 		<div class="rp-section-inner">
 			<?php if ( ! empty( $section['title'] ) ) : ?><h2><?php echo esc_html( $section['title'] ); ?></h2><?php endif; ?>
 			<?php if ( ! empty( $section['text'] ) ) : ?><p><?php echo esc_html( $section['text'] ); ?></p><?php endif; ?>
@@ -531,6 +573,13 @@ function rpsb_section_classes( $base, $section ) {
 	$align      = isset( $section['align'] ) ? sanitize_key( $section['align'] ) : '';
 	$width      = isset( $section['width'] ) ? sanitize_key( $section['width'] ) : '';
 	$padding    = isset( $section['padding'] ) ? sanitize_key( $section['padding'] ) : '';
+	
+	$custom_cls = '';
+	if ( ! empty( $section['css_class'] ) ) {
+		$classes_list = array_map( 'sanitize_html_class', explode( ' ', $section['css_class'] ) );
+		$custom_cls   = implode( ' ', array_filter( $classes_list ) );
+	}
+
 	$classes    = array_filter(
 		array(
 			$base,
@@ -539,6 +588,7 @@ function rpsb_section_classes( $base, $section ) {
 			$align ? 'rpsb-align-' . $align : '',
 			$width ? 'rpsb-width-' . $width : '',
 			$padding ? 'rpsb-padding-' . $padding : '',
+			$custom_cls,
 		)
 	);
 
@@ -549,8 +599,9 @@ function rpsb_render_html_section( $section, $index_attr = '' ) {
 	if ( empty( $section['html'] ) ) {
 		return;
 	}
+	$id_attr = rpsb_section_id_attr( $section );
 	?>
-	<section class="rpsb-section rpsb-html-section"<?php echo $index_attr; ?>>
+	<section class="rpsb-section rpsb-html-section"<?php echo $index_attr; ?><?php echo $id_attr; ?>>
 		<div class="rp-section-inner">
 			<?php echo wp_kses_post( $section['html'] ); ?>
 		</div>
@@ -661,9 +712,15 @@ function rpsb_render_visual_builder() {
 	?>
 	<div class="wrap rpsb-visual-wrap">
 		<div class="rpsb-visual-topbar">
-			<div>
-				<h1><?php esc_html_e( 'Visual Builder', 'rp-site-builder' ); ?></h1>
-				<p><?php esc_html_e( 'Design pages visually, then save the layout back to WordPress.', 'rp-site-builder' ); ?></p>
+			<div style="display: flex; align-items: center; gap: 20px;">
+				<div>
+					<h1><?php esc_html_e( 'Visual Builder', 'rp-site-builder' ); ?></h1>
+					<p><?php esc_html_e( 'Design pages visually, then save the layout back to WordPress.', 'rp-site-builder' ); ?></p>
+				</div>
+				<div class="rpsb-history-controls" style="display: flex; gap: 4px; margin-left: 10px;">
+					<button type="button" class="button" data-rpsb-undo disabled title="<?php esc_attr_e( 'Undo', 'rp-site-builder' ); ?>"><span class="dashicons dashicons-undo"></span></button>
+					<button type="button" class="button" data-rpsb-redo disabled title="<?php esc_attr_e( 'Redo', 'rp-site-builder' ); ?>"><span class="dashicons dashicons-redo"></span></button>
+				</div>
 			</div>
 			<form method="get" class="rpsb-page-picker">
 				<input type="hidden" name="page" value="rpsb-visual-builder">
@@ -700,6 +757,11 @@ function rpsb_render_visual_builder() {
 					<div class="rpsb-vb-actions">
 						<button type="button" class="button button-primary" data-rpsb-save><?php esc_html_e( 'Save Layout', 'rp-site-builder' ); ?></button>
 						<button type="button" class="button" data-rpsb-import-current><?php esc_html_e( 'Import Current Content', 'rp-site-builder' ); ?></button>
+						<div class="rpsb-action-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+							<button type="button" class="button" data-rpsb-export><?php esc_html_e( 'Export', 'rp-site-builder' ); ?></button>
+							<button type="button" class="button" data-rpsb-import-btn><?php esc_html_e( 'Import JSON', 'rp-site-builder' ); ?></button>
+							<input type="file" id="rpsb-import-file" style="display: none;" accept=".json">
+						</div>
 						<a class="button" href="<?php echo esc_url( get_permalink( $page->ID ) ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'View Page', 'rp-site-builder' ); ?></a>
 					</div>
 					<div class="rpsb-vb-tabs">

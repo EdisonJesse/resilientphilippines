@@ -728,6 +728,43 @@
   transform: rotate(45deg);
 }
 
+.rpsb-history-controls .button {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  color: #50575e;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  height: 34px;
+  width: 34px;
+  transition: all 0.15s ease;
+}
+
+.rpsb-history-controls .button:hover:not(:disabled) {
+  background: #f0f0f1;
+  border-color: #c3c4c7;
+  color: #1e87f0;
+}
+
+.rpsb-history-controls .button:disabled {
+  background: #ffffff;
+  border-color: #f0f0f1;
+  color: #c3c4c7;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.rpsb-action-row .button {
+  min-height: 34px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  justify-content: center;
+}
+
 @media (max-width: 1100px) {
   .rpsb-visual-builder {
     grid-template-columns: 310px minmax(0, 1fr);
