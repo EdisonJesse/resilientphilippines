@@ -890,6 +890,118 @@ function rp_child_export_analytics_csv() {
 add_action( 'admin_post_rp_export_analytics_csv', 'rp_child_export_analytics_csv' );
 
 /**
+ * One-time migration for the partners and affiliations page.
+ */
+function rp_child_update_partners_page() {
+	if ( get_option( 'rp_partners_page_version' ) === '2026-06-20-2' ) {
+		return;
+	}
+
+	$page         = get_page_by_path( 'about-us-partners' );
+	$what_we_do_page = get_page_by_path( 'about-us-what-we-do' );
+	if ( ! $page || ! $what_we_do_page ) {
+		return;
+	}
+
+	$reach_content = <<<'HTML'
+<section class="rp-collective-reach">
+<h2>COLLECTIVE WORK &amp; REACH</h2>
+<p class="rp-partners-intro">Through collaborative partnerships with local governments, civil society organizations, and international donors, ACCORD has built a strong track record of disaster risk reduction and community resilience across the Philippines.</p>
+
+<div class="rp-reach-grid">
+<div><strong>18</strong><span>Regions</span></div>
+<div><strong>46</strong><span>Provinces</span></div>
+<div><strong>164</strong><span>Cities &amp; Munis</span></div>
+<div><strong>774</strong><span>Barangays</span></div>
+</div>
+
+<div class="rp-impact-grid">
+<div><strong>120+</strong><span>Projects Implemented</span></div>
+<div><strong>4.5M+</strong><span>Beneficiaries Reached</span></div>
+<div><strong>56</strong><span>Partners and Donors</span></div>
+</div>
+</section>
+HTML;
+
+	$content = <<<'HTML'
+<div class="rp-affiliations">
+<h2>OUR PARTNERS AND AFFILIATIONS</h2>
+<p>At ACCORD, we believe that building a disaster-resilient Philippines requires collective action, shared expertise, and strategic collaboration. We actively engage with national, regional, and global networks to advocate for localized, inclusive, and gender-responsive disaster risk reduction and management (DRRM) and climate action.</p>
+
+<h3>Consortia &amp; Network Leadership</h3>
+<p>We support collaborative platforms that foster learning, localized humanitarian action, and climate advocacy across the Philippines:</p>
+<ul>
+<li><a href="https://drrnetphils.org/" target="_blank" rel="noopener noreferrer"><strong>Disaster Risk Reduction Network Philippines (DRRNetPhils)</strong></a>: Serving as the <strong>Lead Convenor</strong> of the network to champion civil society-led disaster risk reduction and management policy and advocacy.</li>
+<li><a href="https://rilhub.org/" target="_blank" rel="noopener noreferrer"><strong>Resilience and Innovation Learning Hub (RILHUB)</strong></a>: As a <strong>Founding Member</strong>, we collaborate to generate, synthesize, and share critical knowledge, best practices, and innovative solutions in disaster risk reduction, climate change adaptation, and ecosystem management.</li>
+<li><a href="https://www.accessproject.ph/" target="_blank" rel="noopener noreferrer"><strong>ACCESS Consortium</strong></a>: Partnering with international and local humanitarian organizations and the European Union Humanitarian Civil Protection and Aid Operations to deliver timely, dignified humanitarian aid and drive pioneering anticipatory action frameworks in vulnerable communities.</li>
+</ul>
+
+<h3>National Coordination &amp; Representation</h3>
+<p>Through our network leadership, particularly with DRRNet Philippines, we officially represent civil society interests in high-level policy and emergency coordination bodies:</p>
+<ul>
+<li><a href="https://ndrrmc.gov.ph/" target="_blank" rel="noopener noreferrer"><strong>National Disaster Risk Reduction and Management Council (NDRRMC)</strong></a>: We sit as one of the civil society representatives in the government's primary coordinating body for disaster risk reduction.</li>
+<li><a href="https://reliefweb.int/organization/hct-philippines" target="_blank" rel="noopener noreferrer"><strong>Humanitarian Country Team (HCT) Philippines</strong></a>: Partnering with UN agencies, international, and local organizations to coordinate strategic, principled humanitarian responses.</li>
+<li><strong>National Reference Group (NRG) Philippines</strong>: Contributing to the localized implementation and country-level reform of the <a href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener noreferrer">Inter-Agency Standing Committee (IASC)</a> Grand Bargain commitments.</li>
+<li><a href="https://aksyonklima.org.ph/" target="_blank" rel="noopener noreferrer"><strong>Aksyon Klima Pilipinas (AKP)</strong></a>: Working alongside leading civil society organizations on national and global climate change adaptation, mitigation, and finance advocacy.</li>
+</ul>
+
+<h3>Humanitarian Clusters &amp; Technical Working Groups</h3>
+<p>To ensure that emergency preparedness and responses address the specific needs of vulnerable populations, we maintain active memberships and participation in key sectoral clusters, platforms, and technical working groups:</p>
+<ul>
+<li><a href="https://www.unhcr.org/ph/protection-cluster" target="_blank" rel="noopener noreferrer"><strong>Protection Cluster Philippines</strong></a>: Collaborating to safeguard the rights, safety, and dignity of internally displaced and vulnerable populations.</li>
+<li><a href="https://www.educationcluster.net/" target="_blank" rel="noopener noreferrer"><strong>Education Cluster Philippines</strong></a>: Working to ensure the continuity of safe, inclusive, and uninterrupted learning during emergencies.</li>
+<li><a href="https://philippines.unfpa.org/en" target="_blank" rel="noopener noreferrer"><strong>Gender-Based Violence (GBV) Sub-Cluster</strong></a>: Supporting UNFPA- and DSWD-led initiatives to prevent and respond to GBV in humanitarian settings.</li>
+<li><a href="https://www.sheltercluster.org/response/philippines" target="_blank" rel="noopener noreferrer"><strong>Shelter Cluster Philippines</strong></a>: Contributing to coordinated, dignified emergency shelter solutions for displaced families.</li>
+<li><a href="https://rilhub.org/collaborations/hpp/" target="_blank" rel="noopener noreferrer"><strong>Humanitarian Partnership Platform (HPP)</strong></a>: Partnering with local organizations to strengthen disaster management through decentralized emergency response initiatives.</li>
+<li><a href="https://startnetwork.org/" target="_blank" rel="noopener noreferrer"><strong>Start Network Governance Team</strong></a>: Steering rapid, early, and locally led humanitarian financing and anticipatory action in the Philippines.</li>
+<li><a href="https://reliefweb.int/report/philippines/gender-humanitarian-action-community-practice-giha-cop-philippines-terms-reference-2023" target="_blank" rel="noopener noreferrer"><strong>Gender in Humanitarian Action Community of Practice (GiHA COP) Philippines</strong></a>: Integrating gender equality and women's empowerment across humanitarian and disaster resilience programming.</li>
+<li><a href="https://interagencystandingcommittee.org/" target="_blank" rel="noopener noreferrer"><strong>Accountability to Affected Populations (AAP) Technical Working Group</strong></a>: Mainstreaming feedback mechanisms to put crisis-affected populations at the center of aid planning and monitoring.</li>
+<li><a href="https://response.reliefweb.int/philippines/psea-network" target="_blank" rel="noopener noreferrer"><strong>PSEA Network Philippines</strong></a>: Collaborating to prevent, mitigate, and respond to sexual exploitation and abuse by aid and development personnel.</li>
+</ul>
+
+<h3>Active Engagements &amp; Participations</h3>
+<p>We continuously expand our reach to contribute to agricultural and climate-related policy reforms:</p>
+<ul>
+<li><strong>Department of Agriculture – <a href="https://pcaf.da.gov.ph/" target="_blank" rel="noopener noreferrer">Philippine Council for Agriculture and Fisheries (DA-PCAF)</a></strong>: We are currently participating in meetings and working toward formalizing our membership with the <strong>National Sectoral Committee on Gender Equality and Social Inclusion (NSC-GESI)</strong>.</li>
+</ul>
+
+<h3>Global Commitments</h3>
+<p>We hold our operations to high international standards of humanitarian action, accountability, and environmental responsibility as a:</p>
+<ul>
+<li><strong>Signatory to the <a href="https://www.climate-charter.org/signatures/" target="_blank" rel="noopener noreferrer">Climate and Environment Charter for Humanitarian Organizations</a></strong>: Committing to step up our climate response and maximize the environmental sustainability of our operations.</li>
+<li><strong>Endorser of the <a href="https://charter4change.org/" target="_blank" rel="noopener noreferrer">Charter for Change (C4C)</a></strong>: Pledging to support and accelerate the localization of humanitarian aid, ensuring local actors have the resources and decision-making power they need.</li>
+</ul>
+</div>
+HTML;
+
+	$result = wp_update_post(
+		array(
+			'ID'           => $page->ID,
+			'post_content' => $content,
+		),
+		true
+	);
+
+	$what_we_do_content = $what_we_do_page->post_content;
+	if ( false === strpos( $what_we_do_content, 'rp-collective-reach' ) ) {
+		$what_we_do_content .= $reach_content;
+	}
+
+	$what_we_do_result = wp_update_post(
+		array(
+			'ID'           => $what_we_do_page->ID,
+			'post_content' => $what_we_do_content,
+		),
+		true
+	);
+
+	if ( ! is_wp_error( $result ) && ! is_wp_error( $what_we_do_result ) ) {
+		update_option( 'rp_partners_page_version', '2026-06-20-2' );
+	}
+}
+add_action( 'init', 'rp_child_update_partners_page' );
+
+/**
  * Auto-create the compliance policies pages if they don't exist.
  */
 function rp_child_create_compliance_pages() {
