@@ -16,7 +16,6 @@
 				<h3><?php esc_html_e( 'Hub', 'resilient-hub' ); ?></h3>
 				<ul class="rp-footer-list">
 					<li><a href="<?php echo esc_url( home_url( '/resource-hub/' ) ); ?>"><?php esc_html_e( 'Resource Hub', 'resilient-hub' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/submit-resource/' ) ); ?>"><?php esc_html_e( 'Submit Resource', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/opportunities/' ) ); ?>"><?php esc_html_e( 'Opportunities', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/job-ads/' ) ); ?>"><?php esc_html_e( 'Job Ads', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/invitations-to-bid/' ) ); ?>"><?php esc_html_e( 'Invitations to Bid', 'resilient-hub' ); ?></a></li>
