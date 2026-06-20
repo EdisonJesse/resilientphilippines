@@ -1043,6 +1043,9 @@ function rp_resource_hub_allowed_mimes() {
 		'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 		'html' => 'text/html',
 		'zip'  => 'application/zip',
+		'jpg'  => 'image/jpeg',
+		'jpeg' => 'image/jpeg',
+		'png'  => 'image/png',
 	);
 }
 
@@ -3032,6 +3035,18 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 					'posts_per_page' => -1,
 					'orderby'        => 'title',
 					'order'          => 'ASC',
+					'meta_query'     => array(
+						'relation' => 'OR',
+						array(
+							'key'     => '_rp_incident_is_active',
+							'value'   => '0',
+							'compare' => '!=',
+						),
+						array(
+							'key'     => '_rp_incident_is_active',
+							'compare' => 'NOT EXISTS',
+						),
+					),
 				) );
 				foreach ( $incidents as $inc ) {
 					printf( '<option value="%d">%s</option>', absint( $inc->ID ), esc_html( $inc->post_title ) );
@@ -4629,3 +4644,59 @@ function rp_resource_hub_handle_post_upload() {
 	exit;
 }
 add_action( 'admin_post_rp_post_upload', 'rp_resource_hub_handle_post_upload' );
+
+/**
+ * Add active status metabox for Crisis Incidents (rp_incident CPT).
+ */
+function rp_incident_add_active_metabox() {
+	add_meta_box(
+		'rp_incident_status_metabox',
+		__( 'Incident Status', 'rp-resource-hub' ),
+		'rp_incident_render_status_metabox',
+		'rp_incident',
+		'side',
+		'high'
+	);
+}
+add_action( 'add_meta_boxes', 'rp_incident_add_active_metabox' );
+
+/**
+ * Render the Crisis Incident status metabox.
+ */
+function rp_incident_render_status_metabox( $post ) {
+	$is_active = get_post_meta( $post->ID, '_rp_incident_is_active', true );
+	if ( '' === $is_active ) {
+		$is_active = '1'; // Default to active for backward compatibility
+	}
+	wp_nonce_field( 'rp_incident_status_save', 'rp_incident_status_nonce' );
+	?>
+	<p>
+		<label>
+			<input type="checkbox" name="rp_incident_is_active" value="1" <?php checked( $is_active, '1' ); ?>>
+			<strong><?php esc_html_e( 'Active Incident', 'rp-resource-hub' ); ?></strong>
+		</label>
+	</p>
+	<p class="description">
+		<?php esc_html_e( 'Uncheck this to mark the incident as inactive. Inactive incidents will not appear in the active crisis list or SitRep submission dropdown, but their dashboards will remain readable.', 'rp-resource-hub' ); ?>
+	</p>
+	<?php
+}
+
+/**
+ * Save Crisis Incident status metabox value.
+ */
+function rp_incident_save_status_metabox( $post_id ) {
+	if ( ! isset( $_POST['rp_incident_status_nonce'] ) || ! wp_verify_nonce( $_POST['rp_incident_status_nonce'], 'rp_incident_status_save' ) ) {
+		return;
+	}
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+
+	$is_active = isset( $_POST['rp_incident_is_active'] ) ? '1' : '0';
+	update_post_meta( $post_id, '_rp_incident_is_active', $is_active );
+}
+add_action( 'save_post_rp_incident', 'rp_incident_save_status_metabox' );

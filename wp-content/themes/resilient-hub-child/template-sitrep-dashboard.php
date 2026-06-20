@@ -115,13 +115,24 @@ if ( $sitreps_query->have_posts() ) {
 arsort( $province_impacts );
 $max_province_families = count( $province_impacts ) > 0 ? max( $province_impacts ) : 1;
 
-// Fetch active incidents with their aggregated metrics
 $incidents_query = new WP_Query( array(
     'post_type'      => 'rp_incident',
     'post_status'    => 'publish',
     'posts_per_page' => -1,
     'orderby'        => 'title',
     'order'          => 'ASC',
+    'meta_query'     => array(
+        'relation' => 'OR',
+        array(
+            'key'     => '_rp_incident_is_active',
+            'value'   => '0',
+            'compare' => '!=',
+        ),
+        array(
+            'key'     => '_rp_incident_is_active',
+            'compare' => 'NOT EXISTS',
+        ),
+    ),
 ) );
 
 $incidents_data = array();
