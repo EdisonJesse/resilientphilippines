@@ -4,15 +4,13 @@
 
 .rpsb-visual-topbar {
   align-items: center;
-  background: #222223;
-  border: 1px solid #111;
-  color: #fff;
+  background: #fff;
+  border: 1px solid #dcdcde;
   display: flex;
   gap: 18px;
   justify-content: space-between;
   margin: 16px 20px 16px 0;
   padding: 16px 18px;
-  border-radius: 4px;
 }
 
 .rpsb-visual-topbar h1,
@@ -21,13 +19,12 @@
 }
 
 .rpsb-visual-topbar h1 {
-  color: #fff;
   font-size: 22px;
   font-weight: 600;
 }
 
 .rpsb-visual-topbar p {
-  color: #a0a0a5;
+  color: #646970;
   font-size: 13px;
   margin-top: 4px;
 }
@@ -37,40 +34,17 @@
   gap: 8px;
 }
 
-.rpsb-page-picker select {
-  background: #2a2a2c;
-  border: 1px solid #444;
-  color: #fff;
-  border-radius: 4px;
-  padding: 6px 12px;
-}
-
-.rpsb-page-picker button {
-  background: #2271b1;
-  border: 1px solid #2271b1;
-  color: #fff;
-  border-radius: 4px;
-  padding: 6px 12px;
-}
-
-.rpsb-page-picker button:hover {
-  background: #135e96;
-  border-color: #135e96;
-  color: #fff;
-}
-
 .rpsb-visual-builder {
-  background: #1e1e1f;
-  border: 1px solid #111;
+  background: #f0f0f1;
+  border: 1px solid #dcdcde;
   display: grid;
   grid-template-columns: 340px minmax(0, 1fr);
   min-height: calc(100vh - 180px);
 }
 
 .rpsb-vb-sidebar {
-  background: #222223;
-  border-right: 1px solid #111;
-  color: #e0e0e0;
+  background: #fff;
+  border-right: 1px solid #dcdcde;
   display: flex;
   flex-direction: column;
   min-height: 100%;
@@ -80,8 +54,8 @@
 .rpsb-vb-actions,
 .rpsb-vb-tabs,
 .rpsb-vb-panel {
-  border-bottom: 1px solid #111;
-  padding: 16px;
+  border-bottom: 1px solid #dcdcde;
+  padding: 12px;
 }
 
 .rpsb-vb-sidebar-head {
@@ -89,18 +63,13 @@
   gap: 4px;
 }
 
-.rpsb-vb-sidebar-head strong {
-  color: #fff;
-  font-size: 15px;
-}
-
 .rpsb-vb-sidebar-head span {
-  color: #a0a0a5;
+  color: #646970;
   font-size: 12px;
 }
 
 .rpsb-vb-sidebar-head span.is-dirty {
-  color: #ff6b6b;
+  color: #b32d2e;
 }
 
 .rpsb-vb-actions,
@@ -125,19 +94,16 @@
 }
 
 .rpsb-vb-tabs button {
-  background: #2a2a2c;
-  border: 1px solid #444;
-  color: #a0a0a5;
+  background: #f6f7f7;
+  border: 1px solid #c3c4c7;
   cursor: pointer;
   flex: 1;
   padding: 8px;
-  font-weight: 600;
-  border-radius: 4px;
 }
 
 .rpsb-vb-tabs button:hover {
-  background: #333335;
-  color: #fff;
+  background: #f0f0f1;
+  border-color: #a7aaad;
 }
 
 .rpsb-vb-tabs button.is-active {
@@ -171,21 +137,20 @@
 }
 
 .rpsb-add-block {
-  background: #2a2a2c;
-  border: 1px solid #444;
-  color: #fff;
+  background: #fff;
+  border: 1px solid #c3c4c7;
   cursor: pointer;
   padding: 10px 12px;
-  text-align: center;
+  text-align: left;
   border-radius: 4px;
   font-weight: 600;
+  color: #1d2327;
   transition: all 0.2s ease;
 }
 
 .rpsb-add-block:hover {
-  background: #3a3a3c;
   border-color: #2271b1;
-  color: #fff;
+  color: #135e96;
 }
 
 .rpsb-structure-item-wrap {
@@ -194,9 +159,9 @@
 }
 
 .rpsb-structure-btn {
-  background: #2a2a2c;
-  border: 1px solid #444;
-  color: #fff;
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  color: #1d2327;
   border-radius: 4px;
   cursor: grab;
   display: flex;
@@ -209,9 +174,8 @@
 }
 
 .rpsb-structure-btn:hover {
-  background: #3a3a3c;
   border-color: #2271b1;
-  color: #fff;
+  color: #135e96;
 }
 
 .rpsb-structure-btn.is-active {
@@ -259,7 +223,7 @@
 }
 
 .rpsb-inspector-fields span {
-  color: #fff;
+  color: #1d2327;
   font-weight: 600;
   font-size: 13px;
 }
@@ -267,9 +231,9 @@
 .rpsb-inspector-fields input,
 .rpsb-inspector-fields textarea,
 .rpsb-inspector-fields select {
-  background: #2a2a2c;
-  border: 1px solid #444;
-  color: #fff;
+  background: #fff;
+  border: 1px solid #8c8f94;
+  color: #2c3338;
   border-radius: 4px;
   padding: 8px;
   width: 100%;
@@ -281,19 +245,6 @@
   border-color: #2271b1;
   outline: none;
   box-shadow: 0 0 0 1px #2271b1;
-}
-
-.rpsb-inspector-fields .button {
-  background: #2271b1;
-  border-color: #2271b1;
-  color: #fff;
-  min-height: 32px;
-}
-
-.rpsb-inspector-fields .button:hover {
-  background: #135e96;
-  border-color: #135e96;
-  color: #fff;
 }
 
 .rpsb-vb-stage {

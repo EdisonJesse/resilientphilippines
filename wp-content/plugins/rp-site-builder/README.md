@@ -4,7 +4,7 @@ Custom WordPress plugin prototype for editing page layouts, reusable components,
 
 ## Current Status
 
-This plugin is a developed prototype. It features a custom YOOtheme-style page builder with a premium dark mode user interface, a live WYSIWYG editor inside the preview iframe, visual layout structure, responsive canvas outlines, inline text editing directly on the frontend page layout, page content import mapping, reusable site components with recursion prevention, and native drag-and-drop section reordering. The plugin is fully tracked in Git.
+This plugin is a developed prototype. It features a custom YOOtheme-style page builder with a clean light WordPress-native user interface, a live WYSIWYG editor inside the preview iframe, visual layout structure, responsive canvas outlines, inline text editing directly on the frontend page layout, page content import mapping, reusable site components with recursion prevention, and native drag-and-drop section reordering. The plugin is fully tracked in Git.
 
 ## Plugin Files
 
@@ -74,7 +74,7 @@ Current section types:
 
 ## Visual Builder Capabilities
 
-- **Premium Dark Mode UI**: A dark themed sidebar, topbar, and inspector designed like YOOtheme Pro.
+- **WordPress-Native Light UI**: A clean, light-themed sidebar, topbar, and inspector integrating seamlessly with standard WordPress dashboard styles.
 - **Drag-and-Drop Reordering**: Drag and drop sections in the layout structure panel to instantly sort them.
 - **Canvas Hover & Select Overlays**: Sections show custom border outlines and floating type labels (e.g. "Hero", "Cards") on hover.
 - **Click-to-Edit Tab Focus**: Clicking any section on the canvas selects it and automatically shifts the sidebar to the "Edit" settings panel.
