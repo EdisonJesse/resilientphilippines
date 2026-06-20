@@ -1993,6 +1993,62 @@ function rp_child_seo_description( $desc ) {
 	return $desc;
 }
 add_filter( 'wpseo_metadesc', 'rp_child_seo_description', 999 );
+add_filter( 'wpseo_opengraph_title', 'rp_child_seo_title', 999 );
+add_filter( 'wpseo_opengraph_desc', 'rp_child_seo_description', 999 );
+add_filter( 'wpseo_twitter_title', 'rp_child_seo_title', 999 );
+add_filter( 'wpseo_twitter_description', 'rp_child_seo_description', 999 );
+
+/**
+ * Use a featured image for social previews, with a branded homepage screenshot as fallback.
+ */
+function rp_child_get_social_image() {
+	if ( is_singular() && has_post_thumbnail( get_queried_object_id() ) ) {
+		$image_id   = get_post_thumbnail_id( get_queried_object_id() );
+		$image_data = wp_get_attachment_image_src( $image_id, 'full' );
+
+		if ( $image_data ) {
+			return array(
+				'url'    => $image_data[0],
+				'width'  => $image_data[1],
+				'height' => $image_data[2],
+				'alt'    => get_post_meta( $image_id, '_wp_attachment_image_alt', true ) ?: get_the_title(),
+			);
+		}
+	}
+
+	return array(
+		'url'    => get_stylesheet_directory_uri() . '/assets/images/social-share-default.jpg',
+		'width'  => 1200,
+		'height' => 630,
+		'alt'    => 'ACCORD Resilience Hub homepage',
+	);
+}
+
+function rp_child_social_image_url() {
+	$image = rp_child_get_social_image();
+	return $image['url'];
+}
+
+function rp_child_social_image_width() {
+	$image = rp_child_get_social_image();
+	return $image['width'];
+}
+
+function rp_child_social_image_height() {
+	$image = rp_child_get_social_image();
+	return $image['height'];
+}
+
+function rp_child_social_image_alt() {
+	$image = rp_child_get_social_image();
+	return $image['alt'];
+}
+
+add_filter( 'wpseo_opengraph_image', 'rp_child_social_image_url', 999 );
+add_filter( 'wpseo_opengraph_image_width', 'rp_child_social_image_width', 999 );
+add_filter( 'wpseo_opengraph_image_height', 'rp_child_social_image_height', 999 );
+add_filter( 'wpseo_opengraph_image_alt', 'rp_child_social_image_alt', 999 );
+add_filter( 'wpseo_twitter_image', 'rp_child_social_image_url', 999 );
 
 /**
  * Fallback meta tags output in wp_head if Yoast or similar plugins are not active.
@@ -2000,11 +2056,6 @@ add_filter( 'wpseo_metadesc', 'rp_child_seo_description', 999 );
 function rp_child_seo_fallback_head_tags() {
 	// If Yoast SEO is active, it handles meta descriptions and Open Graph tags, so we don't output duplicates.
 	if ( defined( 'WPSEO_VERSION' ) ) {
-		// Filter Yoast's Open Graph and Twitter tags to match our custom mapping
-		add_filter( 'wpseo_opengraph_title', 'rp_child_seo_title', 999 );
-		add_filter( 'wpseo_opengraph_desc', 'rp_child_seo_description', 999 );
-		add_filter( 'wpseo_twitter_title', 'rp_child_seo_title', 999 );
-		add_filter( 'wpseo_twitter_description', 'rp_child_seo_description', 999 );
 		return;
 	}
 
@@ -2028,10 +2079,16 @@ function rp_child_seo_fallback_head_tags() {
 	echo '<meta property="og:type" content="' . ( is_single() ? 'article' : 'website' ) . '">' . "\n";
 	echo '<meta property="og:url" content="' . esc_url( get_permalink() ) . '">' . "\n";
 	echo '<meta property="og:site_name" content="' . esc_attr( get_bloginfo( 'name' ) ) . '">' . "\n";
+	$social_image = rp_child_get_social_image();
+	echo '<meta property="og:image" content="' . esc_url( $social_image['url'] ) . '">' . "\n";
+	echo '<meta property="og:image:width" content="' . esc_attr( $social_image['width'] ) . '">' . "\n";
+	echo '<meta property="og:image:height" content="' . esc_attr( $social_image['height'] ) . '">' . "\n";
+	echo '<meta property="og:image:alt" content="' . esc_attr( $social_image['alt'] ) . '">' . "\n";
 
 	// Twitter Tags
 	echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
 	echo '<meta name="twitter:title" content="' . esc_attr( $title ) . '">' . "\n";
+	echo '<meta name="twitter:image" content="' . esc_url( $social_image['url'] ) . '">' . "\n";
 	if ( ! empty( $description ) ) {
 		echo '<meta name="twitter:description" content="' . esc_attr( $description ) . '">' . "\n";
 	}
