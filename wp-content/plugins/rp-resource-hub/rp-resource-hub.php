@@ -3092,8 +3092,8 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 						</select>
 					</div>
 					<div class="rp-field">
-						<label>Barangay *</label>
-						<input class="rp-loc-barangay" name="rp_locations[0][barangay]" type="text" required placeholder="e.g. Seguinon">
+						<label>Barangay</label>
+						<input class="rp-loc-barangay" name="rp_locations[0][barangay]" type="text" placeholder="e.g. Seguinon">
 					</div>
 				</div>
 				
@@ -3233,7 +3233,7 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 			const municipality = muniInput.value.trim();
 			const barangay = brgyInput.value.trim();
 
-			if (!incidentId || !province || !municipality || !barangay) {
+			if (!incidentId || !province || !municipality) {
 				promptEl.style.display = 'none';
 				promptEl.innerHTML = '';
 				return;
@@ -3401,8 +3401,8 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 						</select>
 					</div>
 					<div class="rp-field">
-						<label>Barangay *</label>
-						<input class="rp-loc-barangay" name="rp_locations[${rowIdx}][barangay]" type="text" required placeholder="e.g. Seguinon">
+						<label>Barangay</label>
+						<input class="rp-loc-barangay" name="rp_locations[${rowIdx}][barangay]" type="text" placeholder="e.g. Seguinon">
 					</div>
 				</div>
 				
@@ -3527,7 +3527,7 @@ function rp_resource_hub_process_sitrep_upload() {
 		$municipality  = isset( $loc['municipality'] ) ? sanitize_text_field( $loc['municipality'] ) : '';
 		$barangay      = isset( $loc['barangay'] ) ? sanitize_text_field( $loc['barangay'] ) : '';
 
-		if ( empty( $province ) || empty( $municipality ) || empty( $barangay ) ) {
+		if ( empty( $province ) || empty( $municipality ) ) {
 			continue;
 		}
 
@@ -3649,7 +3649,7 @@ function rp_ajax_check_location_duplicate_handler() {
 	$municipality = isset( $_POST['municipality'] ) ? sanitize_text_field( wp_unslash( $_POST['municipality'] ) ) : '';
 	$barangay     = isset( $_POST['barangay'] ) ? sanitize_text_field( wp_unslash( $_POST['barangay'] ) ) : '';
 
-	if ( ! $incident_id || ! $province || ! $municipality || ! $barangay ) {
+	if ( ! $incident_id || ! $province || ! $municipality ) {
 		wp_send_json_error( array( 'message' => __( 'Missing parameters.', 'rp-resource-hub' ) ) );
 	}
 

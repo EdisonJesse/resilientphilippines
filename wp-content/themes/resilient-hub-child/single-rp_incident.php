@@ -202,7 +202,7 @@ if ( $sitreps_query->have_posts() ) {
                                         <tbody>
                                             <?php foreach ( $data['details'] as $loc ) : ?>
                                                 <tr style="border-bottom: 1px solid #f1f5f9; color: #334155;">
-                                                    <td style="padding: 10px 8px; font-weight: 600; color: #0f172a;"><?php echo esc_html( $loc->barangay ); ?></td>
+                                                    <td style="padding: 10px 8px; font-weight: 600; color: #0f172a;"><?php echo $loc->barangay ? esc_html( $loc->barangay ) : '—'; ?></td>
                                                     <td style="padding: 10px 8px;"><?php echo esc_html( number_format( $loc->households ) ); ?></td>
                                                     <td style="padding: 10px 8px; text-align: right; font-weight: 700; color: #f97316;"><?php echo esc_html( number_format( $loc->displaced_total ) ); ?></td>
                                                     <td style="padding: 10px 8px; text-align: right;"><?php echo esc_html( number_format( $loc->displaced_inside ) ) . ' / ' . esc_html( number_format( $loc->displaced_outside ) ); ?></td>

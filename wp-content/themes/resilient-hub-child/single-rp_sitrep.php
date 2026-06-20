@@ -165,7 +165,7 @@ get_header();
                                                     <?php echo esc_html( $loc->province ); ?>
                                                 </td>
                                                 <td style="padding: 12px 10px; font-weight: 600;"><?php echo esc_html( $loc->municipality ); ?></td>
-                                                <td style="padding: 12px 10px;"><?php echo esc_html( $loc->barangay ); ?></td>
+                                                <td style="padding: 12px 10px;"><?php echo $loc->barangay ? esc_html( $loc->barangay ) : '—'; ?></td>
                                                 <td style="padding: 12px 10px; text-align: right;"><?php echo esc_html( number_format( $loc->individuals ) ); ?></td>
                                                 <td style="padding: 12px 10px; text-align: right; font-weight: 700; color: #f97316;"><?php echo esc_html( number_format( $loc->displaced_total ) ); ?></td>
                                                 <td style="padding: 12px 10px; text-align: right;">
