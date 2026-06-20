@@ -1605,6 +1605,9 @@ function rp_child_add_opportunities_submenus( $items, $args ) {
 			$job_ads_item->attr_title = '';
 			$job_ads_item->description = '';
 			$job_ads_item->xfn = '';
+			$job_ads_item->current = false;
+			$job_ads_item->current_item_ancestor = false;
+			$job_ads_item->current_item_parent = false;
 			
 			$new_items[] = $job_ads_item;
 		}
@@ -1625,6 +1628,9 @@ function rp_child_add_opportunities_submenus( $items, $args ) {
 			$itb_item->attr_title = '';
 			$itb_item->description = '';
 			$itb_item->xfn = '';
+			$itb_item->current = false;
+			$itb_item->current_item_ancestor = false;
+			$itb_item->current_item_parent = false;
 			
 			$new_items[] = $itb_item;
 		}
