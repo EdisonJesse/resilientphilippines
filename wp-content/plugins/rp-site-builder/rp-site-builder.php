@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Site Builder
  * Description: Dashboard layout builder for pages, reusable site components, and optional custom header/footer controls.
- * Version: 0.2.5
+ * Version: 0.2.6
  * Author: ACCORD
  * Text Domain: rp-site-builder
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RPSB_VERSION', '0.2.5' );
+define( 'RPSB_VERSION', '0.2.6' );
 define( 'RPSB_FILE', __FILE__ );
 define( 'RPSB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RPSB_URL', plugin_dir_url( __FILE__ ) );
@@ -373,7 +373,8 @@ function rpsb_render_layout( $layout_json ) {
 	}
 
 	ob_start();
-	foreach ( $sections as $section ) {
+	foreach ( $sections as $index => $section ) {
+		$section['_index'] = $index;
 		rpsb_render_section( $section );
 	}
 	return ob_get_clean();
@@ -381,33 +382,34 @@ function rpsb_render_layout( $layout_json ) {
 
 function rpsb_render_section( $section ) {
 	$type = isset( $section['type'] ) ? sanitize_key( $section['type'] ) : '';
+	$index_attr = isset( $section['_index'] ) ? ' data-rpsb-section-index="' . absint( $section['_index'] ) . '"' : '';
 
 	if ( 'hero' === $type ) {
-		rpsb_render_hero_section( $section );
+		rpsb_render_hero_section( $section, $index_attr );
 	} elseif ( 'text' === $type ) {
-		rpsb_render_text_section( $section );
+		rpsb_render_text_section( $section, $index_attr );
 	} elseif ( 'image_text' === $type ) {
-		rpsb_render_image_text_section( $section );
+		rpsb_render_image_text_section( $section, $index_attr );
 	} elseif ( 'image' === $type ) {
-		rpsb_render_image_section( $section );
+		rpsb_render_image_section( $section, $index_attr );
 	} elseif ( 'cards' === $type ) {
-		rpsb_render_cards_section( $section );
+		rpsb_render_cards_section( $section, $index_attr );
 	} elseif ( 'cta' === $type ) {
-		rpsb_render_cta_section( $section );
+		rpsb_render_cta_section( $section, $index_attr );
 	} elseif ( 'shortcode' === $type ) {
-		echo '<div class="rpsb-shortcode-block">' . do_shortcode( isset( $section['shortcode'] ) ? $section['shortcode'] : '' ) . '</div>';
+		echo '<div class="rpsb-shortcode-block"' . $index_attr . '>' . do_shortcode( isset( $section['shortcode'] ) ? $section['shortcode'] : '' ) . '</div>';
 	} elseif ( 'html' === $type ) {
-		rpsb_render_html_section( $section );
+		rpsb_render_html_section( $section, $index_attr );
 	} elseif ( 'component' === $type ) {
-		echo rpsb_render_component_shortcode( array( 'id' => isset( $section['component_id'] ) ? absint( $section['component_id'] ) : 0 ) );
+		echo rpsb_render_component_shortcode( array( 'id' => isset( $section['component_id'] ) ? absint( $section['component_id'] ) : 0 ), $index_attr );
 	}
 }
 
-function rpsb_render_hero_section( $section ) {
+function rpsb_render_hero_section( $section, $index_attr = '' ) {
 	$image = ! empty( $section['image_url'] ) ? esc_url( $section['image_url'] ) : '';
 	$classes = rpsb_section_classes( 'rpsb-hero', $section );
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>">
+	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?>>
 		<?php if ( $image ) : ?>
 			<img src="<?php echo $image; ?>" alt="<?php echo esc_attr( isset( $section['image_alt'] ) ? $section['image_alt'] : '' ); ?>">
 		<?php endif; ?>
@@ -425,10 +427,10 @@ function rpsb_render_hero_section( $section ) {
 	<?php
 }
 
-function rpsb_render_text_section( $section ) {
+function rpsb_render_text_section( $section, $index_attr = '' ) {
 	$classes = rpsb_section_classes( 'rpsb-section rpsb-cards-section', $section );
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>">
+	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?>>
 		<div class="rp-section-inner">
 			<?php if ( ! empty( $section['title'] ) ) : ?><h2><?php echo esc_html( $section['title'] ); ?></h2><?php endif; ?>
 			<?php if ( ! empty( $section['text'] ) ) : ?><div class="rpsb-rich-text"><?php echo wpautop( wp_kses_post( $section['text'] ) ); ?></div><?php endif; ?>
@@ -437,14 +439,14 @@ function rpsb_render_text_section( $section ) {
 	<?php
 }
 
-function rpsb_render_image_section( $section ) {
+function rpsb_render_image_section( $section, $index_attr = '' ) {
 	$image = ! empty( $section['image_url'] ) ? esc_url( $section['image_url'] ) : '';
 	if ( ! $image ) {
 		return;
 	}
 	$classes = rpsb_section_classes( 'rpsb-section rpsb-image-section', $section );
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>">
+	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?>>
 		<div class="rp-section-inner">
 			<figure class="rpsb-image-figure">
 				<img src="<?php echo $image; ?>" alt="<?php echo esc_attr( isset( $section['image_alt'] ) ? $section['image_alt'] : '' ); ?>">
@@ -457,11 +459,11 @@ function rpsb_render_image_section( $section ) {
 	<?php
 }
 
-function rpsb_render_image_text_section( $section ) {
+function rpsb_render_image_text_section( $section, $index_attr = '' ) {
 	$classes = rpsb_section_classes( 'rpsb-section rpsb-image-text-section', $section );
 	$image   = ! empty( $section['image_url'] ) ? esc_url( $section['image_url'] ) : '';
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>">
+	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?>>
 		<div class="rp-section-inner rpsb-image-text">
 			<div class="rpsb-image-text-media">
 				<?php if ( $image ) : ?>
@@ -481,12 +483,12 @@ function rpsb_render_image_text_section( $section ) {
 	<?php
 }
 
-function rpsb_render_cards_section( $section ) {
+function rpsb_render_cards_section( $section, $index_attr = '' ) {
 	$columns = isset( $section['columns'] ) ? max( 1, min( 4, absint( $section['columns'] ) ) ) : 3;
 	$rows    = ! empty( $section['text'] ) ? preg_split( '/\r\n|\r|\n/', $section['text'] ) : array();
 	$classes = rpsb_section_classes( 'rpsb-section', $section );
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>">
+	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?>>
 		<div class="rp-section-inner">
 			<?php if ( ! empty( $section['title'] ) ) : ?><h2><?php echo esc_html( $section['title'] ); ?></h2><?php endif; ?>
 			<div class="rpsb-card-grid" style="--rpsb-columns: <?php echo absint( $columns ); ?>;">
@@ -508,10 +510,10 @@ function rpsb_render_cards_section( $section ) {
 	<?php
 }
 
-function rpsb_render_cta_section( $section ) {
+function rpsb_render_cta_section( $section, $index_attr = '' ) {
 	$classes = rpsb_section_classes( 'rpsb-cta', $section );
 	?>
-	<section class="<?php echo esc_attr( $classes ); ?>">
+	<section class="<?php echo esc_attr( $classes ); ?>"<?php echo $index_attr; ?>>
 		<div class="rp-section-inner">
 			<?php if ( ! empty( $section['title'] ) ) : ?><h2><?php echo esc_html( $section['title'] ); ?></h2><?php endif; ?>
 			<?php if ( ! empty( $section['text'] ) ) : ?><p><?php echo esc_html( $section['text'] ); ?></p><?php endif; ?>
@@ -543,12 +545,12 @@ function rpsb_section_classes( $base, $section ) {
 	return implode( ' ', $classes );
 }
 
-function rpsb_render_html_section( $section ) {
+function rpsb_render_html_section( $section, $index_attr = '' ) {
 	if ( empty( $section['html'] ) ) {
 		return;
 	}
 	?>
-	<section class="rpsb-section rpsb-html-section">
+	<section class="rpsb-section rpsb-html-section"<?php echo $index_attr; ?>>
 		<div class="rp-section-inner">
 			<?php echo wp_kses_post( $section['html'] ); ?>
 		</div>
@@ -556,7 +558,7 @@ function rpsb_render_html_section( $section ) {
 	<?php
 }
 
-function rpsb_render_component_shortcode( $atts ) {
+function rpsb_render_component_shortcode( $atts, $index_attr = '' ) {
 	$atts = shortcode_atts( array( 'id' => 0 ), $atts, 'rpsb_component' );
 	$id   = absint( $atts['id'] );
 	if ( ! $id || 'rpsb_component' !== get_post_type( $id ) || 'publish' !== get_post_status( $id ) ) {
@@ -576,7 +578,7 @@ function rpsb_render_component_shortcode( $atts ) {
 
 	array_pop( $rendering_components );
 
-	return '<section class="rpsb-section rpsb-component"><div class="rp-section-inner">' . $content . '</div></section>';
+	return '<section class="rpsb-section rpsb-component"' . $index_attr . '><div class="rp-section-inner">' . $content . '</div></section>';
 }
 add_shortcode( 'rpsb_component', 'rpsb_render_component_shortcode' );
 

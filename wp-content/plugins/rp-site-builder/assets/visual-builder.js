@@ -219,6 +219,116 @@
       pageSource = {};
     }
 
+    function refreshIframe() {
+      if (liveFrame && canvasWrap.classList.contains('is-live-mode')) {
+        try {
+          liveFrame.contentWindow.location.reload();
+        } catch (e) {}
+      }
+    }
+
+    function makeIframeEditable(el, secIndex, field) {
+      if (!el) {
+        return;
+      }
+      el.setAttribute('contenteditable', 'true');
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+      el.addEventListener('input', function () {
+        var newValue = textFromEditable(el);
+        layout[secIndex][field] = newValue;
+        markDirty();
+
+        var canvasInput = canvas.querySelector('[data-rpsb-section="' + secIndex + '"] [data-rpsb-inline="' + field + '"]');
+        if (canvasInput) {
+          canvasInput.innerHTML = el.innerHTML;
+        }
+
+        inspectorNode.innerHTML = inspector(layout[selected], window.rpsbAdmin.components);
+      });
+    }
+
+    function initIframeEditing() {
+      var doc = liveDocument();
+      if (!doc) {
+        return;
+      }
+
+      if (!doc.getElementById('rpsb-iframe-styles')) {
+        var style = doc.createElement('style');
+        style.id = 'rpsb-iframe-styles';
+        style.textContent = 
+          '[data-rpsb-section-index] { outline: 2px solid transparent !important; position: relative !important; transition: outline-color 0.2s ease !important; } ' +
+          '[data-rpsb-section-index]:hover { outline: 2px dashed rgba(34, 113, 177, 0.6) !important; cursor: pointer !important; } ' +
+          '[data-rpsb-section-index].is-selected { outline: 2px solid #2271b1 !important; } ' +
+          '[data-rpsb-section-index]::after { content: attr(data-rpsb-type); position: absolute; left: 10px; top: 10px; background: #2271b1; color: #fff; font-size: 10px; font-weight: bold; padding: 3px 6px; text-transform: uppercase; border-radius: 3px; display: none; z-index: 9999; pointer-events: none; } ' +
+          '[data-rpsb-section-index]:hover::after, [data-rpsb-section-index].is-selected::after { display: block; } ' +
+          '[contenteditable] { outline: 1px dashed rgba(34, 113, 177, 0.4); } ' +
+          '[contenteditable]:focus { background: rgba(34, 113, 177, 0.08); outline-color: #72aee6; }';
+        doc.head.appendChild(style);
+      }
+
+      var sections = doc.querySelectorAll('[data-rpsb-section-index]');
+      sections.forEach(function (secNode) {
+        var secIndex = parseInt(secNode.getAttribute('data-rpsb-section-index'), 10);
+        var section = layout[secIndex];
+        if (!section) {
+          return;
+        }
+
+        secNode.setAttribute('data-rpsb-type', section.type);
+        if (secIndex === selected) {
+          secNode.classList.add('is-selected');
+        } else {
+          secNode.classList.remove('is-selected');
+        }
+
+        if (section.type === 'hero') {
+          makeIframeEditable(secNode.querySelector('.rp-eyebrow'), secIndex, 'eyebrow');
+          makeIframeEditable(secNode.querySelector('h2'), secIndex, 'title');
+          makeIframeEditable(secNode.querySelector('p:not(.rp-eyebrow)'), secIndex, 'text');
+        } else if (section.type === 'text') {
+          makeIframeEditable(secNode.querySelector('h2'), secIndex, 'title');
+          makeIframeEditable(secNode.querySelector('.rpsb-rich-text'), secIndex, 'text');
+        } else if (section.type === 'image_text') {
+          makeIframeEditable(secNode.querySelector('.rp-eyebrow'), secIndex, 'kicker');
+          makeIframeEditable(secNode.querySelector('h2'), secIndex, 'title');
+          makeIframeEditable(secNode.querySelector('.rpsb-rich-text'), secIndex, 'text');
+        } else if (section.type === 'image') {
+          makeIframeEditable(secNode.querySelector('figcaption'), secIndex, 'caption');
+        } else if (section.type === 'cards') {
+          makeIframeEditable(secNode.querySelector('h2'), secIndex, 'title');
+        } else if (section.type === 'cta') {
+          makeIframeEditable(secNode.querySelector('h2'), secIndex, 'title');
+          makeIframeEditable(secNode.querySelector('p'), secIndex, 'text');
+        }
+
+        secNode.addEventListener('click', function (e) {
+          if (selected !== secIndex) {
+            selected = secIndex;
+
+            builder.querySelectorAll('[data-rpsb-tab], [data-rpsb-panel]').forEach(function (node) {
+              node.classList.remove('is-active');
+            });
+            var editTab = builder.querySelector('[data-rpsb-tab="edit"]');
+            var editPanel = builder.querySelector('[data-rpsb-panel="edit"]');
+            if (editTab && editPanel) {
+              editTab.classList.add('is-active');
+              editPanel.classList.add('is-active');
+            }
+
+            doc.querySelectorAll('[data-rpsb-section-index]').forEach(function (node) {
+              node.classList.remove('is-selected');
+            });
+            secNode.classList.add('is-selected');
+
+            draw();
+          }
+        });
+      });
+    }
+
     function markDirty() {
       statusNode.textContent = 'Unsaved changes';
       statusNode.classList.add('is-dirty');
@@ -255,6 +365,7 @@
       selected = Math.min(selected + 1, layout.length - 1);
       markDirty();
       draw();
+      refreshIframe();
     }
 
     function importCurrentContent() {
@@ -264,6 +375,7 @@
         selected = 0;
         markDirty();
         draw();
+        refreshIframe();
         return;
       }
 
@@ -273,6 +385,7 @@
         selected = 0;
         markDirty();
         draw();
+        refreshIframe();
         return;
       }
 
@@ -291,6 +404,7 @@
       selected = 0;
       markDirty();
       draw();
+      refreshIframe();
     }
 
     function htmlToDocument(rawHtml) {
@@ -526,6 +640,7 @@
       selected = layout.length - next.length;
       markDirty();
       draw();
+      refreshIframe();
     }
 
     function moveSelected(offset) {
@@ -537,6 +652,7 @@
       selected = next;
       markDirty();
       draw();
+      refreshIframe();
     }
 
     var draggedIndex = null;
@@ -585,6 +701,7 @@
           selected = targetIndex;
           markDirty();
           draw();
+          refreshIframe();
         }
       }
       draggedIndex = null;
@@ -658,11 +775,13 @@
           selected += 1;
           markDirty();
           draw();
+          refreshIframe();
         } else if (event.target.closest('[data-rpsb-remove]')) {
           layout.splice(selected, 1);
           selected = Math.max(0, selected - 1);
           markDirty();
           draw();
+          refreshIframe();
         } else {
           // Switch to Edit tab on canvas section click
           builder.querySelectorAll('[data-rpsb-tab], [data-rpsb-panel]').forEach(function (node) {
@@ -754,11 +873,16 @@
         statusNode.textContent = 'Saved';
         statusNode.classList.remove('is-dirty');
         builder.dataset.rpsbEnabled = '1';
+        refreshIframe();
       }).catch(function (error) {
         statusNode.textContent = error.message;
         statusNode.classList.add('is-dirty');
       });
     });
+
+    if (liveFrame) {
+      liveFrame.addEventListener('load', initIframeEditing);
+    }
 
     setMode('builder');
     draw();

@@ -4,7 +4,7 @@ Custom WordPress plugin prototype for editing page layouts, reusable components,
 
 ## Current Status
 
-This plugin is a developed prototype. It features a custom YOOtheme-style page builder with a premium dark mode user interface, visual layout structure, responsive canvas overlays, inline text editing, page content import mapping, frontend layout rendering, reusable site components with recursion prevention, and native drag-and-drop section reordering. The plugin is fully tracked in Git.
+This plugin is a developed prototype. It features a custom YOOtheme-style page builder with a premium dark mode user interface, a live WYSIWYG editor inside the preview iframe, visual layout structure, responsive canvas outlines, inline text editing directly on the frontend page layout, page content import mapping, reusable site components with recursion prevention, and native drag-and-drop section reordering. The plugin is fully tracked in Git.
 
 ## Plugin Files
 
@@ -78,6 +78,7 @@ Current section types:
 - **Drag-and-Drop Reordering**: Drag and drop sections in the layout structure panel to instantly sort them.
 - **Canvas Hover & Select Overlays**: Sections show custom border outlines and floating type labels (e.g. "Hero", "Cards") on hover.
 - **Click-to-Edit Tab Focus**: Clicking any section on the canvas selects it and automatically shifts the sidebar to the "Edit" settings panel.
+- **Full Live WYSIWYG Editing**: Switch to "Live Page" mode and edit text, headers, and body fields inline directly inside the live page preview iframe, with real-time state syncing to the builder and save modules.
 - Select a page to edit.
 - Add sections from the sidebar.
 - Insert basic landing/content templates.
@@ -164,4 +165,5 @@ During development, the following checks were run repeatedly:
 - Save validation and prompt verification when layout is enabled over raw content.
 - Native drag-and-drop ordering verification in the sidebar structure panel.
 - Dark mode theme color and styling verification.
+- Bi-directional iframe synchronization and WYSIWYG inline editing verification.
 
