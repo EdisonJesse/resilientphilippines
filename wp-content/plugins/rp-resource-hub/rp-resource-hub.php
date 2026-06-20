@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Resource Hub
  * Description: Custom post types, taxonomies, roles, upload workflow, and catalog shortcodes for the humanitarian resource hub.
- * Version: 1.11.0
+ * Version: 1.12.0
  * Author: ACCORD
  * Text Domain: rp-resource-hub
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_RESOURCE_HUB_VERSION', '1.11.0' );
+define( 'RP_RESOURCE_HUB_VERSION', '1.12.0' );
 define( 'RP_RESOURCE_HUB_FILE', __FILE__ );
 define( 'RP_RESOURCE_HUB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_URL', plugin_dir_url( __FILE__ ) );
@@ -358,10 +358,23 @@ function rp_resource_hub_create_analytics_tables() {
 		user_id BIGINT(20) UNSIGNED DEFAULT NULL,
 		ip_address VARCHAR(45) NOT NULL,
 		user_agent TEXT DEFAULT NULL,
+		visitor_id VARCHAR(64) DEFAULT '',
+		session_id VARCHAR(64) DEFAULT '',
+		is_new_visitor TINYINT(1) NOT NULL DEFAULT 0,
+		country_code CHAR(2) DEFAULT 'ZZ',
+		device_type VARCHAR(20) DEFAULT 'unknown',
+		referrer_url TEXT DEFAULT NULL,
+		traffic_source VARCHAR(100) DEFAULT '',
+		traffic_medium VARCHAR(100) DEFAULT '',
+		campaign VARCHAR(190) DEFAULT '',
 		created_at DATETIME NOT NULL,
 		PRIMARY KEY (id),
 		KEY post_id (post_id),
 		KEY user_id (user_id),
+		KEY visitor_id (visitor_id),
+		KEY session_id (session_id),
+		KEY country_code (country_code),
+		KEY traffic_source (traffic_source),
 		KEY created_at (created_at)
 	) $charset_collate;";
 
@@ -373,16 +386,46 @@ function rp_resource_hub_create_analytics_tables() {
 		user_id BIGINT(20) UNSIGNED DEFAULT NULL,
 		ip_address VARCHAR(45) NOT NULL,
 		user_agent TEXT DEFAULT NULL,
+		visitor_id VARCHAR(64) DEFAULT '',
+		session_id VARCHAR(64) DEFAULT '',
+		is_new_visitor TINYINT(1) NOT NULL DEFAULT 0,
+		country_code CHAR(2) DEFAULT 'ZZ',
+		device_type VARCHAR(20) DEFAULT 'unknown',
+		referrer_url TEXT DEFAULT NULL,
+		traffic_source VARCHAR(100) DEFAULT '',
+		traffic_medium VARCHAR(100) DEFAULT '',
+		campaign VARCHAR(190) DEFAULT '',
 		created_at DATETIME NOT NULL,
 		PRIMARY KEY (id),
 		KEY post_id (post_id),
 		KEY user_id (user_id),
+		KEY visitor_id (visitor_id),
+		KEY session_id (session_id),
+		KEY country_code (country_code),
+		KEY traffic_source (traffic_source),
+		KEY created_at (created_at)
+	) $charset_collate;";
+
+	$searches_table = $wpdb->prefix . 'rp_analytics_searches';
+	$sql_searches = "CREATE TABLE $searches_table (
+		id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+		search_term VARCHAR(190) NOT NULL,
+		results_count BIGINT(20) UNSIGNED NOT NULL DEFAULT 0,
+		visitor_id VARCHAR(64) DEFAULT '',
+		session_id VARCHAR(64) DEFAULT '',
+		country_code CHAR(2) DEFAULT 'ZZ',
+		device_type VARCHAR(20) DEFAULT 'unknown',
+		created_at DATETIME NOT NULL,
+		PRIMARY KEY (id),
+		KEY search_term (search_term),
+		KEY session_id (session_id),
 		KEY created_at (created_at)
 	) $charset_collate;";
 
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	dbDelta( $sql_views );
 	dbDelta( $sql_downloads );
+	dbDelta( $sql_searches );
 }
 
 function rp_resource_hub_create_tinig_tables() {
@@ -498,6 +541,146 @@ function rp_resource_hub_get_ip() {
 	return sanitize_text_field( $ip );
 }
 
+function rp_resource_hub_set_analytics_cookie( $name, $value, $expires ) {
+	setcookie( $name, $value, array(
+		'expires'  => $expires,
+		'path'     => COOKIEPATH ? COOKIEPATH : '/',
+		'domain'   => COOKIE_DOMAIN,
+		'secure'   => is_ssl(),
+		'httponly' => true,
+		'samesite' => 'Lax',
+	) );
+	$_COOKIE[ $name ] = $value;
+}
+
+function rp_resource_hub_get_country_code() {
+	$headers = array( 'HTTP_CF_IPCOUNTRY', 'HTTP_X_COUNTRY_CODE', 'GEOIP_COUNTRY_CODE' );
+	foreach ( $headers as $header ) {
+		if ( ! empty( $_SERVER[ $header ] ) ) {
+			$country = strtoupper( sanitize_text_field( wp_unslash( $_SERVER[ $header ] ) ) );
+			if ( preg_match( '/^[A-Z]{2}$/', $country ) && ! in_array( $country, array( 'XX', 'T1' ), true ) ) {
+				return $country;
+			}
+		}
+	}
+	return 'ZZ';
+}
+
+function rp_resource_hub_get_device_type( $user_agent ) {
+	if ( preg_match( '/bot|crawl|spider|slurp|headless|lighthouse|monitor|uptime/i', $user_agent ) ) {
+		return 'bot';
+	}
+	if ( preg_match( '/ipad|tablet|kindle|silk/i', $user_agent ) ) {
+		return 'tablet';
+	}
+	if ( preg_match( '/mobile|iphone|ipod|android/i', $user_agent ) ) {
+		return 'mobile';
+	}
+	return $user_agent ? 'desktop' : 'unknown';
+}
+
+function rp_resource_hub_get_acquisition() {
+	$source   = isset( $_GET['utm_source'] ) ? sanitize_text_field( wp_unslash( $_GET['utm_source'] ) ) : '';
+	$medium   = isset( $_GET['utm_medium'] ) ? sanitize_text_field( wp_unslash( $_GET['utm_medium'] ) ) : '';
+	$campaign = isset( $_GET['utm_campaign'] ) ? sanitize_text_field( wp_unslash( $_GET['utm_campaign'] ) ) : '';
+	$referrer = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
+
+	if ( ! $source && ! empty( $_COOKIE['rp_analytics_source'] ) ) {
+		$source   = sanitize_text_field( wp_unslash( $_COOKIE['rp_analytics_source'] ) );
+		$medium   = isset( $_COOKIE['rp_analytics_medium'] ) ? sanitize_text_field( wp_unslash( $_COOKIE['rp_analytics_medium'] ) ) : '';
+		$campaign = isset( $_COOKIE['rp_analytics_campaign'] ) ? sanitize_text_field( wp_unslash( $_COOKIE['rp_analytics_campaign'] ) ) : '';
+	} elseif ( ! $source ) {
+		$referrer_host = strtolower( (string) wp_parse_url( $referrer, PHP_URL_HOST ) );
+		$site_host     = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+		if ( ! $referrer_host || $referrer_host === $site_host ) {
+			$source = 'direct';
+			$medium = 'none';
+		} elseif ( preg_match( '/(^|\.)(google|bing|yahoo|duckduckgo|ecosia)\./', $referrer_host, $match ) ) {
+			$source = $match[2];
+			$medium = 'organic_search';
+		} elseif ( preg_match( '/(^|\.)(facebook|instagram|linkedin|x|twitter|youtube|tiktok)\./', $referrer_host, $match ) ) {
+			$source = $match[2];
+			$medium = 'social';
+		} else {
+			$source = $referrer_host;
+			$medium = 'referral';
+		}
+	}
+
+	$expires = time() + ( 30 * MINUTE_IN_SECONDS );
+	rp_resource_hub_set_analytics_cookie( 'rp_analytics_source', substr( $source, 0, 100 ), $expires );
+	rp_resource_hub_set_analytics_cookie( 'rp_analytics_medium', substr( $medium, 0, 100 ), $expires );
+	rp_resource_hub_set_analytics_cookie( 'rp_analytics_campaign', substr( $campaign, 0, 190 ), $expires );
+
+	return array(
+		'source'   => substr( $source, 0, 100 ),
+		'medium'   => substr( $medium, 0, 100 ),
+		'campaign' => substr( $campaign, 0, 190 ),
+		'referrer' => substr( $referrer, 0, 1000 ),
+	);
+}
+
+function rp_resource_hub_get_analytics_context() {
+	static $context = null;
+	if ( null !== $context ) {
+		return $context;
+	}
+
+	$visitor_id = isset( $_COOKIE['rp_analytics_visitor'] ) && preg_match( '/^[a-f0-9]{32}$/', $_COOKIE['rp_analytics_visitor'] ) ? $_COOKIE['rp_analytics_visitor'] : '';
+	$session_id = isset( $_COOKIE['rp_analytics_session'] ) && preg_match( '/^[a-f0-9]{32}$/', $_COOKIE['rp_analytics_session'] ) ? $_COOKIE['rp_analytics_session'] : '';
+	$is_new     = ! $visitor_id;
+	if ( ! $visitor_id ) {
+		$visitor_id = bin2hex( random_bytes( 16 ) );
+	}
+	if ( ! $session_id ) {
+		$session_id = bin2hex( random_bytes( 16 ) );
+	}
+
+	rp_resource_hub_set_analytics_cookie( 'rp_analytics_visitor', $visitor_id, time() + YEAR_IN_SECONDS );
+	rp_resource_hub_set_analytics_cookie( 'rp_analytics_session', $session_id, time() + ( 30 * MINUTE_IN_SECONDS ) );
+	$acquisition = rp_resource_hub_get_acquisition();
+	$user_agent  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+	$context     = array_merge( $acquisition, array(
+		'visitor_id'    => $visitor_id,
+		'session_id'    => $session_id,
+		'is_new_visitor'=> $is_new ? 1 : 0,
+		'country_code'  => rp_resource_hub_get_country_code(),
+		'device_type'   => rp_resource_hub_get_device_type( $user_agent ),
+		'user_agent'    => $user_agent,
+	) );
+
+	return $context;
+}
+
+function rp_resource_hub_log_search( $search_term, $results_count ) {
+	$search_term = trim( substr( sanitize_text_field( $search_term ), 0, 190 ) );
+	if ( strlen( $search_term ) < 2 || ( isset( $_COOKIE['rp_cookie_consent'] ) && 'declined' === $_COOKIE['rp_cookie_consent'] ) || current_user_can( 'publish_posts' ) ) {
+		return;
+	}
+
+	global $wpdb;
+	$analytics = rp_resource_hub_get_analytics_context();
+	$table     = $wpdb->prefix . 'rp_analytics_searches';
+	$duplicate = $wpdb->get_var( $wpdb->prepare(
+		"SELECT id FROM {$table} WHERE session_id = %s AND search_term = %s AND created_at >= DATE_SUB(NOW(), INTERVAL 10 MINUTE) LIMIT 1",
+		$analytics['session_id'],
+		$search_term
+	) );
+	if ( $duplicate ) {
+		return;
+	}
+
+	$wpdb->insert( $table, array(
+		'search_term'  => $search_term,
+		'results_count'=> absint( $results_count ),
+		'visitor_id'   => $analytics['visitor_id'],
+		'session_id'   => $analytics['session_id'],
+		'country_code' => $analytics['country_code'],
+		'device_type'  => $analytics['device_type'],
+		'created_at'   => current_time( 'mysql' ),
+	), array( '%s', '%d', '%s', '%s', '%s', '%s', '%s' ) );
+}
+
 function rp_resource_hub_track_page_view() {
 	// Check cookie opt-out choice
 	if ( isset( $_COOKIE['rp_cookie_consent'] ) && 'declined' === $_COOKIE['rp_cookie_consent'] ) {
@@ -532,7 +715,8 @@ function rp_resource_hub_track_page_view() {
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'rp_analytics_views';
 	$ip_address = rp_resource_hub_get_ip();
-	$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+	$analytics  = rp_resource_hub_get_analytics_context();
+	$user_agent = $analytics['user_agent'];
 	$user_id    = get_current_user_id() ? get_current_user_id() : null;
 
 	$wpdb->insert(
@@ -542,9 +726,18 @@ function rp_resource_hub_track_page_view() {
 			'user_id'    => $user_id,
 			'ip_address' => $ip_address,
 			'user_agent' => $user_agent,
+			'visitor_id' => $analytics['visitor_id'],
+			'session_id' => $analytics['session_id'],
+			'is_new_visitor' => $analytics['is_new_visitor'],
+			'country_code' => $analytics['country_code'],
+			'device_type' => $analytics['device_type'],
+			'referrer_url' => $analytics['referrer'],
+			'traffic_source' => $analytics['source'],
+			'traffic_medium' => $analytics['medium'],
+			'campaign' => $analytics['campaign'],
 			'created_at' => current_time( 'mysql' ),
 		),
-		array( '%d', '%d', '%s', '%s', '%s' )
+		array( '%d', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
 	);
 }
 add_action( 'template_redirect', 'rp_resource_hub_track_page_view' );
@@ -558,7 +751,8 @@ function rp_resource_hub_log_download( $post_id ) {
 	global $wpdb;
 	$downloads_table = $wpdb->prefix . 'rp_analytics_downloads';
 	$ip_address = rp_resource_hub_get_ip();
-	$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+	$analytics  = rp_resource_hub_get_analytics_context();
+	$user_agent = $analytics['user_agent'];
 	$user_id    = get_current_user_id() ? get_current_user_id() : null;
 
 	$wpdb->insert(
@@ -568,9 +762,18 @@ function rp_resource_hub_log_download( $post_id ) {
 			'user_id'    => $user_id,
 			'ip_address' => $ip_address,
 			'user_agent' => $user_agent,
+			'visitor_id' => $analytics['visitor_id'],
+			'session_id' => $analytics['session_id'],
+			'is_new_visitor' => $analytics['is_new_visitor'],
+			'country_code' => $analytics['country_code'],
+			'device_type' => $analytics['device_type'],
+			'referrer_url' => $analytics['referrer'],
+			'traffic_source' => $analytics['source'],
+			'traffic_medium' => $analytics['medium'],
+			'campaign' => $analytics['campaign'],
 			'created_at' => current_time( 'mysql' ),
 		),
-		array( '%d', '%d', '%s', '%s', '%s' )
+		array( '%d', '%d', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
 	);
 }
 
@@ -2586,6 +2789,9 @@ function rp_resource_hub_catalog_shortcode( $atts ) {
 	}
 
 	$resources = rp_resource_hub_get_catalog_query( $params );
+	if ( $search_query && 1 === $paged ) {
+		rp_resource_hub_log_search( $search_query, $resources->found_posts );
+	}
 
 	ob_start();
 	?>
@@ -2658,6 +2864,9 @@ function rp_ajax_filter_resources() {
 	}
 
 	$resources = rp_resource_hub_get_catalog_query( $params );
+	if ( $params['q'] && 1 === $params['paged'] && ! empty( $_POST['track_search'] ) ) {
+		rp_resource_hub_log_search( $params['q'], $resources->found_posts );
+	}
 
 	$grid_html       = rp_resource_hub_render_grid_items( $resources );
 	$pagination_html = rp_resource_hub_render_pagination( $resources, $params['paged'] );

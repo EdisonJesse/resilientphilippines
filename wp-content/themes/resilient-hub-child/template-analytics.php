@@ -43,7 +43,8 @@ $downloads_where .= rp_child_analytics_traffic_sql( 'd', $traffic_type );
 // -------------------------------------------------------------
 // 1. KPI Counts
 // -------------------------------------------------------------
-$unique_visits = $wpdb->get_var( "SELECT COUNT(DISTINCT v.ip_address) FROM {$wpdb->prefix}rp_analytics_views v $views_where" );
+$session_key   = "CASE WHEN v.session_id <> '' THEN v.session_id ELSE CONCAT('legacy:', v.ip_address) END";
+$unique_visits = $wpdb->get_var( "SELECT COUNT(DISTINCT {$session_key}) FROM {$wpdb->prefix}rp_analytics_views v $views_where" );
 $total_views   = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}rp_analytics_views v $views_where" );
 $total_downloads = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}rp_analytics_downloads d $downloads_where" );
 
@@ -51,8 +52,8 @@ $view_bot_condition     = preg_replace( '/^\s*AND\s+/i', '', rp_child_analytics_
 $download_bot_condition = preg_replace( '/^\s*AND\s+/i', '', rp_child_analytics_traffic_sql( 'd', 'bot' ) );
 $view_breakdown = $wpdb->get_row( "
 	SELECT
-		COUNT(DISTINCT CASE WHEN NOT {$view_bot_condition} THEN v.ip_address END) AS organic_visits,
-		COUNT(DISTINCT CASE WHEN {$view_bot_condition} THEN v.ip_address END) AS bot_visits,
+		COUNT(DISTINCT CASE WHEN NOT {$view_bot_condition} THEN {$session_key} END) AS organic_visits,
+		COUNT(DISTINCT CASE WHEN {$view_bot_condition} THEN {$session_key} END) AS bot_visits,
 		SUM(CASE WHEN NOT {$view_bot_condition} THEN 1 ELSE 0 END) AS organic_views,
 		SUM(CASE WHEN {$view_bot_condition} THEN 1 ELSE 0 END) AS bot_views
 	FROM {$wpdb->prefix}rp_analytics_views v
@@ -72,12 +73,26 @@ $bot_views         = (int) $view_breakdown->bot_views;
 $organic_downloads = (int) $download_breakdown->organic_downloads;
 $bot_downloads     = (int) $download_breakdown->bot_downloads;
 
+$comparison = array( 'visits' => null, 'views' => null, 'downloads' => null );
+if ( $days > 0 ) {
+	$previous_views_where = $wpdb->prepare( 'WHERE v.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY) AND v.created_at < DATE_SUB(NOW(), INTERVAL %d DAY)', $days * 2, $days );
+	$previous_downloads_where = $wpdb->prepare( 'WHERE d.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY) AND d.created_at < DATE_SUB(NOW(), INTERVAL %d DAY)', $days * 2, $days );
+	$previous_views_where .= rp_child_analytics_traffic_sql( 'v', $traffic_type );
+	$previous_downloads_where .= rp_child_analytics_traffic_sql( 'd', $traffic_type );
+	$previous_visits    = (int) $wpdb->get_var( "SELECT COUNT(DISTINCT {$session_key}) FROM {$wpdb->prefix}rp_analytics_views v {$previous_views_where}" );
+	$previous_views     = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}rp_analytics_views v {$previous_views_where}" );
+	$previous_downloads = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}rp_analytics_downloads d {$previous_downloads_where}" );
+	$comparison['visits']    = $previous_visits ? ( ( (int) $unique_visits - $previous_visits ) / $previous_visits ) * 100 : null;
+	$comparison['views']     = $previous_views ? ( ( (int) $total_views - $previous_views ) / $previous_views ) * 100 : null;
+	$comparison['downloads'] = $previous_downloads ? ( ( (int) $total_downloads - $previous_downloads ) / $previous_downloads ) * 100 : null;
+}
+
 // -------------------------------------------------------------
 // 2. Chart Timeline Data
 // -------------------------------------------------------------
 $chart_days = $days > 0 ? $days : 90; // Default to 90 days for all-time timeline
 $views_by_day = $wpdb->get_results( $wpdb->prepare( "
-	SELECT DATE(created_at) as date, COUNT(*) as count, COUNT(DISTINCT ip_address) as unique_ips
+	SELECT DATE(created_at) as date, COUNT(*) as count, COUNT(DISTINCT {$session_key}) as unique_ips
 	FROM {$wpdb->prefix}rp_analytics_views v
 	WHERE v.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY) " . rp_child_analytics_traffic_sql( 'v', $traffic_type ) . "
 	GROUP BY DATE(v.created_at)
@@ -150,7 +165,104 @@ $popular_pages = $wpdb->get_results( "
 " );
 
 // -------------------------------------------------------------
-// 4. Download Audit Log Query
+// 4. Audience, acquisition, conversion, and search reports
+// -------------------------------------------------------------
+$country_breakdown = $wpdb->get_results( "
+	SELECT COALESCE(NULLIF(v.country_code, ''), 'ZZ') AS country_code, COUNT(DISTINCT {$session_key}) AS sessions, COUNT(*) AS views
+	FROM {$wpdb->prefix}rp_analytics_views v
+	{$views_where}
+	GROUP BY country_code
+	ORDER BY sessions DESC
+	LIMIT 10
+" );
+$source_breakdown = $wpdb->get_results( "
+	SELECT COALESCE(NULLIF(v.traffic_source, ''), 'unknown') AS source, COALESCE(NULLIF(v.traffic_medium, ''), 'unknown') AS medium, COUNT(DISTINCT {$session_key}) AS sessions
+	FROM {$wpdb->prefix}rp_analytics_views v
+	{$views_where}
+	GROUP BY source, medium
+	ORDER BY sessions DESC
+	LIMIT 10
+" );
+$device_breakdown = $wpdb->get_results( "
+	SELECT COALESCE(NULLIF(v.device_type, ''), 'unknown') AS device, COUNT(DISTINCT {$session_key}) AS sessions
+	FROM {$wpdb->prefix}rp_analytics_views v
+	{$views_where}
+	GROUP BY device
+	ORDER BY sessions DESC
+" );
+$visitor_breakdown = $wpdb->get_row( "
+	SELECT
+		SUM(CASE WHEN session_is_new = 1 THEN 1 ELSE 0 END) AS new_sessions,
+		SUM(CASE WHEN session_is_new = 0 THEN 1 ELSE 0 END) AS returning_sessions
+	FROM (
+		SELECT v.session_id, MAX(v.is_new_visitor) AS session_is_new
+		FROM {$wpdb->prefix}rp_analytics_views v
+		{$views_where} AND v.session_id <> ''
+		GROUP BY v.session_id
+	) session_types
+" );
+$effective_content = $wpdb->get_results( "
+	SELECT activity.post_id, p.post_title, p.post_type, SUM(activity.views) AS views, SUM(activity.downloads) AS downloads
+	FROM (
+		SELECT v.post_id, COUNT(*) AS views, 0 AS downloads
+		FROM {$wpdb->prefix}rp_analytics_views v
+		{$views_where} AND v.post_id > 0
+		GROUP BY v.post_id
+		UNION ALL
+		SELECT d.post_id, 0 AS views, COUNT(*) AS downloads
+		FROM {$wpdb->prefix}rp_analytics_downloads d
+		{$downloads_where}
+		GROUP BY d.post_id
+	) activity
+	LEFT JOIN {$wpdb->posts} p ON activity.post_id = p.ID
+	GROUP BY activity.post_id, p.post_title, p.post_type
+	ORDER BY downloads DESC, views DESC
+	LIMIT 10
+" );
+$previous_content_downloads = array();
+if ( $days > 0 ) {
+	$previous_content_rows = $wpdb->get_results( "
+		SELECT d.post_id, COUNT(*) AS downloads
+		FROM {$wpdb->prefix}rp_analytics_downloads d
+		{$previous_downloads_where}
+		GROUP BY d.post_id
+	" );
+	foreach ( $previous_content_rows as $previous_content ) {
+		$previous_content_downloads[ (int) $previous_content->post_id ] = (int) $previous_content->downloads;
+	}
+}
+
+$search_where = 'WHERE 1=1';
+if ( $days > 0 ) {
+	$search_where .= $wpdb->prepare( ' AND s.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)', $days );
+}
+if ( 'organic' === $traffic_type ) {
+	$search_where .= " AND s.device_type <> 'bot'";
+} elseif ( 'bot' === $traffic_type ) {
+	$search_where .= " AND s.device_type = 'bot'";
+}
+$popular_searches = $wpdb->get_results( "
+	SELECT s.search_term, COUNT(*) AS searches, ROUND(AVG(s.results_count)) AS average_results,
+		SUM(CASE WHEN s.results_count = 0 THEN 1 ELSE 0 END) AS zero_results
+	FROM {$wpdb->prefix}rp_analytics_searches s
+	{$search_where}
+	GROUP BY s.search_term
+	ORDER BY searches DESC, s.search_term ASC
+	LIMIT 10
+" );
+
+$quality = $wpdb->get_row( "
+	SELECT COUNT(*) AS total,
+		SUM(CASE WHEN COALESCE(v.country_code, 'ZZ') = 'ZZ' THEN 1 ELSE 0 END) AS unknown_country,
+		SUM(CASE WHEN COALESCE(v.session_id, '') = '' THEN 1 ELSE 0 END) AS legacy_session,
+		SUM(CASE WHEN COALESCE(v.user_agent, '') = '' THEN 1 ELSE 0 END) AS missing_agent,
+		SUM(CASE WHEN {$view_bot_condition} THEN 1 ELSE 0 END) AS bot_views
+	FROM {$wpdb->prefix}rp_analytics_views v
+	{$views_date_where}
+" );
+
+// -------------------------------------------------------------
+// 5. Download Audit Log Query
 // -------------------------------------------------------------
 $search_log = isset( $_GET['rp_search_log'] ) ? sanitize_text_field( wp_unslash( $_GET['rp_search_log'] ) ) : '';
 $log_where = $downloads_where;
@@ -187,7 +299,7 @@ $log_page        = min( $log_page, $total_log_pages );
 $log_offset      = ( $log_page - 1 ) * $logs_per_page;
 
 $download_logs = $wpdb->get_results( $wpdb->prepare( "
-	SELECT d.id, d.post_id, d.user_id, d.ip_address, d.user_agent, d.created_at, p.post_title, p.post_type
+	SELECT d.id, d.post_id, d.user_id, d.ip_address, d.user_agent, d.created_at, d.country_code, d.device_type, d.traffic_source, d.traffic_medium, d.campaign, p.post_title, p.post_type
 	FROM {$wpdb->prefix}rp_analytics_downloads d
 	LEFT JOIN {$wpdb->posts} p ON d.post_id = p.ID
 	$log_where
@@ -301,6 +413,31 @@ get_header();
 }
 .rp-card-breakdown-organic::before { background: #16a34a; }
 .rp-card-breakdown-bot::before { background: #9ca3af; }
+.rp-card-comparison {
+	margin-top: 8px;
+	font-size: 11px;
+	color: #6b7280;
+}
+.rp-card-comparison strong { color: #374151; }
+.rp-analytics-section-title {
+	margin: 36px 0 16px;
+	font-size: 20px;
+	color: #111827;
+}
+.rp-quality-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 14px;
+	margin-bottom: 32px;
+}
+.rp-quality-item {
+	padding: 16px;
+	border: 1px solid #e5e7eb;
+	border-radius: 10px;
+	background: #fff;
+}
+.rp-quality-item strong { display: block; font-size: 22px; color: #111827; }
+.rp-quality-item span { font-size: 12px; color: #6b7280; }
 
 .rp-chart-container {
 	background: #ffffff;
@@ -472,7 +609,7 @@ get_header();
 						<label for="rp_traffic" style="font-size: 14px; font-weight: 600; color: #4b5563;"><?php esc_html_e( 'Traffic:', 'resilient-hub' ); ?></label>
 						<select id="rp_traffic" name="rp_traffic" onchange="this.form.submit()" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 12px; font-size: 14px; background: #fff; min-width: 160px;">
 							<option value="all" <?php selected( $traffic_type, 'all' ); ?>><?php esc_html_e( 'All Traffic', 'resilient-hub' ); ?></option>
-							<option value="organic" <?php selected( $traffic_type, 'organic' ); ?>><?php esc_html_e( 'Organic / Human', 'resilient-hub' ); ?></option>
+							<option value="organic" <?php selected( $traffic_type, 'organic' ); ?>><?php esc_html_e( 'Human Traffic', 'resilient-hub' ); ?></option>
 							<option value="bot" <?php selected( $traffic_type, 'bot' ); ?>><?php esc_html_e( 'Inorganic / Bot', 'resilient-hub' ); ?></option>
 						</select>
 						<label for="rp_days" style="font-size: 14px; font-weight: 600; color: #4b5563;"><?php esc_html_e( 'Range:', 'resilient-hub' ); ?></label>
@@ -500,19 +637,20 @@ get_header();
 
 			<!-- Summary Cards Grid -->
 			<div class="rp-analytics-grid">
-				<!-- Card 1: Unique Visits -->
+				<!-- Card 1: Unique Sessions -->
 				<div class="rp-analytics-card">
 					<div class="rp-card-header">
-						<span class="rp-card-title"><?php esc_html_e( 'Unique Visits', 'resilient-hub' ); ?></span>
+						<span class="rp-card-title"><?php esc_html_e( 'Unique Sessions', 'resilient-hub' ); ?></span>
 						<div class="rp-card-icon rp-icon-visits">
 							<span class="dashicons dashicons-admin-users" style="font-size: 20px; width: 20px; height: 20px;"></span>
 						</div>
 					</div>
 					<div class="rp-card-value"><?php echo number_format( absint( $unique_visits ) ); ?></div>
 					<div class="rp-card-breakdown">
-						<span class="rp-card-breakdown-organic"><?php printf( esc_html__( 'Organic: %s', 'resilient-hub' ), number_format_i18n( $organic_visits ) ); ?></span>
+						<span class="rp-card-breakdown-organic"><?php printf( esc_html__( 'Human: %s', 'resilient-hub' ), number_format_i18n( $organic_visits ) ); ?></span>
 						<span class="rp-card-breakdown-bot"><?php printf( esc_html__( 'Bots: %s', 'resilient-hub' ), number_format_i18n( $bot_visits ) ); ?></span>
 					</div>
+					<?php if ( null !== $comparison['visits'] ) : ?><div class="rp-card-comparison"><strong><?php echo esc_html( sprintf( '%+.1f%%', $comparison['visits'] ) ); ?></strong> <?php esc_html_e( 'vs previous period', 'resilient-hub' ); ?></div><?php endif; ?>
 				</div>
 
 				<!-- Card 2: Page Views -->
@@ -525,9 +663,10 @@ get_header();
 					</div>
 					<div class="rp-card-value"><?php echo number_format( absint( $total_views ) ); ?></div>
 					<div class="rp-card-breakdown">
-						<span class="rp-card-breakdown-organic"><?php printf( esc_html__( 'Organic: %s', 'resilient-hub' ), number_format_i18n( $organic_views ) ); ?></span>
+						<span class="rp-card-breakdown-organic"><?php printf( esc_html__( 'Human: %s', 'resilient-hub' ), number_format_i18n( $organic_views ) ); ?></span>
 						<span class="rp-card-breakdown-bot"><?php printf( esc_html__( 'Bots: %s', 'resilient-hub' ), number_format_i18n( $bot_views ) ); ?></span>
 					</div>
+					<?php if ( null !== $comparison['views'] ) : ?><div class="rp-card-comparison"><strong><?php echo esc_html( sprintf( '%+.1f%%', $comparison['views'] ) ); ?></strong> <?php esc_html_e( 'vs previous period', 'resilient-hub' ); ?></div><?php endif; ?>
 				</div>
 
 				<!-- Card 3: Downloads -->
@@ -540,9 +679,10 @@ get_header();
 					</div>
 					<div class="rp-card-value"><?php echo number_format( absint( $total_downloads ) ); ?></div>
 					<div class="rp-card-breakdown">
-						<span class="rp-card-breakdown-organic"><?php printf( esc_html__( 'Organic: %s', 'resilient-hub' ), number_format_i18n( $organic_downloads ) ); ?></span>
+						<span class="rp-card-breakdown-organic"><?php printf( esc_html__( 'Human: %s', 'resilient-hub' ), number_format_i18n( $organic_downloads ) ); ?></span>
 						<span class="rp-card-breakdown-bot"><?php printf( esc_html__( 'Bots: %s', 'resilient-hub' ), number_format_i18n( $bot_downloads ) ); ?></span>
 					</div>
+					<?php if ( null !== $comparison['downloads'] ) : ?><div class="rp-card-comparison"><strong><?php echo esc_html( sprintf( '%+.1f%%', $comparison['downloads'] ) ); ?></strong> <?php esc_html_e( 'vs previous period', 'resilient-hub' ); ?></div><?php endif; ?>
 				</div>
 			</div>
 
@@ -677,6 +817,77 @@ get_header();
 				</div>
 			</div>
 
+			<h2 class="rp-analytics-section-title"><?php esc_html_e( 'Audience & Acquisition', 'resilient-hub' ); ?></h2>
+			<div class="rp-analytics-tables-row">
+				<div class="rp-analytics-table-card">
+					<h3 class="rp-analytics-table-title"><?php esc_html_e( 'Sessions by Country', 'resilient-hub' ); ?></h3>
+					<div class="rp-table-responsive"><table class="rp-moderation-table" style="font-size:13px;"><thead><tr>
+						<th><?php esc_html_e( 'Country', 'resilient-hub' ); ?></th><th style="text-align:right;"><?php esc_html_e( 'Sessions', 'resilient-hub' ); ?></th><th style="text-align:right;"><?php esc_html_e( 'Views', 'resilient-hub' ); ?></th>
+					</tr></thead><tbody>
+					<?php if ( $country_breakdown ) : foreach ( $country_breakdown as $country ) : ?>
+						<tr><td><strong><?php echo esc_html( rp_child_analytics_country_name( $country->country_code ) ); ?></strong> <small><?php echo esc_html( $country->country_code ); ?></small></td><td style="text-align:right;"><?php echo number_format_i18n( $country->sessions ); ?></td><td style="text-align:right;"><?php echo number_format_i18n( $country->views ); ?></td></tr>
+					<?php endforeach; else : ?><tr><td colspan="3"><?php esc_html_e( 'No country data yet.', 'resilient-hub' ); ?></td></tr><?php endif; ?>
+					</tbody></table></div>
+				</div>
+				<div class="rp-analytics-table-card">
+					<h3 class="rp-analytics-table-title"><?php esc_html_e( 'Acquisition Sources', 'resilient-hub' ); ?></h3>
+					<div class="rp-table-responsive"><table class="rp-moderation-table" style="font-size:13px;"><thead><tr>
+						<th><?php esc_html_e( 'Source', 'resilient-hub' ); ?></th><th><?php esc_html_e( 'Medium', 'resilient-hub' ); ?></th><th style="text-align:right;"><?php esc_html_e( 'Sessions', 'resilient-hub' ); ?></th>
+					</tr></thead><tbody>
+					<?php if ( $source_breakdown ) : foreach ( $source_breakdown as $source ) : ?>
+						<tr><td><strong><?php echo esc_html( $source->source ); ?></strong></td><td><?php echo esc_html( str_replace( '_', ' ', $source->medium ) ); ?></td><td style="text-align:right;"><?php echo number_format_i18n( $source->sessions ); ?></td></tr>
+					<?php endforeach; else : ?><tr><td colspan="3"><?php esc_html_e( 'No acquisition data yet.', 'resilient-hub' ); ?></td></tr><?php endif; ?>
+					</tbody></table></div>
+				</div>
+			</div>
+
+			<div class="rp-analytics-tables-row">
+				<div class="rp-analytics-table-card">
+					<h3 class="rp-analytics-table-title"><?php esc_html_e( 'Sessions by Device', 'resilient-hub' ); ?></h3>
+					<div class="rp-table-responsive"><table class="rp-moderation-table" style="font-size:13px;"><thead><tr><th><?php esc_html_e( 'Device', 'resilient-hub' ); ?></th><th style="text-align:right;"><?php esc_html_e( 'Sessions', 'resilient-hub' ); ?></th></tr></thead><tbody>
+					<?php if ( $device_breakdown ) : foreach ( $device_breakdown as $device ) : ?><tr><td><?php echo esc_html( ucwords( $device->device ) ); ?></td><td style="text-align:right;"><?php echo number_format_i18n( $device->sessions ); ?></td></tr><?php endforeach; else : ?><tr><td colspan="2"><?php esc_html_e( 'No device data yet.', 'resilient-hub' ); ?></td></tr><?php endif; ?>
+					</tbody></table></div>
+				</div>
+				<div class="rp-analytics-table-card">
+					<h3 class="rp-analytics-table-title"><?php esc_html_e( 'New vs Returning Sessions', 'resilient-hub' ); ?></h3>
+					<div class="rp-table-responsive"><table class="rp-moderation-table" style="font-size:13px;"><thead><tr><th><?php esc_html_e( 'Visitor Type', 'resilient-hub' ); ?></th><th style="text-align:right;"><?php esc_html_e( 'Sessions', 'resilient-hub' ); ?></th></tr></thead><tbody>
+						<tr><td><?php esc_html_e( 'New visitor', 'resilient-hub' ); ?></td><td style="text-align:right;"><?php echo number_format_i18n( (int) $visitor_breakdown->new_sessions ); ?></td></tr>
+						<tr><td><?php esc_html_e( 'Returning visitor', 'resilient-hub' ); ?></td><td style="text-align:right;"><?php echo number_format_i18n( (int) $visitor_breakdown->returning_sessions ); ?></td></tr>
+					</tbody></table></div>
+				</div>
+			</div>
+
+			<h2 class="rp-analytics-section-title"><?php esc_html_e( 'Content Performance & Discovery', 'resilient-hub' ); ?></h2>
+			<div class="rp-analytics-tables-row">
+				<div class="rp-analytics-table-card">
+					<h3 class="rp-analytics-table-title"><?php esc_html_e( 'Resource View-to-Download Performance', 'resilient-hub' ); ?></h3>
+					<div class="rp-table-responsive"><table class="rp-moderation-table" style="font-size:13px;"><thead><tr><th><?php esc_html_e( 'Resource', 'resilient-hub' ); ?></th><th style="text-align:right;"><?php esc_html_e( 'Views', 'resilient-hub' ); ?></th><th style="text-align:right;"><?php esc_html_e( 'Downloads', 'resilient-hub' ); ?></th><th style="text-align:right;"><?php esc_html_e( 'Rate', 'resilient-hub' ); ?></th><th style="text-align:right;"><?php esc_html_e( 'Download Trend', 'resilient-hub' ); ?></th></tr></thead><tbody>
+					<?php if ( $effective_content ) : foreach ( $effective_content as $content ) :
+						$download_rate = $content->views ? ( (int) $content->downloads / (int) $content->views ) * 100 : 0;
+						$previous_content_count = isset( $previous_content_downloads[ (int) $content->post_id ] ) ? $previous_content_downloads[ (int) $content->post_id ] : 0;
+						$content_trend = ! $days ? '—' : ( $previous_content_count ? sprintf( '%+.1f%%', ( ( (int) $content->downloads - $previous_content_count ) / $previous_content_count ) * 100 ) : ( $content->downloads ? __( 'New', 'resilient-hub' ) : '—' ) );
+					?>
+						<tr><td><strong><?php echo esc_html( $content->post_title ? $content->post_title : sprintf( __( 'Content #%d', 'resilient-hub' ), $content->post_id ) ); ?></strong></td><td style="text-align:right;"><?php echo number_format_i18n( $content->views ); ?></td><td style="text-align:right;"><?php echo number_format_i18n( $content->downloads ); ?></td><td style="text-align:right;"><?php echo esc_html( number_format_i18n( $download_rate, 1 ) . '%' ); ?></td><td style="text-align:right;"><?php echo esc_html( $content_trend ); ?></td></tr>
+					<?php endforeach; else : ?><tr><td colspan="5"><?php esc_html_e( 'No resource performance data yet.', 'resilient-hub' ); ?></td></tr><?php endif; ?>
+					</tbody></table></div>
+				</div>
+				<div class="rp-analytics-table-card">
+					<h3 class="rp-analytics-table-title"><?php esc_html_e( 'Resource Search Terms', 'resilient-hub' ); ?></h3>
+					<div class="rp-table-responsive"><table class="rp-moderation-table" style="font-size:13px;"><thead><tr><th><?php esc_html_e( 'Term', 'resilient-hub' ); ?></th><th style="text-align:right;"><?php esc_html_e( 'Searches', 'resilient-hub' ); ?></th><th style="text-align:right;"><?php esc_html_e( 'Avg. Results', 'resilient-hub' ); ?></th><th style="text-align:right;"><?php esc_html_e( 'Zero Results', 'resilient-hub' ); ?></th></tr></thead><tbody>
+					<?php if ( $popular_searches ) : foreach ( $popular_searches as $search ) : ?><tr><td><strong><?php echo esc_html( $search->search_term ); ?></strong></td><td style="text-align:right;"><?php echo number_format_i18n( $search->searches ); ?></td><td style="text-align:right;"><?php echo number_format_i18n( $search->average_results ); ?></td><td style="text-align:right;"><?php echo number_format_i18n( $search->zero_results ); ?></td></tr><?php endforeach; else : ?><tr><td colspan="4"><?php esc_html_e( 'No resource searches recorded yet.', 'resilient-hub' ); ?></td></tr><?php endif; ?>
+					</tbody></table></div>
+				</div>
+			</div>
+
+			<h2 class="rp-analytics-section-title"><?php esc_html_e( 'Data Quality', 'resilient-hub' ); ?></h2>
+			<?php $quality_total = max( 1, (int) $quality->total ); ?>
+			<div class="rp-quality-grid">
+				<div class="rp-quality-item"><strong><?php echo esc_html( number_format_i18n( 100 - ( (int) $quality->unknown_country / $quality_total * 100 ), 1 ) . '%' ); ?></strong><span><?php esc_html_e( 'Country coverage', 'resilient-hub' ); ?></span></div>
+				<div class="rp-quality-item"><strong><?php echo esc_html( number_format_i18n( 100 - ( (int) $quality->legacy_session / $quality_total * 100 ), 1 ) . '%' ); ?></strong><span><?php esc_html_e( 'Session-ID coverage', 'resilient-hub' ); ?></span></div>
+				<div class="rp-quality-item"><strong><?php echo esc_html( number_format_i18n( (int) $quality->bot_views / $quality_total * 100, 1 ) . '%' ); ?></strong><span><?php esc_html_e( 'Views classified as bots', 'resilient-hub' ); ?></span></div>
+				<div class="rp-quality-item"><strong><?php echo number_format_i18n( (int) $quality->missing_agent ); ?></strong><span><?php esc_html_e( 'Events missing user agent', 'resilient-hub' ); ?></span></div>
+			</div>
+
 			<!-- Full Width Detailed Audit Log Table -->
 			<div class="rp-analytics-table-card" style="margin-bottom: 40px;">
 				<h3 class="rp-analytics-table-title">
@@ -695,6 +906,8 @@ get_header();
 								<th><?php esc_html_e( 'User (Who)', 'resilient-hub' ); ?></th>
 								<th><?php esc_html_e( 'Downloaded Resource (What)', 'resilient-hub' ); ?></th>
 								<th><?php esc_html_e( 'IP Address', 'resilient-hub' ); ?></th>
+								<th><?php esc_html_e( 'Country', 'resilient-hub' ); ?></th>
+								<th><?php esc_html_e( 'Acquisition', 'resilient-hub' ); ?></th>
 								<th><?php esc_html_e( 'Timestamp (When)', 'resilient-hub' ); ?></th>
 								<th><?php esc_html_e( 'Browser / Device', 'resilient-hub' ); ?></th>
 							</tr>
@@ -734,6 +947,8 @@ get_header();
 											</div>
 										</td>
 										<td><code><?php echo esc_html( $log->ip_address ); ?></code></td>
+										<td><?php echo esc_html( rp_child_analytics_country_name( $log->country_code ) ); ?></td>
+										<td><strong><?php echo esc_html( $log->traffic_source ? $log->traffic_source : __( 'Unknown', 'resilient-hub' ) ); ?></strong><br><small><?php echo esc_html( $log->traffic_medium ? str_replace( '_', ' ', $log->traffic_medium ) : __( 'Unknown', 'resilient-hub' ) ); ?><?php echo $log->campaign ? ' · ' . esc_html( $log->campaign ) : ''; ?></small></td>
 										<td><?php echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $log->created_at ) ) ); ?></td>
 										<td>
 											<span class="rp-log-agent" title="<?php echo esc_attr( $log->user_agent ); ?>">
@@ -744,7 +959,7 @@ get_header();
 								<?php endforeach; ?>
 							<?php else : ?>
 								<tr>
-									<td colspan="5" style="text-align: center; color: #9ca3af; padding: 24px;"><?php esc_html_e( 'No downloads logged matching your criteria.', 'resilient-hub' ); ?></td>
+									<td colspan="7" style="text-align: center; color: #9ca3af; padding: 24px;"><?php esc_html_e( 'No downloads logged matching your criteria.', 'resilient-hub' ); ?></td>
 								</tr>
 							<?php endif; ?>
 						</tbody>
@@ -804,7 +1019,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					pointHoverRadius: 6
 				},
 				{
-					label: 'Unique Visits',
+					label: 'Unique Sessions',
 					data: visitsData,
 					borderColor: '#d97706',
 					backgroundColor: 'transparent',

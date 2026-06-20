@@ -799,6 +799,25 @@ function rp_child_is_bot_user_agent( $user_agent ) {
 	return empty( $user_agent ) || (bool) preg_match( '/bot|crawl|spider|slurp|bingpreview|headless|phantom|selenium|puppeteer|playwright|lighthouse|monitor|uptime|facebookexternalhit|whatsapp|telegrambot|discordbot/i', $user_agent );
 }
 
+function rp_child_analytics_country_name( $country_code ) {
+	$country_code = strtoupper( (string) $country_code );
+	if ( 'ZZ' === $country_code ) {
+		return __( 'Unknown', 'resilient-hub' );
+	}
+	if ( class_exists( 'Locale' ) ) {
+		$name = Locale::getDisplayRegion( '-' . $country_code, 'en' );
+		if ( $name && $name !== $country_code ) {
+			return $name;
+		}
+	}
+	return $country_code;
+}
+
+function rp_child_analytics_csv_value( $value ) {
+	$value = (string) $value;
+	return preg_match( '/^[=+\-@]/', $value ) ? "'" . $value : $value;
+}
+
 /**
  * Export the filtered download audit trail as CSV.
  */
@@ -832,7 +851,7 @@ function rp_child_export_analytics_csv() {
 	}
 
 	$logs = $wpdb->get_results( "
-		SELECT d.user_id, d.ip_address, d.user_agent, d.created_at, d.post_id, p.post_title, p.post_type
+		SELECT d.user_id, d.ip_address, d.user_agent, d.created_at, d.post_id, d.session_id, d.country_code, d.device_type, d.traffic_source, d.traffic_medium, d.campaign, p.post_title, p.post_type
 		FROM {$wpdb->prefix}rp_analytics_downloads d
 		LEFT JOIN {$wpdb->posts} p ON d.post_id = p.ID
 		{$where}
@@ -843,20 +862,27 @@ function rp_child_export_analytics_csv() {
 	header( 'Content-Type: text/csv; charset=utf-8' );
 	header( 'Content-Disposition: attachment; filename="download-audit-' . gmdate( 'Y-m-d' ) . '.csv"' );
 	$output = fopen( 'php://output', 'w' );
-	fputcsv( $output, array( 'User', 'Email', 'Resource', 'Resource ID', 'Type', 'IP Address', 'Traffic', 'Timestamp', 'User Agent' ) );
+	fputcsv( $output, array( 'User', 'Email', 'Resource', 'Resource ID', 'Type', 'IP Address', 'Traffic', 'Country', 'Device', 'Source', 'Medium', 'Campaign', 'Session ID', 'Timestamp', 'User Agent' ) );
 	foreach ( $logs as $log ) {
 		$user = $log->user_id ? get_userdata( $log->user_id ) : false;
-		fputcsv( $output, array(
+		$row = array(
 			$user ? $user->display_name : 'Guest User',
 			$user ? $user->user_email : '',
 			$log->post_title ? $log->post_title : 'Deleted Resource',
 			$log->post_id,
 			$log->post_type,
 			$log->ip_address,
-			rp_child_is_bot_user_agent( (string) $log->user_agent ) ? 'Bot / Inorganic' : 'Organic',
+			rp_child_is_bot_user_agent( (string) $log->user_agent ) ? 'Bot / Inorganic' : 'Human',
+			$log->country_code,
+			$log->device_type,
+			$log->traffic_source,
+			$log->traffic_medium,
+			$log->campaign,
+			$log->session_id,
 			$log->created_at,
 			$log->user_agent,
-		) );
+		);
+		fputcsv( $output, array_map( 'rp_child_analytics_csv_value', $row ) );
 	}
 	fclose( $output );
 	exit;

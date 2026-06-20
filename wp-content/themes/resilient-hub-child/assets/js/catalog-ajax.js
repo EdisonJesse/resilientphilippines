@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let debounceTimeout = null;
 
         // Fetch catalog results via WP Admin AJAX API
-        function fetchCatalogResults(paged = 1) {
+        function fetchCatalogResults(paged = 1, trackSearch = false) {
             // Show loader
             loader.style.display = 'flex';
             gridContainer.style.opacity = '0.5';
@@ -40,6 +40,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Map form fields to AJAX params
             const searchVal = filterForm.querySelector('#rp_q') ? filterForm.querySelector('#rp_q').value : '';
             params.append('q', searchVal);
+            if (trackSearch && searchVal.trim().length >= 2) {
+                params.append('track_search', '1');
+            }
 
             const categoryVal = filterForm.querySelector('#rp_resource_category') ? filterForm.querySelector('#rp_resource_category').value : '0';
             params.append('resource_category', categoryVal);
@@ -88,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
         filterForm.addEventListener('submit', function(e) {
             e.preventDefault();
             if (debounceTimeout) clearTimeout(debounceTimeout);
-            fetchCatalogResults(1);
+            fetchCatalogResults(1, true);
         });
 
         filterForm.querySelectorAll('select').forEach(select => {
@@ -103,8 +106,8 @@ document.addEventListener('DOMContentLoaded', function() {
             searchInput.addEventListener('input', function() {
                 if (debounceTimeout) clearTimeout(debounceTimeout);
                 debounceTimeout = setTimeout(() => {
-                    fetchCatalogResults(1);
-                }, 400); // 400ms debounce
+                    fetchCatalogResults(1, true);
+                }, 800);
             });
         }
 
