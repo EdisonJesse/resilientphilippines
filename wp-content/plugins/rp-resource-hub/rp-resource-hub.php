@@ -3074,8 +3074,8 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 			<div class="rp-location-row" data-idx="0" style="border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; margin-bottom: 20px; position: relative; background: #fafafa;">
 				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
 					<div class="rp-field">
-						<label>Region</label>
-						<select class="rp-loc-region" name="rp_locations[0][region]">
+						<label>Region *</label>
+						<select class="rp-loc-region" name="rp_locations[0][region]" required>
 							<option value="">Loading regions...</option>
 						</select>
 					</div>
@@ -3383,8 +3383,8 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 				<button type="button" class="rp-remove-row-btn" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ef4444; font-weight: bold; cursor: pointer; font-size: 14px;">✕ Remove</button>
 				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
 					<div class="rp-field">
-						<label>Region</label>
-						<select class="rp-loc-region" name="rp_locations[${rowIdx}][region]">
+						<label>Region *</label>
+						<select class="rp-loc-region" name="rp_locations[${rowIdx}][region]" required>
 							<option value="">Loading regions...</option>
 						</select>
 					</div>
