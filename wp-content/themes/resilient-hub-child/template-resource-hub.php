@@ -21,15 +21,20 @@ get_header();
 			while ( have_posts() ) :
 				the_post();
 				$page_content = get_the_content();
-				if ( trim( $page_content ) ) {
-					echo '<div class="entry-content">';
-					the_content();
-					echo '</div>';
-				}
 			endwhile;
 
-			if ( false === strpos( $page_content, '[rp_resource_catalog' ) ) {
+			$stripped_content = trim( wp_strip_all_tags( strip_shortcodes( $page_content ) ) );
+
+			if ( empty( $stripped_content ) ) {
 				echo do_shortcode( '[rp_resource_catalog limit="12" filters="true"]' );
+			} else {
+				echo '<div class="entry-content">';
+				the_content();
+				echo '</div>';
+
+				if ( false === strpos( $page_content, '[rp_resource_catalog' ) ) {
+					echo do_shortcode( '[rp_resource_catalog limit="12" filters="true"]' );
+				}
 			}
 			?>
 		</div>
