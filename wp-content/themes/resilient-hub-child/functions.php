@@ -1599,7 +1599,7 @@ function rp_child_append_cf7_honeypot( $content ) {
 	$token         = base64_encode( $challenge . ':' . $signature );
 
 	$human_check_html = sprintf(
-		'<p class="cf7-human-check"><label for="cf7_human_answer">Human check: What is %1$d + %2$d? <span aria-hidden="true">*</span></label><br><input type="number" id="cf7_human_answer" name="cf7_human_answer" min="4" max="18" inputmode="numeric" autocomplete="off" required aria-required="true"><input type="hidden" name="cf7_human_token" value="%3$s"></p>',
+		'<p class="cf7-human-check"><label for="cf7_human_answer">Human check: What is %1$d + %2$d? <span aria-hidden="true">*</span></label><input type="number" id="cf7_human_answer" name="cf7_human_answer" min="4" max="18" inputmode="numeric" autocomplete="off" required aria-required="true"><input type="hidden" name="cf7_human_token" value="%3$s"></p>',
 		$first_number,
 		$second_number,
 		esc_attr( $token )
