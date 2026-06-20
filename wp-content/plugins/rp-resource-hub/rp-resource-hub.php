@@ -2542,7 +2542,7 @@ function rp_resource_hub_handle_download() {
 	}
 
 	$post = get_post( $post_id );
-	if ( ! $post || 'publish' !== $post->post_status || ! in_array( $post->post_type, array( 'accord_library', 'partner_resources' ), true ) ) {
+	if ( ! $post || 'publish' !== $post->post_status || ! in_array( $post->post_type, array( 'accord_library', 'partner_resources', 'rp_sitrep' ), true ) ) {
 		wp_die( esc_html__( 'Resource not found.', 'rp-resource-hub' ), '', array( 'response' => 404 ) );
 	}
 
