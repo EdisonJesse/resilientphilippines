@@ -1843,7 +1843,7 @@ function rp_child_append_cf7_honeypot( $content ) {
 }
 add_filter( 'wpcf7_form_elements', 'rp_child_append_cf7_honeypot' );
 
-// 2. Validate submissions using the honeypot field, link count, and spam keywords.
+// 2. Validate submissions using the honeypot field, human check, URL blocking, and spam keywords.
 function rp_child_cf7_spam_verification( $spam, $submission ) {
 	if ( $spam ) {
 		return $spam;
@@ -1876,24 +1876,23 @@ function rp_child_cf7_spam_verification( $spam, $submission ) {
 	// Get form submission data.
 	$posted_data = $submission->get_posted_data();
 
-	// Combine all text fields to inspect for spam patterns.
+	// Combine user-entered text while keeping email addresses out of URL detection.
 	$text_content = '';
+	$url_content  = '';
 	if ( is_array( $posted_data ) ) {
 		foreach ( $posted_data as $key => $value ) {
 			if ( is_string( $value ) ) {
 				$text_content .= ' ' . $value;
+				if ( false === stripos( $key, 'email' ) && 0 !== strpos( $key, '_wpcf7' ) && 0 !== strpos( $key, 'cf7_' ) ) {
+					$url_content .= ' ' . $value;
+				}
 			}
 		}
 	}
 
-	// Case 3: Block multiple links and URL shorteners commonly used to conceal spam destinations.
-	$link_count = preg_match_all( '/(?:https?:\/\/|www\.)[^\s]+/i', $text_content );
-	if ( $link_count > 1 ) {
-		return true; // Mark as spam.
-	}
-
-	$shortener_pattern = '/\b(?:bit\.ly|tinyurl\.com|t\.co|goo\.gl|ow\.ly|buff\.ly|is\.gd|cutt\.ly|rebrand\.ly|shorturl\.at|bpl\.kr)(?:\/|\b)/i';
-	if ( preg_match( $shortener_pattern, $text_content ) ) {
+	// Case 3: Block any URL, including protocol links, www links, bare domains, and IP-address links.
+	$url_pattern = '~(?:https?|hxxps?)://[^\s<]+|www\.[^\s<]+|(?<![@\w])(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}(?:/[^\s<]*)?|(?<![\d@])(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?(?:/[^\s<]*)?~i';
+	if ( preg_match( $url_pattern, $url_content ) ) {
 		return true;
 	}
 
