@@ -5,6 +5,14 @@
  * @package ResilientHub
  */
 
+add_filter(
+	'body_class',
+	static function ( $classes ) {
+		return array_values( array_diff( $classes, array( 'rpsb-builder-page' ) ) );
+	},
+	20
+);
+
 get_header();
 ?>
 <main id="primary">
