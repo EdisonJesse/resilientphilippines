@@ -35,6 +35,8 @@ if ( $days > 0 ) {
 	$views_where .= $wpdb->prepare( " AND v.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)", $days );
 	$downloads_where .= $wpdb->prepare( " AND d.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)", $days );
 }
+$views_date_where     = $views_where;
+$downloads_date_where = $downloads_where;
 $views_where     .= rp_child_analytics_traffic_sql( 'v', $traffic_type );
 $downloads_where .= rp_child_analytics_traffic_sql( 'd', $traffic_type );
 
@@ -44,6 +46,31 @@ $downloads_where .= rp_child_analytics_traffic_sql( 'd', $traffic_type );
 $unique_visits = $wpdb->get_var( "SELECT COUNT(DISTINCT v.ip_address) FROM {$wpdb->prefix}rp_analytics_views v $views_where" );
 $total_views   = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}rp_analytics_views v $views_where" );
 $total_downloads = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}rp_analytics_downloads d $downloads_where" );
+
+$view_bot_condition     = preg_replace( '/^\s*AND\s+/i', '', rp_child_analytics_traffic_sql( 'v', 'bot' ) );
+$download_bot_condition = preg_replace( '/^\s*AND\s+/i', '', rp_child_analytics_traffic_sql( 'd', 'bot' ) );
+$view_breakdown = $wpdb->get_row( "
+	SELECT
+		COUNT(DISTINCT CASE WHEN NOT {$view_bot_condition} THEN v.ip_address END) AS organic_visits,
+		COUNT(DISTINCT CASE WHEN {$view_bot_condition} THEN v.ip_address END) AS bot_visits,
+		SUM(CASE WHEN NOT {$view_bot_condition} THEN 1 ELSE 0 END) AS organic_views,
+		SUM(CASE WHEN {$view_bot_condition} THEN 1 ELSE 0 END) AS bot_views
+	FROM {$wpdb->prefix}rp_analytics_views v
+	{$views_date_where}
+" );
+$download_breakdown = $wpdb->get_row( "
+	SELECT
+		SUM(CASE WHEN NOT {$download_bot_condition} THEN 1 ELSE 0 END) AS organic_downloads,
+		SUM(CASE WHEN {$download_bot_condition} THEN 1 ELSE 0 END) AS bot_downloads
+	FROM {$wpdb->prefix}rp_analytics_downloads d
+	{$downloads_date_where}
+" );
+$organic_visits    = (int) $view_breakdown->organic_visits;
+$bot_visits        = (int) $view_breakdown->bot_visits;
+$organic_views     = (int) $view_breakdown->organic_views;
+$bot_views         = (int) $view_breakdown->bot_views;
+$organic_downloads = (int) $download_breakdown->organic_downloads;
+$bot_downloads     = (int) $download_breakdown->bot_downloads;
 
 // -------------------------------------------------------------
 // 2. Chart Timeline Data
@@ -255,6 +282,25 @@ get_header();
 	font-weight: 700;
 	color: #111827;
 }
+.rp-card-breakdown {
+	display: flex;
+	gap: 14px;
+	margin-top: 7px;
+	font-size: 12px;
+	font-weight: 600;
+	color: #6b7280;
+}
+.rp-card-breakdown-organic::before,
+.rp-card-breakdown-bot::before {
+	content: '';
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	margin-right: 5px;
+	border-radius: 50%;
+}
+.rp-card-breakdown-organic::before { background: #16a34a; }
+.rp-card-breakdown-bot::before { background: #9ca3af; }
 
 .rp-chart-container {
 	background: #ffffff;
@@ -463,6 +509,10 @@ get_header();
 						</div>
 					</div>
 					<div class="rp-card-value"><?php echo number_format( absint( $unique_visits ) ); ?></div>
+					<div class="rp-card-breakdown">
+						<span class="rp-card-breakdown-organic"><?php printf( esc_html__( 'Organic: %s', 'resilient-hub' ), number_format_i18n( $organic_visits ) ); ?></span>
+						<span class="rp-card-breakdown-bot"><?php printf( esc_html__( 'Bots: %s', 'resilient-hub' ), number_format_i18n( $bot_visits ) ); ?></span>
+					</div>
 				</div>
 
 				<!-- Card 2: Page Views -->
@@ -474,6 +524,10 @@ get_header();
 						</div>
 					</div>
 					<div class="rp-card-value"><?php echo number_format( absint( $total_views ) ); ?></div>
+					<div class="rp-card-breakdown">
+						<span class="rp-card-breakdown-organic"><?php printf( esc_html__( 'Organic: %s', 'resilient-hub' ), number_format_i18n( $organic_views ) ); ?></span>
+						<span class="rp-card-breakdown-bot"><?php printf( esc_html__( 'Bots: %s', 'resilient-hub' ), number_format_i18n( $bot_views ) ); ?></span>
+					</div>
 				</div>
 
 				<!-- Card 3: Downloads -->
@@ -485,6 +539,10 @@ get_header();
 						</div>
 					</div>
 					<div class="rp-card-value"><?php echo number_format( absint( $total_downloads ) ); ?></div>
+					<div class="rp-card-breakdown">
+						<span class="rp-card-breakdown-organic"><?php printf( esc_html__( 'Organic: %s', 'resilient-hub' ), number_format_i18n( $organic_downloads ) ); ?></span>
+						<span class="rp-card-breakdown-bot"><?php printf( esc_html__( 'Bots: %s', 'resilient-hub' ), number_format_i18n( $bot_downloads ) ); ?></span>
+					</div>
 				</div>
 			</div>
 
