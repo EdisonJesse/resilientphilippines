@@ -44,7 +44,7 @@
   function renderPreview(section, index, selected) {
     var selectedClass = selected ? ' is-selected' : '';
     var tools = '<div class="rpsb-vb-section-tools"><button type="button" data-rpsb-up>Up</button><button type="button" data-rpsb-down>Down</button><button type="button" data-rpsb-duplicate>Duplicate</button><button type="button" data-rpsb-remove>Remove</button></div>';
-    var data = ' data-rpsb-section="' + index + '"';
+    var data = ' data-rpsb-section="' + index + '" data-rpsb-type="' + html(section.type) + '"';
 
     if (section.type === 'hero') {
       return '<section' + data + ' class="' + sectionClasses('rpsb-vb-section rpsb-hero', section) + selectedClass + '">' +
@@ -179,7 +179,14 @@
       return '<p>No sections yet.</p>';
     }
     return layout.map(function (section, index) {
-      return '<button type="button" class="' + (selected === index ? 'is-active' : '') + '" data-rpsb-structure-item="' + index + '">' + (index + 1) + '. ' + html(section.title || section.type) + '</button>';
+      var title = section.title || (section.type.charAt(0).toUpperCase() + section.type.slice(1));
+      return '<div class="rpsb-structure-item-wrap" draggable="true" data-rpsb-structure-index="' + index + '">' +
+        '<button type="button" class="rpsb-structure-btn ' + (selected === index ? 'is-active' : '') + '" data-rpsb-structure-item="' + index + '">' +
+        '<span class="dashicons dashicons-menu rpsb-drag-handle"></span>' +
+        '<span class="rpsb-structure-num">' + (index + 1) + '.</span> ' +
+        '<span class="rpsb-structure-title">' + html(title) + '</span>' +
+        '</button>' +
+        '</div>';
     }).join('');
   }
 
@@ -532,6 +539,57 @@
       draw();
     }
 
+    var draggedIndex = null;
+
+    builder.addEventListener('dragstart', function (event) {
+      var draggable = event.target.closest('[data-rpsb-structure-index]');
+      if (draggable) {
+        draggedIndex = parseInt(draggable.dataset.rpsbStructureIndex, 10);
+        draggable.classList.add('is-dragging');
+        event.dataTransfer.effectAllowed = 'move';
+      }
+    });
+
+    builder.addEventListener('dragend', function (event) {
+      var draggable = event.target.closest('[data-rpsb-structure-index]');
+      if (draggable) {
+        draggable.classList.remove('is-dragging');
+      }
+      builder.querySelectorAll('.rpsb-structure-item-wrap').forEach(function (node) {
+        node.classList.remove('drag-over');
+      });
+    });
+
+    builder.addEventListener('dragover', function (event) {
+      var draggable = event.target.closest('[data-rpsb-structure-index]');
+      if (draggable) {
+        event.preventDefault();
+        draggable.classList.add('drag-over');
+      }
+    });
+
+    builder.addEventListener('dragleave', function (event) {
+      var draggable = event.target.closest('[data-rpsb-structure-index]');
+      if (draggable) {
+        draggable.classList.remove('drag-over');
+      }
+    });
+
+    builder.addEventListener('drop', function (event) {
+      var draggable = event.target.closest('[data-rpsb-structure-index]');
+      if (draggable && draggedIndex !== null) {
+        var targetIndex = parseInt(draggable.dataset.rpsbStructureIndex, 10);
+        if (draggedIndex !== targetIndex) {
+          var draggedItem = layout.splice(draggedIndex, 1)[0];
+          layout.splice(targetIndex, 0, draggedItem);
+          selected = targetIndex;
+          markDirty();
+          draw();
+        }
+      }
+      draggedIndex = null;
+    });
+
     builder.addEventListener('click', function (event) {
       var tab = event.target.closest('[data-rpsb-tab]');
       if (tab) {
@@ -606,6 +664,16 @@
           markDirty();
           draw();
         } else {
+          // Switch to Edit tab on canvas section click
+          builder.querySelectorAll('[data-rpsb-tab], [data-rpsb-panel]').forEach(function (node) {
+            node.classList.remove('is-active');
+          });
+          var editTab = builder.querySelector('[data-rpsb-tab="edit"]');
+          var editPanel = builder.querySelector('[data-rpsb-panel="edit"]');
+          if (editTab && editPanel) {
+            editTab.classList.add('is-active');
+            editPanel.classList.add('is-active');
+          }
           draw();
         }
       }

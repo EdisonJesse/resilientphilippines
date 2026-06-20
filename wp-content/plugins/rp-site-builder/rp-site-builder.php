@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Site Builder
  * Description: Dashboard layout builder for pages, reusable site components, and optional custom header/footer controls.
- * Version: 0.2.4
+ * Version: 0.2.5
  * Author: ACCORD
  * Text Domain: rp-site-builder
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RPSB_VERSION', '0.2.4' );
+define( 'RPSB_VERSION', '0.2.5' );
 define( 'RPSB_FILE', __FILE__ );
 define( 'RPSB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RPSB_URL', plugin_dir_url( __FILE__ ) );

@@ -4,7 +4,7 @@ Custom WordPress plugin prototype for editing page layouts, reusable components,
 
 ## Current Status
 
-This plugin is a developed prototype. It is not yet a production-ready YOOtheme-style builder, but it features visual admin screens, page content import mapping, frontend layout rendering, a recursion prevention safety system for reusable components, and an automated data overwrite warning system. The plugin is now tracked in Git.
+This plugin is a developed prototype. It features a custom YOOtheme-style page builder with a premium dark mode user interface, visual layout structure, responsive canvas overlays, inline text editing, page content import mapping, frontend layout rendering, reusable site components with recursion prevention, and native drag-and-drop section reordering. The plugin is fully tracked in Git.
 
 ## Plugin Files
 
@@ -74,8 +74,10 @@ Current section types:
 
 ## Visual Builder Capabilities
 
-Current capabilities:
-
+- **Premium Dark Mode UI**: A dark themed sidebar, topbar, and inspector designed like YOOtheme Pro.
+- **Drag-and-Drop Reordering**: Drag and drop sections in the layout structure panel to instantly sort them.
+- **Canvas Hover & Select Overlays**: Sections show custom border outlines and floating type labels (e.g. "Hero", "Cards") on hover.
+- **Click-to-Edit Tab Focus**: Clicking any section on the canvas selects it and automatically shifts the sidebar to the "Edit" settings panel.
 - Select a page to edit.
 - Add sections from the sidebar.
 - Insert basic landing/content templates.
@@ -145,7 +147,6 @@ Recommended improvements if continuing this plugin:
 
 - Define a stable section schema and migration strategy.
 - Replace string-based `cards` data with structured card arrays.
-- Add drag-and-drop section sorting.
 - Add dedicated import mappings for each active page template.
 - Add preview parity tests for front-end and admin canvas.
 - Add nonce/capability tests for AJAX endpoints.
@@ -161,4 +162,6 @@ During development, the following checks were run repeatedly:
 - Basic homepage request check.
 - Component recursion tests to verify protection blocks memory limits.
 - Save validation and prompt verification when layout is enabled over raw content.
+- Native drag-and-drop ordering verification in the sidebar structure panel.
+- Dark mode theme color and styling verification.
 
