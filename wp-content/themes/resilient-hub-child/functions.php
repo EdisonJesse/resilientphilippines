@@ -1702,3 +1702,398 @@ function rp_child_cf7_spam_verification( $spam, $submission ) {
 	return $spam;
 }
 add_filter( 'wpcf7_spam', 'rp_child_cf7_spam_verification', 10, 2 );
+
+/**
+ * ============================================================================
+ * PROGRAMMATIC SEO OPTIMIZATIONS AND META FALLBACKS
+ * ============================================================================
+ */
+
+/**
+ * Retrieve custom SEO metadata mapping based on the current page context.
+ */
+function rp_child_get_seo_meta_for_current_page() {
+	$seo_data = array(
+		'title'       => '',
+		'description' => '',
+	);
+
+	if ( is_front_page() || is_home() ) {
+		$seo_data['title']       = 'ACCORD | Resilient Communities, Resilient Philippines';
+		$seo_data['description'] = 'ACCORD supports disaster risk reduction, humanitarian action, and community resilience work across the Philippines through practical tools, learning, and partnerships.';
+	} elseif ( is_page( 'resource-hub' ) ) {
+		$seo_data['title']       = 'Resource Hub | Disaster Risk Reduction and Humanitarian Tools';
+		$seo_data['description'] = 'Browse ACCORD knowledge products, partner resources, training materials, reports, and tools for disaster risk reduction and humanitarian action.';
+	} elseif ( is_page( array( 'about', 'about-us' ) ) ) {
+		$seo_data['title']       = 'About ACCORD | Community Resilience and Humanitarian Action';
+		$seo_data['description'] = 'Learn about ACCORD\'s work with communities and partners to strengthen disaster risk reduction, resilience, and humanitarian response in the Philippines.';
+	} elseif ( is_page( 'who-we-are' ) ) {
+		$seo_data['title']       = 'Who We Are | ACCORD Philippines';
+		$seo_data['description'] = 'Meet ACCORD, a Philippine organization working with communities, civil society, and partners to advance resilience and humanitarian action.';
+	} elseif ( is_page( array( 'resources', 'resources-3' ) ) ) {
+		$seo_data['title']       = 'Resources | ACCORD Publications and Learning Materials';
+		$seo_data['description'] = 'Access ACCORD publications, manuals, flyers, and learning resources on disaster risk reduction, resilience, and community-based action.';
+	} elseif ( is_page( array( 'news-stories', 'posts', 'news' ) ) ) {
+		$seo_data['title']       = 'News and Stories | ACCORD Resilience Work';
+		$seo_data['description'] = 'Read updates, stories, and field notes from ACCORD\'s disaster risk reduction, humanitarian, and community resilience work.';
+	}
+
+	return $seo_data;
+}
+
+/**
+ * Custom SEO title filters for both Yoast and standard WordPress.
+ */
+function rp_child_seo_title( $title ) {
+	$custom_seo = rp_child_get_seo_meta_for_current_page();
+	if ( ! empty( $custom_seo['title'] ) ) {
+		return $custom_seo['title'];
+	}
+	return $title;
+}
+add_filter( 'pre_get_document_title', 'rp_child_seo_title', 999 );
+add_filter( 'wpseo_title', 'rp_child_seo_title', 999 );
+
+/**
+ * Custom SEO meta description filters for Yoast.
+ */
+function rp_child_seo_description( $desc ) {
+	$custom_seo = rp_child_get_seo_meta_for_current_page();
+	if ( ! empty( $custom_seo['description'] ) ) {
+		return $custom_seo['description'];
+	}
+	return $desc;
+}
+add_filter( 'wpseo_metadesc', 'rp_child_seo_description', 999 );
+
+/**
+ * Fallback meta tags output in wp_head if Yoast or similar plugins are not active.
+ */
+function rp_child_seo_fallback_head_tags() {
+	// If Yoast SEO is active, it handles meta descriptions and Open Graph tags, so we don't output duplicates.
+	if ( defined( 'WPSEO_VERSION' ) ) {
+		// Filter Yoast's Open Graph and Twitter tags to match our custom mapping
+		add_filter( 'wpseo_opengraph_title', 'rp_child_seo_title', 999 );
+		add_filter( 'wpseo_opengraph_desc', 'rp_child_seo_description', 999 );
+		add_filter( 'wpseo_twitter_title', 'rp_child_seo_title', 999 );
+		add_filter( 'wpseo_twitter_description', 'rp_child_seo_description', 999 );
+		return;
+	}
+
+	$custom_seo = rp_child_get_seo_meta_for_current_page();
+	if ( empty( $custom_seo['title'] ) && empty( $custom_seo['description'] ) ) {
+		return;
+	}
+
+	$title = ! empty( $custom_seo['title'] ) ? $custom_seo['title'] : get_the_title() . ' - ' . get_bloginfo( 'name' );
+	$description = ! empty( $custom_seo['description'] ) ? $custom_seo['description'] : '';
+
+	if ( ! empty( $description ) ) {
+		echo '<meta name="description" content="' . esc_attr( $description ) . '">' . "\n";
+	}
+
+	// Open Graph Tags
+	echo '<meta property="og:title" content="' . esc_attr( $title ) . '">' . "\n";
+	if ( ! empty( $description ) ) {
+		echo '<meta property="og:description" content="' . esc_attr( $description ) . '">' . "\n";
+	}
+	echo '<meta property="og:type" content="' . ( is_single() ? 'article' : 'website' ) . '">' . "\n";
+	echo '<meta property="og:url" content="' . esc_url( get_permalink() ) . '">' . "\n";
+	echo '<meta property="og:site_name" content="' . esc_attr( get_bloginfo( 'name' ) ) . '">' . "\n";
+
+	// Twitter Tags
+	echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
+	echo '<meta name="twitter:title" content="' . esc_attr( $title ) . '">' . "\n";
+	if ( ! empty( $description ) ) {
+		echo '<meta name="twitter:description" content="' . esc_attr( $description ) . '">' . "\n";
+	}
+}
+add_action( 'wp_head', 'rp_child_seo_fallback_head_tags', 1 );
+
+/**
+ * Output structured JSON-LD schema block for organization, website, and collection page.
+ */
+function rp_child_output_seo_json_ld() {
+	// If Yoast SEO is active and outputting schema, we don't need to duplicate it unless Yoast's schema output is filtered.
+	// But adding organization, website, CollectionPage, and BlogPosting explicitly here guarantees compliant data.
+	$logo_url = esc_url( get_stylesheet_directory_uri() . '/assets/images/accord-logo.png' );
+	$site_url = esc_url( home_url( '/' ) );
+	$site_name = esc_attr( get_bloginfo( 'name' ) );
+
+	$graph = array();
+
+	// 1. Organization
+	$organization = array(
+		'@type' => 'Organization',
+		'@id'   => $site_url . '#organization',
+		'name'  => 'ACCORD',
+		'url'   => $site_url,
+		'logo'  => array(
+			'@type' => 'ImageObject',
+			'@id'   => $site_url . '#logo',
+			'url'   => $logo_url,
+			'caption' => 'ACCORD Logo',
+		),
+	);
+	$graph[] = $organization;
+
+	// 2. WebSite
+	$website = array(
+		'@type' => 'WebSite',
+		'@id'   => $site_url . '#website',
+		'url'   => $site_url,
+		'name'  => $site_name,
+		'publisher' => array(
+			'@id' => $site_url . '#organization',
+		),
+	);
+	$graph[] = $website;
+
+	// 3. Page specific schemas
+	if ( is_front_page() ) {
+		$graph[] = array(
+			'@type' => 'WebPage',
+			'@id'   => $site_url . '#webpage',
+			'url'   => $site_url,
+			'name'  => 'ACCORD | Resilient Communities, Resilient Philippines',
+			'isPartOf' => array(
+				'@id' => $site_url . '#website',
+			),
+			'about' => array(
+				'@id' => $site_url . '#organization',
+			),
+			'description' => 'ACCORD supports disaster risk reduction, humanitarian action, and community resilience work across the Philippines.',
+		);
+	} elseif ( is_page( 'resource-hub' ) ) {
+		$graph[] = array(
+			'@type' => 'CollectionPage',
+			'@id'   => esc_url( get_permalink() ) . '#webpage',
+			'url'   => esc_url( get_permalink() ),
+			'name'  => 'Resource Hub | Disaster Risk Reduction and Humanitarian Tools',
+			'isPartOf' => array(
+				'@id' => $site_url . '#website',
+			),
+			'description' => 'Browse ACCORD knowledge products, partner resources, training materials, reports, and tools.',
+		);
+	} elseif ( is_single() && get_post_type() === 'post' ) {
+		$post_id = get_the_ID();
+		$graph[] = array(
+			'@type' => 'BlogPosting',
+			'@id'   => esc_url( get_permalink() ) . '#article',
+			'url'   => esc_url( get_permalink() ),
+			'name'  => esc_attr( get_the_title() ),
+			'headline' => esc_attr( get_the_title() ),
+			'description' => esc_attr( wp_strip_all_tags( get_the_excerpt() ) ),
+			'datePublished' => get_the_date( 'c' ),
+			'dateModified' => get_the_modified_date( 'c' ),
+			'author' => array(
+				'@type' => 'Person',
+				'name' => get_the_author(),
+			),
+			'publisher' => array(
+				'@id' => $site_url . '#organization',
+			),
+			'isPartOf' => array(
+				'@id' => esc_url( get_permalink() ) . '#webpage',
+			),
+		);
+
+		$graph[] = array(
+			'@type' => 'WebPage',
+			'@id'   => esc_url( get_permalink() ) . '#webpage',
+			'url'   => esc_url( get_permalink() ),
+			'name'  => esc_attr( get_the_title() ),
+			'isPartOf' => array(
+				'@id' => $site_url . '#website',
+			),
+		);
+	} else {
+		// Default WebPage
+		$graph[] = array(
+			'@type' => 'WebPage',
+			'@id'   => esc_url( get_permalink() ) . '#webpage',
+			'url'   => esc_url( get_permalink() ),
+			'name'  => esc_attr( get_the_title() ) . ' - ' . $site_name,
+			'isPartOf' => array(
+				'@id' => $site_url . '#website',
+			),
+		);
+	}
+
+	$schema = array(
+		'@context' => 'https://schema.org',
+		'@graph'   => $graph,
+	);
+
+	echo "\n" . '<!-- Custom JSON-LD Schema -->' . "\n";
+	echo '<script type="application/ld+json">' . "\n";
+	echo wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ) . "\n";
+	echo '</script>' . "\n";
+}
+add_action( 'wp_head', 'rp_child_output_seo_json_ld', 20 );
+
+/**
+ * Hook into robots.txt to dynamically append sitemap location.
+ */
+function rp_child_custom_robots_txt( $output, $public ) {
+	$sitemap_url = home_url( '/sitemap_index.xml' );
+	$output .= "\nSitemap: " . esc_url( $sitemap_url ) . "\n";
+	return $output;
+}
+add_filter( 'robots_txt', 'rp_child_custom_robots_txt', 10, 2 );
+
+/**
+ * Ensure custom post types are not excluded from Yoast XML sitemap.
+ */
+function rp_child_ensure_cpt_in_sitemap( $exclude, $post_type ) {
+	$hub_post_types = array( 'accord_library', 'partner_resources', 'rp_sitrep', 'rp_incident', 'rp_opportunity' );
+	if ( in_array( $post_type, $hub_post_types, true ) ) {
+		return false;
+	}
+	return $exclude;
+}
+add_filter( 'wpseo_sitemap_exclude_post_type', 'rp_child_ensure_cpt_in_sitemap', 10, 2 );
+
+/**
+ * Ensure custom post types are included in native WordPress sitemaps (WP 5.5+).
+ */
+function rp_child_wp_sitemaps_post_types( $post_types ) {
+	$hub_post_types = array( 'accord_library', 'partner_resources', 'rp_sitrep', 'rp_incident', 'rp_opportunity' );
+	foreach ( $hub_post_types as $pt ) {
+		if ( post_type_exists( $pt ) ) {
+			$post_types[ $pt ] = get_post_type_object( $pt );
+		}
+	}
+	return $post_types;
+}
+add_filter( 'wp_sitemaps_post_types', 'rp_child_wp_sitemaps_post_types' );
+
+/**
+ * Rewrite canonical URL domain to point to the main production website.
+ */
+function rp_child_canonical_domain_rewrite( $canonical ) {
+	$current_host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+	if ( strpos( $current_host, 'preview.' ) !== false || strpos( $current_host, '.local' ) !== false ) {
+		$canonical = str_replace(
+			array( 'http://resilientphilippines.local', 'https://preview.resilientphilippines.com' ),
+			'https://resilientphilippines.com',
+			$canonical
+		);
+	}
+	return $canonical;
+}
+add_filter( 'wpseo_canonical', 'rp_child_canonical_domain_rewrite', 999 );
+add_filter( 'wp_get_canonical_url', 'rp_child_canonical_domain_rewrite', 999 );
+
+/**
+ * Parse post content on save or render to supply smart fallback image alt tags if none exist.
+ */
+function rp_child_add_fallback_img_alt_tags( $content ) {
+	if ( empty( $content ) || ! class_exists( 'DOMDocument' ) ) {
+		return $content;
+	}
+
+	$dom = new DOMDocument();
+	libxml_use_internal_errors( true );
+	// Support UTF-8 encoding properly during document load
+	$dom->loadHTML( mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+	libxml_clear_errors();
+
+	$images   = $dom->getElementsByTagName( 'img' );
+	$modified = false;
+
+	foreach ( $images as $image ) {
+		if ( ! $image->hasAttribute( 'alt' ) || trim( $image->getAttribute( 'alt' ) ) === '' ) {
+			$src      = $image->getAttribute( 'src' );
+			$alt_text = '';
+			$classes  = $image->getAttribute( 'class' );
+
+			if ( preg_match( '/wp-image-(\d+)/', $classes, $matches ) ) {
+				$attachment_id = intval( $matches[1] );
+				$alt_text      = get_post_meta( $attachment_id, '_wp_attachment_image_alt', true );
+				if ( empty( $alt_text ) ) {
+					$alt_text = get_the_title( $attachment_id );
+				}
+			}
+
+			if ( empty( $alt_text ) ) {
+				$alt_text = get_the_title();
+			}
+
+			if ( empty( $alt_text ) ) {
+				$filename       = basename( $src );
+				$filename_clean = pathinfo( $filename, PATHINFO_FILENAME );
+				$alt_text       = ucwords( str_replace( array( '-', '_' ), ' ', $filename_clean ) );
+			}
+
+			$image->setAttribute( 'alt', esc_attr( $alt_text ) );
+			$modified = true;
+		}
+	}
+
+	if ( $modified ) {
+		$content = $dom->saveHTML();
+	}
+
+	return $content;
+}
+add_filter( 'the_content', 'rp_child_add_fallback_img_alt_tags', 100 );
+
+/**
+ * Filter WordPress core attachment image helper to inject alt tag fallbacks.
+ */
+function rp_child_fallback_attachment_image_alt( $attr, $attachment, $size ) {
+	if ( empty( $attr['alt'] ) ) {
+		$alt_text = get_post_meta( $attachment->ID, '_wp_attachment_image_alt', true );
+		if ( empty( $alt_text ) ) {
+			$alt_text = get_the_title( $attachment->ID );
+		}
+		if ( empty( $alt_text ) ) {
+			$alt_text = get_the_title();
+		}
+		$attr['alt'] = $alt_text;
+	}
+	return $attr;
+}
+add_filter( 'wp_get_attachment_image_attributes', 'rp_child_fallback_attachment_image_alt', 10, 3 );
+
+/**
+ * Auto-assign templates to pages in the database.
+ */
+function rp_child_ensure_page_templates() {
+	$page_template_mappings = array(
+		'resource-hub'    => 'template-resource-hub.php',
+		'submit-resource' => 'template-submit-resource.php',
+	);
+
+	foreach ( $page_template_mappings as $slug => $template ) {
+		$page = get_page_by_path( $slug );
+		if ( $page ) {
+			$current_template = get_post_meta( $page->ID, '_wp_page_template', true );
+			if ( $current_template !== $template ) {
+				update_post_meta( $page->ID, '_wp_page_template', $template );
+			}
+		}
+	}
+}
+add_action( 'init', 'rp_child_ensure_page_templates', 999 );
+
+/**
+ * Force template loading dynamically for Resource Hub page at runtime.
+ */
+function rp_child_force_page_templates( $template ) {
+	if ( is_page( 'resource-hub' ) ) {
+		$custom_template = locate_template( array( 'template-resource-hub.php' ) );
+		if ( ! empty( $custom_template ) ) {
+			return $custom_template;
+		}
+	}
+	if ( is_page( 'submit-resource' ) ) {
+		$custom_template = locate_template( array( 'template-submit-resource.php' ) );
+		if ( ! empty( $custom_template ) ) {
+			return $custom_template;
+		}
+	}
+	return $template;
+}
+add_filter( 'page_template', 'rp_child_force_page_templates', 999 );
