@@ -79,11 +79,8 @@ select:focus-visible,
 textarea:focus-visible {
   outline: 3px solid var(--rp-color-focus);
   outline-offset: 3px;
-}
-
-/* Partners and affiliations page. */
-.rp-collective-reach > h2,
-.rp-affiliations > h2 {
+}/* Partners and affiliations page. */
+.rp-collective-reach > h2 {
   margin: 20px 0 15px;
   color: #0f172a;
   font-family: "Outfit", sans-serif;
@@ -92,8 +89,17 @@ textarea:focus-visible {
   text-align: center;
 }
 
-.rp-partners-intro,
-.rp-affiliations > p {
+.entry-content .rp-affiliations h2,
+.rp-affiliations > h2 {
+  margin: 20px 0 15px !important;
+  color: #0f172a;
+  font-family: "Outfit", sans-serif;
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 800;
+  text-align: left !important;
+}
+
+.rp-partners-intro {
   max-width: 760px;
   margin: 0 auto 40px;
   color: #475569;
@@ -101,6 +107,14 @@ textarea:focus-visible {
   text-align: center;
 }
 
+.entry-content .rp-affiliations p,
+.rp-affiliations > p {
+  max-width: 760px;
+  margin: 0 0 40px 0 !important;
+  color: #475569;
+  line-height: 1.7;
+  text-align: left !important;
+}
 .rp-reach-grid,
 .rp-impact-grid {
   display: grid;
@@ -162,6 +176,7 @@ textarea:focus-visible {
   margin-bottom: 18px;
   color: #475569;
   line-height: 1.7;
+  text-align: left;
 }
 
 .rp-affiliations ul {
