@@ -1833,8 +1833,8 @@ function rp_child_get_seo_meta_for_current_page() {
 		$seo_data['title']       = 'ACCORD | Resilient Communities, Resilient Philippines';
 		$seo_data['description'] = 'ACCORD supports disaster risk reduction, humanitarian action, and community resilience work across the Philippines through practical tools, learning, and partnerships.';
 	} elseif ( is_page( 'resource-hub' ) ) {
-		$seo_data['title']       = 'Resource Hub | Disaster Risk Reduction and Humanitarian Tools';
-		$seo_data['description'] = 'Browse ACCORD knowledge products, partner resources, training materials, reports, and tools for disaster risk reduction and humanitarian action.';
+		$seo_data['title']       = 'Resource Hub | ACCORD Knowledge and Learning Resources';
+		$seo_data['description'] = 'Browse ACCORD knowledge products, partner resources, training materials, reports, and practical tools.';
 	} elseif ( is_page( array( 'about', 'about-us' ) ) ) {
 		$seo_data['title']       = 'About ACCORD | Community Resilience and Humanitarian Action';
 		$seo_data['description'] = 'Learn about ACCORD\'s work with communities and partners to strengthen disaster risk reduction, resilience, and humanitarian response in the Philippines.';
@@ -1980,7 +1980,7 @@ function rp_child_output_seo_json_ld() {
 			'@type' => 'CollectionPage',
 			'@id'   => esc_url( get_permalink() ) . '#webpage',
 			'url'   => esc_url( get_permalink() ),
-			'name'  => 'Resource Hub | Disaster Risk Reduction and Humanitarian Tools',
+			'name'  => 'Resource Hub | ACCORD Knowledge and Learning Resources',
 			'isPartOf' => array(
 				'@id' => $site_url . '#website',
 			),
