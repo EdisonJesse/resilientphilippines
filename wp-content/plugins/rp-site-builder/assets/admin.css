@@ -1,0 +1,100 @@
+.rpsb-builder {
+  border: 1px solid #dcdcde;
+  padding: 16px;
+}
+
+.rpsb-toggle {
+  align-items: center;
+  display: flex;
+  font-weight: 600;
+  gap: 8px;
+}
+
+.rpsb-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.rpsb-sections {
+  display: grid;
+  gap: 12px;
+}
+
+.rpsb-section-editor {
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+}
+
+.rpsb-section-editor > header,
+.rpsb-section-editor > footer {
+  align-items: center;
+  background: #f6f7f7;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 10px 12px;
+}
+
+.rpsb-section-editor > header span {
+  color: #646970;
+  flex: 1;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.rpsb-fields {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 160px minmax(0, 1fr);
+  padding: 12px;
+}
+
+.rpsb-fields label {
+  font-weight: 600;
+  padding-top: 7px;
+}
+
+.rpsb-fields input,
+.rpsb-fields textarea,
+.rpsb-fields select {
+  max-width: 760px;
+  width: 100%;
+}
+
+.rpsb-empty {
+  color: #646970;
+  margin: 0;
+}
+
+.rpsb-admin-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(420px, 1.2fr);
+  margin-top: 18px;
+}
+
+.rpsb-panel {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  padding: 18px;
+}
+
+.rpsb-panel form {
+  display: grid;
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .rpsb-admin-grid,
+  .rpsb-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .rpsb-fields label {
+    padding-top: 0;
+  }
+}
+

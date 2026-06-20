@@ -32,6 +32,7 @@
 # 4. Ignore all plugins except our custom plugin
 /wp-content/plugins/*
 !/wp-content/plugins/rp-resource-hub/
+!/wp-content/plugins/rp-site-builder/
 
 # 5. Ignore all themes except our custom child theme and modified parent theme
 /wp-content/themes/*
