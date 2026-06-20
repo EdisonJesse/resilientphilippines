@@ -18,7 +18,7 @@ The dashboard is intended for content planning, communications reporting, resour
 
 ### Unique Sessions
 
-A session is a period of activity associated with the first-party `rp_analytics_session` cookie. The session expires after 30 minutes and is refreshed while activity continues.
+A session is a period of activity associated with the first-party `rp_analytics_session` cookie. The session has a fixed 30-minute lifetime. Analytics cookies are issued only when needed instead of being rewritten on every page response.
 
 Older records created before session tracking use a legacy IP-based fallback. The Data Quality section reports how much of the selected period has a real session ID.
 

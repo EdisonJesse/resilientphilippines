@@ -579,10 +579,11 @@ function rp_resource_hub_get_device_type( $user_agent ) {
 	return $user_agent ? 'desktop' : 'unknown';
 }
 
-function rp_resource_hub_get_acquisition() {
+function rp_resource_hub_get_acquisition( $persist = false ) {
 	$source   = isset( $_GET['utm_source'] ) ? sanitize_text_field( wp_unslash( $_GET['utm_source'] ) ) : '';
 	$medium   = isset( $_GET['utm_medium'] ) ? sanitize_text_field( wp_unslash( $_GET['utm_medium'] ) ) : '';
 	$campaign = isset( $_GET['utm_campaign'] ) ? sanitize_text_field( wp_unslash( $_GET['utm_campaign'] ) ) : '';
+	$has_utm  = (bool) ( $source || $medium || $campaign );
 	$referrer = isset( $_SERVER['HTTP_REFERER'] ) ? esc_url_raw( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
 
 	if ( ! $source && ! empty( $_COOKIE['rp_analytics_source'] ) ) {
@@ -607,10 +608,14 @@ function rp_resource_hub_get_acquisition() {
 		}
 	}
 
-	$expires = time() + ( 30 * MINUTE_IN_SECONDS );
-	rp_resource_hub_set_analytics_cookie( 'rp_analytics_source', substr( $source, 0, 100 ), $expires );
-	rp_resource_hub_set_analytics_cookie( 'rp_analytics_medium', substr( $medium, 0, 100 ), $expires );
-	rp_resource_hub_set_analytics_cookie( 'rp_analytics_campaign', substr( $campaign, 0, 190 ), $expires );
+	if ( $persist || $has_utm ) {
+		$expires = time() + ( 30 * MINUTE_IN_SECONDS );
+		rp_resource_hub_set_analytics_cookie( 'rp_analytics_source', substr( $source, 0, 100 ), $expires );
+		rp_resource_hub_set_analytics_cookie( 'rp_analytics_medium', substr( $medium, 0, 100 ), $expires );
+		if ( $campaign ) {
+			rp_resource_hub_set_analytics_cookie( 'rp_analytics_campaign', substr( $campaign, 0, 190 ), $expires );
+		}
+	}
 
 	return array(
 		'source'   => substr( $source, 0, 100 ),
@@ -629,16 +634,17 @@ function rp_resource_hub_get_analytics_context() {
 	$visitor_id = isset( $_COOKIE['rp_analytics_visitor'] ) && preg_match( '/^[a-f0-9]{32}$/', $_COOKIE['rp_analytics_visitor'] ) ? $_COOKIE['rp_analytics_visitor'] : '';
 	$session_id = isset( $_COOKIE['rp_analytics_session'] ) && preg_match( '/^[a-f0-9]{32}$/', $_COOKIE['rp_analytics_session'] ) ? $_COOKIE['rp_analytics_session'] : '';
 	$is_new     = ! $visitor_id;
+	$is_new_session = ! $session_id;
 	if ( ! $visitor_id ) {
 		$visitor_id = bin2hex( random_bytes( 16 ) );
+		rp_resource_hub_set_analytics_cookie( 'rp_analytics_visitor', $visitor_id, time() + YEAR_IN_SECONDS );
 	}
 	if ( ! $session_id ) {
 		$session_id = bin2hex( random_bytes( 16 ) );
+		rp_resource_hub_set_analytics_cookie( 'rp_analytics_session', $session_id, time() + ( 30 * MINUTE_IN_SECONDS ) );
 	}
 
-	rp_resource_hub_set_analytics_cookie( 'rp_analytics_visitor', $visitor_id, time() + YEAR_IN_SECONDS );
-	rp_resource_hub_set_analytics_cookie( 'rp_analytics_session', $session_id, time() + ( 30 * MINUTE_IN_SECONDS ) );
-	$acquisition = rp_resource_hub_get_acquisition();
+	$acquisition = rp_resource_hub_get_acquisition( $is_new_session );
 	$user_agent  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
 	$context     = array_merge( $acquisition, array(
 		'visitor_id'    => $visitor_id,
