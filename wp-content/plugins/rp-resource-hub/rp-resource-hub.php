@@ -3014,14 +3014,50 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 		$notice_class = 'success' === $notice['type'] ? 'rp-notice-success' : 'rp-notice-error';
 		echo '<div class="rp-notice ' . esc_attr( $notice_class ) . '">' . esc_html( $notice['message'] ) . '</div>';
 	}
+
+	$edit_id            = isset( $_GET['sitrep_id'] ) ? absint( $_GET['sitrep_id'] ) : 0;
+	$edit_post          = $edit_id ? get_post( $edit_id ) : null;
+	$existing_locations = array();
+	$selected_terms     = array();
+
+	if ( $edit_id ) {
+		if ( ! $edit_post || 'rp_sitrep' !== $edit_post->post_type || ! current_user_can( 'edit_post', $edit_id ) ) {
+			echo '<div class="rp-notice rp-notice-error">' . esc_html__( 'You do not have permission to edit this situation report.', 'rp-resource-hub' ) . '</div>';
+			return ob_get_clean();
+		}
+
+		global $wpdb;
+		$existing_locations = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->prefix}rp_sitrep_locations WHERE sitrep_id = %d ORDER BY id ASC",
+				$edit_id
+			),
+			ARRAY_A
+		);
+		$selected_terms = wp_get_object_terms( $edit_id, 'hazard_type', array( 'fields' => 'ids' ) );
+		if ( is_wp_error( $selected_terms ) ) {
+			$selected_terms = array();
+		}
+	}
+
+	if ( empty( $existing_locations ) ) {
+		$existing_locations = array( array() );
+	}
+
+	$form_title       = $edit_post ? $edit_post->post_title : '';
+	$form_description = $edit_post ? $edit_post->post_content : '';
+	$form_incident_id = $edit_post ? absint( get_post_meta( $edit_id, '_sitrep_incident_id', true ) ) : 0;
 	?>
 	<form class="rp-upload-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" enctype="multipart/form-data">
 		<input type="hidden" name="action" value="rp_sitrep_upload">
+		<?php if ( $edit_id ) : ?>
+			<input type="hidden" name="rp_sitrep_id" value="<?php echo absint( $edit_id ); ?>">
+		<?php endif; ?>
 		<?php wp_nonce_field( 'rp_sitrep_upload', 'rp_sitrep_upload_nonce' ); ?>
 		
 		<div class="rp-field">
 			<label for="rp_title"><?php esc_html_e( 'Report Title', 'rp-resource-hub' ); ?> <span class="rp-required-star" style="color: #ef4444;">*</span></label>
-			<input id="rp_title" name="rp_title" type="text" required placeholder="e.g. Typhoon Pepito - Contributor SitRep #1" maxlength="160">
+			<input id="rp_title" name="rp_title" type="text" required placeholder="e.g. Typhoon Pepito - Contributor SitRep #1" maxlength="160" value="<?php echo esc_attr( $form_title ); ?>">
 		</div>
 
 		<div class="rp-field">
@@ -3049,7 +3085,7 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 					),
 				) );
 				foreach ( $incidents as $inc ) {
-					printf( '<option value="%d">%s</option>', absint( $inc->ID ), esc_html( $inc->post_title ) );
+					printf( '<option value="%d"%s>%s</option>', absint( $inc->ID ), selected( $form_incident_id, $inc->ID, false ), esc_html( $inc->post_title ) );
 				}
 				?>
 			</select>
@@ -3057,12 +3093,12 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 
 		<div class="rp-field">
 			<label for="rp_description"><?php esc_html_e( 'Situation Summary', 'rp-resource-hub' ); ?> <span class="rp-required-star" style="color: #ef4444;">*</span></label>
-			<textarea id="rp_description" name="rp_description" rows="5" required placeholder="Describe the current situation, main impacts, and timeline..."></textarea>
+			<textarea id="rp_description" name="rp_description" rows="5" required placeholder="Describe the current situation, main impacts, and timeline..."><?php echo esc_textarea( $form_description ); ?></textarea>
 		</div>
 
 		<fieldset class="rp-field rp-checkbox-list">
 			<legend><?php esc_html_e( 'Hazard Type', 'rp-resource-hub' ); ?></legend>
-			<?php rp_resource_hub_term_options( 'hazard_type' ); ?>
+			<?php rp_resource_hub_term_options( 'hazard_type', $selected_terms ); ?>
 		</fieldset>
 
 		<h3 style="margin-top: 30px; color: var(--rp-color-primary, #0f172a); border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
@@ -3070,69 +3106,73 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 		</h3>
 
 		<div id="rp-locations-container">
-			<!-- Row 0 (Default) -->
-			<div class="rp-location-row" data-idx="0" style="border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; margin-bottom: 20px; position: relative; background: #fafafa;">
+			<?php foreach ( $existing_locations as $location_index => $location ) : ?>
+			<div class="rp-location-row" data-idx="<?php echo absint( $location_index ); ?>" data-region="<?php echo esc_attr( $location['region'] ?? '' ); ?>" data-province="<?php echo esc_attr( $location['province'] ?? '' ); ?>" data-municipality="<?php echo esc_attr( $location['municipality'] ?? '' ); ?>" style="border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; margin-bottom: 20px; position: relative; background: #fafafa;">
+				<?php if ( 0 < $location_index ) : ?>
+					<button type="button" class="rp-remove-row-btn" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #ef4444; font-weight: bold; cursor: pointer; font-size: 14px;">✕ <?php esc_html_e( 'Remove', 'rp-resource-hub' ); ?></button>
+				<?php endif; ?>
 				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
 					<div class="rp-field">
 						<label>Region *</label>
-						<select class="rp-loc-region" name="rp_locations[0][region]" required>
+						<select class="rp-loc-region" name="rp_locations[<?php echo absint( $location_index ); ?>][region]" required>
 							<option value="">Loading regions...</option>
 						</select>
 					</div>
 					<div class="rp-field">
 						<label>Province *</label>
-						<select class="rp-loc-province" name="rp_locations[0][province]" required>
+						<select class="rp-loc-province" name="rp_locations[<?php echo absint( $location_index ); ?>][province]" required>
 							<option value="">Select Region first...</option>
 						</select>
 					</div>
 					<div class="rp-field">
 						<label>Municipality *</label>
-						<select class="rp-loc-municipality" name="rp_locations[0][municipality]" required>
+						<select class="rp-loc-municipality" name="rp_locations[<?php echo absint( $location_index ); ?>][municipality]" required>
 							<option value="">Select Province first...</option>
 						</select>
 					</div>
 					<div class="rp-field">
 						<label>Barangay</label>
-						<input class="rp-loc-barangay" name="rp_locations[0][barangay]" type="text" placeholder="e.g. Seguinon">
+						<input class="rp-loc-barangay" name="rp_locations[<?php echo absint( $location_index ); ?>][barangay]" type="text" placeholder="e.g. Seguinon" value="<?php echo esc_attr( $location['barangay'] ?? '' ); ?>">
 					</div>
 				</div>
 				
 				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-top: 15px;">
 					<div class="rp-field">
 						<label>Affected Barangays</label>
-						<input name="rp_locations[0][affected_barangays]" type="number" min="0" value="0">
+						<input name="rp_locations[<?php echo absint( $location_index ); ?>][affected_barangays]" type="number" min="0" value="<?php echo absint( $location['affected_barangays'] ?? 0 ); ?>">
 					</div>
 					<div class="rp-field">
 						<label>Affected Households</label>
-						<input name="rp_locations[0][households]" type="number" min="0" value="0">
+						<input name="rp_locations[<?php echo absint( $location_index ); ?>][households]" type="number" min="0" value="<?php echo absint( $location['households'] ?? 0 ); ?>">
 					</div>
 					<div class="rp-field">
 						<label>Affected Individuals</label>
-						<input name="rp_locations[0][individuals]" type="number" min="0" value="0">
+						<input name="rp_locations[<?php echo absint( $location_index ); ?>][individuals]" type="number" min="0" value="<?php echo absint( $location['individuals'] ?? 0 ); ?>">
 					</div>
 					<div class="rp-field">
 						<label>Displaced Inside EC</label>
-						<input class="rp-displaced-inside" name="rp_locations[0][displaced_inside]" type="number" min="0" value="0">
+						<input class="rp-displaced-inside" name="rp_locations[<?php echo absint( $location_index ); ?>][displaced_inside]" type="number" min="0" value="<?php echo absint( $location['displaced_inside'] ?? 0 ); ?>">
 					</div>
 					<div class="rp-field">
 						<label>Displaced Outside EC</label>
-						<input class="rp-displaced-outside" name="rp_locations[0][displaced_outside]" type="number" min="0" value="0">
+						<input class="rp-displaced-outside" name="rp_locations[<?php echo absint( $location_index ); ?>][displaced_outside]" type="number" min="0" value="<?php echo absint( $location['displaced_outside'] ?? 0 ); ?>">
 					</div>
 					<div class="rp-field">
 						<label>Total Displaced Indivs</label>
-						<input class="rp-displaced-total" type="text" readonly value="0" style="background: #e2e8f0; font-weight: bold;">
+						<input class="rp-displaced-total" type="text" readonly value="<?php echo absint( $location['displaced_total'] ?? 0 ); ?>" style="background: #e2e8f0; font-weight: bold;">
 					</div>
 					<div class="rp-field">
 						<label>Displaced Households</label>
-						<input name="rp_locations[0][displaced_households]" type="number" min="0" value="0">
+						<input name="rp_locations[<?php echo absint( $location_index ); ?>][displaced_households]" type="number" min="0" value="<?php echo absint( $location['displaced_households'] ?? 0 ); ?>">
 					</div>
 					<div class="rp-field">
 						<label>Data Source</label>
-						<input name="rp_locations[0][data_source]" type="text" placeholder="e.g. MDRRMO">
+						<input name="rp_locations[<?php echo absint( $location_index ); ?>][data_source]" type="text" placeholder="e.g. MDRRMO" value="<?php echo esc_attr( $location['data_source'] ?? '' ); ?>">
 					</div>
 				</div>
 				<div class="rp-duplicate-prompt" style="display: none;"></div>
 			</div>
+			<?php endforeach; ?>
 		</div>
 
 		<button type="button" id="rp-add-location-btn" style="background: #0f172a; color: #fff; padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; font-weight: 600; margin-bottom: 30px;">
@@ -3145,22 +3185,22 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 
 		<div class="rp-field" style="margin-top: 15px;">
 			<label for="rp_sectoral_fsl"><?php esc_html_e( 'Food Security & Livelihoods (FSL)', 'rp-resource-hub' ); ?></label>
-			<textarea id="rp_sectoral_fsl" name="rp_sectoral_fsl" rows="3" placeholder="Food availability, markets status, farm damages, needed food packs..."></textarea>
+			<textarea id="rp_sectoral_fsl" name="rp_sectoral_fsl" rows="3" placeholder="Food availability, markets status, farm damages, needed food packs..."><?php echo esc_textarea( $edit_post ? get_post_meta( $edit_id, '_sitrep_sectoral_fsl', true ) : '' ); ?></textarea>
 		</div>
 
 		<div class="rp-field" style="margin-top: 15px;">
 			<label for="rp_sectoral_wash"><?php esc_html_e( 'Water, Sanitation & Hygiene (WASH)', 'rp-resource-hub' ); ?></label>
-			<textarea id="rp_sectoral_wash" name="rp_sectoral_wash" rows="3" placeholder="Access to clean drinking water, sanitation facilities, hygiene kits needed..."></textarea>
+			<textarea id="rp_sectoral_wash" name="rp_sectoral_wash" rows="3" placeholder="Access to clean drinking water, sanitation facilities, hygiene kits needed..."><?php echo esc_textarea( $edit_post ? get_post_meta( $edit_id, '_sitrep_sectoral_wash', true ) : '' ); ?></textarea>
 		</div>
 
 		<div class="rp-field" style="margin-top: 15px;">
 			<label for="rp_sectoral_shelter"><?php esc_html_e( 'Emergency Shelter', 'rp-resource-hub' ); ?></label>
-			<textarea id="rp_sectoral_shelter" name="rp_sectoral_shelter" rows="3" placeholder="Damaged roofing, evacuation center congestion, tarpaulins needed..."></textarea>
+			<textarea id="rp_sectoral_shelter" name="rp_sectoral_shelter" rows="3" placeholder="Damaged roofing, evacuation center congestion, tarpaulins needed..."><?php echo esc_textarea( $edit_post ? get_post_meta( $edit_id, '_sitrep_sectoral_shelter', true ) : '' ); ?></textarea>
 		</div>
 
 		<div class="rp-field" style="margin-top: 15px;">
 			<label for="rp_sectoral_other"><?php esc_html_e( 'Other Sectors (Protection, Health, Education)', 'rp-resource-hub' ); ?></label>
-			<textarea id="rp_sectoral_other" name="rp_sectoral_other" rows="3" placeholder="Health facilities status, child-friendly spaces, school damages..."></textarea>
+			<textarea id="rp_sectoral_other" name="rp_sectoral_other" rows="3" placeholder="Health facilities status, child-friendly spaces, school damages..."><?php echo esc_textarea( $edit_post ? get_post_meta( $edit_id, '_sitrep_sectoral_other', true ) : '' ); ?></textarea>
 		</div>
 
 		<div class="rp-field" style="margin-top: 30px;">
@@ -3175,7 +3215,7 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 		</div>
 
 		<button type="submit" style="margin-top: 30px; background: #ef4444; color: #fff; border: none; font-size: 16px; font-weight: bold; padding: 12px 24px; border-radius: 6px; cursor: pointer;">
-			<?php esc_html_e( 'Submit Situation Report for Verification', 'rp-resource-hub' ); ?>
+			<?php echo esc_html( $edit_post ? __( 'Update Situation Report', 'rp-resource-hub' ) : __( 'Submit Situation Report for Verification', 'rp-resource-hub' ) ); ?>
 		</button>
 	</form>
 
@@ -3183,7 +3223,7 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 	document.addEventListener('DOMContentLoaded', function() {
 		const container = document.getElementById('rp-locations-container');
 		const addBtn = document.getElementById('rp-add-location-btn');
-		let rowIdx = 1;
+		let rowIdx = container.querySelectorAll('.rp-location-row').length;
 
 		let geoData = {
 			regions: [],
@@ -3284,6 +3324,9 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 			const regSelect = row.querySelector('.rp-loc-region');
 			const provSelect = row.querySelector('.rp-loc-province');
 			const muniSelect = row.querySelector('.rp-loc-municipality');
+			const initialRegion = row.dataset.region || '';
+			let initialProvince = row.dataset.province || '';
+			let initialMunicipality = row.dataset.municipality || '';
 
 			// Populate Region
 			regSelect.innerHTML = '<option value="">Select Region...</option>';
@@ -3292,11 +3335,9 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 				opt.value = r.region_name;
 				opt.dataset.code = r.region_code;
 				opt.textContent = r.region_name;
-				if (r.region_name.includes('Region VIII')) {
-					opt.selected = true;
-				}
 				regSelect.appendChild(opt);
 			});
+			regSelect.value = initialRegion || geoData.regions.find(r => r.region_name.includes('Region VIII'))?.region_name || '';
 
 			provSelect.innerHTML = '<option value="">Select Province...</option>';
 			provSelect.disabled = true;
@@ -3322,6 +3363,10 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 						provSelect.appendChild(opt);
 					});
 					provSelect.disabled = false;
+					if (initialProvince) {
+						provSelect.value = initialProvince;
+						initialProvince = '';
+					}
 				} else {
 					provSelect.disabled = true;
 				}
@@ -3344,6 +3389,10 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 						muniSelect.appendChild(opt);
 					});
 					muniSelect.disabled = false;
+					if (initialMunicipality) {
+						muniSelect.value = initialMunicipality;
+						initialMunicipality = '';
+					}
 				} else {
 					muniSelect.disabled = true;
 				}
@@ -3371,6 +3420,12 @@ function rp_resource_hub_submit_sitrep_shortcode() {
 			// Initialize default row(s)
 			Array.from(container.querySelectorAll('.rp-location-row')).forEach(row => {
 				initializeRowLocations(row);
+				const removeButton = row.querySelector('.rp-remove-row-btn');
+				if (removeButton) {
+					removeButton.addEventListener('click', function() {
+						row.remove();
+					});
+				}
 			});
 		}).catch(err => console.error('Error loading geographic data:', err));
 
@@ -3475,6 +3530,12 @@ function rp_resource_hub_process_sitrep_upload() {
 	$title       = isset( $_POST['rp_title'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_title'] ) ) : '';
 	$description = isset( $_POST['rp_description'] ) ? wp_kses_post( wp_unslash( $_POST['rp_description'] ) ) : '';
 	$incident_id = isset( $_POST['rp_incident_id'] ) ? absint( $_POST['rp_incident_id'] ) : 0;
+	$edit_id     = isset( $_POST['rp_sitrep_id'] ) ? absint( $_POST['rp_sitrep_id'] ) : 0;
+	$edit_post   = $edit_id ? get_post( $edit_id ) : null;
+
+	if ( $edit_id && ( ! $edit_post || 'rp_sitrep' !== $edit_post->post_type || ! current_user_can( 'edit_post', $edit_id ) ) ) {
+		return new WP_Error( 'rp_edit_forbidden', __( 'You do not have permission to edit this situation report.', 'rp-resource-hub' ) );
+	}
 
 	if ( '' === $title || '' === $description ) {
 		return new WP_Error( 'rp_required', __( 'Title and situation summary are required.', 'rp-resource-hub' ) );
@@ -3495,16 +3556,20 @@ function rp_resource_hub_process_sitrep_upload() {
 	$sectoral_shelter = isset( $_POST['rp_sectoral_shelter'] ) ? sanitize_textarea_field( wp_unslash( $_POST['rp_sectoral_shelter'] ) ) : '';
 	$sectoral_other   = isset( $_POST['rp_sectoral_other'] ) ? sanitize_textarea_field( wp_unslash( $_POST['rp_sectoral_other'] ) ) : '';
 
-	$post_id = wp_insert_post(
-		array(
-			'post_type'    => 'rp_sitrep',
-			'post_title'   => $title,
-			'post_content' => $description,
-			'post_status'  => 'pending',
-			'post_author'  => get_current_user_id(),
-		),
-		true
+	$post_data = array(
+		'post_title'   => $title,
+		'post_content' => $description,
 	);
+
+	if ( $edit_id ) {
+		$post_data['ID'] = $edit_id;
+		$post_id         = wp_update_post( $post_data, true );
+	} else {
+		$post_data['post_type']   = 'rp_sitrep';
+		$post_data['post_status'] = 'pending';
+		$post_data['post_author'] = get_current_user_id();
+		$post_id                  = wp_insert_post( $post_data, true );
+	}
 
 	if ( is_wp_error( $post_id ) ) {
 		return $post_id;
@@ -3520,6 +3585,9 @@ function rp_resource_hub_process_sitrep_upload() {
 	// Insert location records
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'rp_sitrep_locations';
+	if ( $edit_id ) {
+		$wpdb->delete( $table_name, array( 'sitrep_id' => $post_id ), array( '%d' ) );
+	}
 
 	foreach ( $locations as $loc ) {
 		$region        = isset( $loc['region'] ) ? sanitize_text_field( $loc['region'] ) : '';
@@ -3594,15 +3662,14 @@ function rp_resource_hub_process_sitrep_upload() {
 
 	// Store hazard types tax
 	$submitted_terms = isset( $_POST['rp_terms'] ) && is_array( $_POST['rp_terms'] ) ? wp_unslash( $_POST['rp_terms'] ) : array();
-	if ( ! empty( $submitted_terms['hazard_type'] ) && is_array( $submitted_terms['hazard_type'] ) ) {
-		$term_ids = array_map( 'absint', $submitted_terms['hazard_type'] );
-		$term_ids = array_filter( $term_ids );
-		wp_set_object_terms( $post_id, $term_ids, 'hazard_type', false );
-	}
+	$term_ids = ! empty( $submitted_terms['hazard_type'] ) && is_array( $submitted_terms['hazard_type'] )
+		? array_filter( array_map( 'absint', $submitted_terms['hazard_type'] ) )
+		: array();
+	wp_set_object_terms( $post_id, $term_ids, 'hazard_type', false );
 
 	// Dispatch email
 	$admin_email = get_option( 'admin_email' );
-	if ( is_email( $admin_email ) ) {
+	if ( ! $edit_id && is_email( $admin_email ) ) {
 		wp_mail(
 			$admin_email,
 			sprintf( __( 'Situation Report pending review: %s', 'rp-resource-hub' ), $title ),
@@ -3618,6 +3685,7 @@ function rp_resource_hub_process_sitrep_upload() {
 }
 
 function rp_resource_hub_handle_sitrep_form() {
+	$is_edit = ! empty( $_POST['rp_sitrep_id'] );
 	$result = rp_resource_hub_process_sitrep_upload();
 
 	if ( is_wp_error( $result ) ) {
@@ -3631,6 +3699,11 @@ function rp_resource_hub_handle_sitrep_form() {
 	if ( ! is_numeric( $result ) ) {
 		$notice_key = rp_resource_hub_store_upload_notice( 'error', __( 'Submission could not be processed. Please try again.', 'rp-resource-hub' ) );
 		wp_safe_redirect( add_query_arg( 'rp_upload_notice', $notice_key, home_url( '/submit-sitrep/' ) ) );
+		exit;
+	}
+
+	if ( $is_edit ) {
+		wp_safe_redirect( add_query_arg( 'sitrep_updated', '1', home_url( '/moderation-dashboard/' ) ) );
 		exit;
 	}
 

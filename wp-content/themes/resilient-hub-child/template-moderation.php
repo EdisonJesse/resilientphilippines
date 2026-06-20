@@ -35,6 +35,10 @@ get_header();
             <p class="rp-dashboard-subtitle"><?php esc_html_e( 'Review and approve submitted resources, reports, stories, and gallery photos.', 'resilient-hub' ); ?></p>
         </header>
 
+        <?php if ( isset( $_GET['sitrep_updated'] ) ) : ?>
+            <div class="rp-notice rp-notice-success"><?php esc_html_e( 'Situation report updated successfully.', 'resilient-hub' ); ?></div>
+        <?php endif; ?>
+
         <div class="rp-moderation-container">
             <?php
             // Query pending partner resources, situation reports, accord library products, posts, and gallery photos
@@ -84,7 +88,12 @@ get_header();
                                 }
 
                                 $can_moderate = rp_child_current_user_can_moderate_post( $post_id );
-                                $edit_url     = current_user_can( 'edit_post', $post_id ) ? get_edit_post_link( $post_id, 'raw' ) : '';
+                                $edit_url     = '';
+                                if ( current_user_can( 'edit_post', $post_id ) ) {
+                                    $edit_url = 'rp_sitrep' === $post_type
+                                        ? add_query_arg( 'sitrep_id', $post_id, home_url( '/submit-sitrep/' ) )
+                                        : get_edit_post_link( $post_id, 'raw' );
+                                }
 
                                 // Nonces for AJAX moderation actions
                                 $approve_nonce = wp_create_nonce( 'rp_approve_resource_' . $post_id );
