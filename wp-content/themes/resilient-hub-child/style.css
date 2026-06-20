@@ -3393,10 +3393,19 @@ input[type="submit"].give-submit:focus {
     border-radius: var(--rp-radius);
     box-shadow: 0 12px 30px rgba(16, 32, 39, 0.08);
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     margin-top: 2px;
     max-height: calc(100vh - 112px);
-    overflow-y: auto;
+    max-height: calc(100dvh - 112px);
+    overflow: hidden;
     padding: 12px;
+  }
+
+  .rp-nav.is-open > ul {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .rp-nav a,
