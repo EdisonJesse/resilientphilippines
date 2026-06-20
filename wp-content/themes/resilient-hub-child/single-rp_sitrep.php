@@ -111,6 +111,18 @@ get_header();
                             </div>
                         </div>
 
+                        <div class="rp-metric-card" style="background: #f8fafc; border-left: 4px solid #10b981; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                            <div style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 6px;">
+                                <?php esc_html_e( 'Affected Barangays', 'resilient-hub' ); ?>
+                            </div>
+                            <div style="font-size: 26px; font-weight: 700; color: #10b981; font-family: 'Outfit', sans-serif;">
+                                <?php echo esc_html( number_format( $total_barangays ) ); ?>
+                            </div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                                <?php esc_html_e( 'reported across municipalities', 'resilient-hub' ); ?>
+                            </div>
+                        </div>
+
                         <div class="rp-metric-card" style="background: #f8fafc; border-left: 4px solid #f97316; padding: 20px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                             <div style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 6px;">
                                 <?php esc_html_e( 'Total Displaced Persons', 'resilient-hub' ); ?>
@@ -149,7 +161,7 @@ get_header();
                                         <tr style="border-bottom: 2px solid #cbd5e1; color: #475569; font-weight: bold; background-color: #f8fafc;">
                                             <th style="padding: 10px;"><?php esc_html_e( 'Region / Province', 'resilient-hub' ); ?></th>
                                             <th style="padding: 10px;"><?php esc_html_e( 'Municipality', 'resilient-hub' ); ?></th>
-                                            <th style="padding: 10px;"><?php esc_html_e( 'Barangay', 'resilient-hub' ); ?></th>
+                                            <th style="padding: 10px; text-align: right;"><?php esc_html_e( 'Affected Barangays', 'resilient-hub' ); ?></th>
                                             <th style="padding: 10px; text-align: right;"><?php esc_html_e( 'Affected Indivs', 'resilient-hub' ); ?></th>
                                             <th style="padding: 10px; text-align: right;"><?php esc_html_e( 'Displaced Indivs', 'resilient-hub' ); ?></th>
                                             <th style="padding: 10px; text-align: right;"><?php esc_html_e( 'Mode', 'resilient-hub' ); ?></th>
@@ -165,7 +177,7 @@ get_header();
                                                     <?php echo esc_html( $loc->province ); ?>
                                                 </td>
                                                 <td style="padding: 12px 10px; font-weight: 600;"><?php echo esc_html( $loc->municipality ); ?></td>
-                                                <td style="padding: 12px 10px;"><?php echo $loc->barangay ? esc_html( $loc->barangay ) : '—'; ?></td>
+                                                <td style="padding: 12px 10px; text-align: right;"><?php echo esc_html( number_format( $loc->affected_barangays ) ); ?></td>
                                                 <td style="padding: 12px 10px; text-align: right;"><?php echo esc_html( number_format( $loc->individuals ) ); ?></td>
                                                 <td style="padding: 12px 10px; text-align: right; font-weight: 700; color: #f97316;"><?php echo esc_html( number_format( $loc->displaced_total ) ); ?></td>
                                                 <td style="padding: 12px 10px; text-align: right;">
