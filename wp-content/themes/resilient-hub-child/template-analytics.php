@@ -23,20 +23,26 @@ global $wpdb;
 
 // Time range parameter
 $days = isset( $_GET['rp_days'] ) ? absint( $_GET['rp_days'] ) : 30;
+$traffic_type = isset( $_GET['rp_traffic'] ) ? sanitize_key( $_GET['rp_traffic'] ) : 'all';
+if ( ! in_array( $traffic_type, array( 'all', 'organic', 'bot' ), true ) ) {
+	$traffic_type = 'all';
+}
 
 // Base date constraints
 $views_where = "WHERE 1=1";
 $downloads_where = "WHERE 1=1";
 if ( $days > 0 ) {
-	$views_where .= $wpdb->prepare( " AND created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)", $days );
+	$views_where .= $wpdb->prepare( " AND v.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)", $days );
 	$downloads_where .= $wpdb->prepare( " AND d.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)", $days );
 }
+$views_where     .= rp_child_analytics_traffic_sql( 'v', $traffic_type );
+$downloads_where .= rp_child_analytics_traffic_sql( 'd', $traffic_type );
 
 // -------------------------------------------------------------
 // 1. KPI Counts
 // -------------------------------------------------------------
-$unique_visits = $wpdb->get_var( "SELECT COUNT(DISTINCT ip_address) FROM {$wpdb->prefix}rp_analytics_views $views_where" );
-$total_views   = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}rp_analytics_views $views_where" );
+$unique_visits = $wpdb->get_var( "SELECT COUNT(DISTINCT v.ip_address) FROM {$wpdb->prefix}rp_analytics_views v $views_where" );
+$total_views   = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}rp_analytics_views v $views_where" );
 $total_downloads = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}rp_analytics_downloads d $downloads_where" );
 
 // -------------------------------------------------------------
@@ -45,18 +51,18 @@ $total_downloads = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}rp_analy
 $chart_days = $days > 0 ? $days : 90; // Default to 90 days for all-time timeline
 $views_by_day = $wpdb->get_results( $wpdb->prepare( "
 	SELECT DATE(created_at) as date, COUNT(*) as count, COUNT(DISTINCT ip_address) as unique_ips
-	FROM {$wpdb->prefix}rp_analytics_views
-	WHERE created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)
-	GROUP BY DATE(created_at)
-	ORDER BY DATE(created_at) ASC
+	FROM {$wpdb->prefix}rp_analytics_views v
+	WHERE v.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY) " . rp_child_analytics_traffic_sql( 'v', $traffic_type ) . "
+	GROUP BY DATE(v.created_at)
+	ORDER BY DATE(v.created_at) ASC
 ", $chart_days ) );
 
 $downloads_by_day = $wpdb->get_results( $wpdb->prepare( "
 	SELECT DATE(created_at) as date, COUNT(*) as count
-	FROM {$wpdb->prefix}rp_analytics_downloads
-	WHERE created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)
-	GROUP BY DATE(created_at)
-	ORDER BY DATE(created_at) ASC
+	FROM {$wpdb->prefix}rp_analytics_downloads d
+	WHERE d.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY) " . rp_child_analytics_traffic_sql( 'd', $traffic_type ) . "
+	GROUP BY DATE(d.created_at)
+	ORDER BY DATE(d.created_at) ASC
 ", $chart_days ) );
 
 // Prepare datasets for JavaScript
@@ -100,7 +106,7 @@ $popular_downloads = $wpdb->get_results( "
 	SELECT d.post_id, COUNT(*) as count, p.post_title, p.post_type
 	FROM {$wpdb->prefix}rp_analytics_downloads d
 	LEFT JOIN {$wpdb->posts} p ON d.post_id = p.ID
-	" . str_replace( 'd.', '', $downloads_where ) . "
+	$downloads_where
 	GROUP BY d.post_id
 	ORDER BY count DESC
 	LIMIT 10
@@ -110,7 +116,7 @@ $popular_pages = $wpdb->get_results( "
 	SELECT v.post_id, COUNT(*) as count, p.post_title, p.post_type
 	FROM {$wpdb->prefix}rp_analytics_views v
 	LEFT JOIN {$wpdb->posts} p ON v.post_id = p.ID
-	" . str_replace( 'v.', '', $views_where ) . "
+	$views_where
 	GROUP BY v.post_id
 	ORDER BY count DESC
 	LIMIT 10
@@ -121,6 +127,8 @@ $popular_pages = $wpdb->get_results( "
 // -------------------------------------------------------------
 $search_log = isset( $_GET['rp_search_log'] ) ? sanitize_text_field( wp_unslash( $_GET['rp_search_log'] ) ) : '';
 $log_where = $downloads_where;
+$log_page = isset( $_GET['rp_log_page'] ) ? max( 1, absint( $_GET['rp_log_page'] ) ) : 1;
+$logs_per_page = 25;
 
 if ( $search_log ) {
 	// Search in user display name, user email, post title or IP
@@ -141,14 +149,31 @@ if ( $search_log ) {
 	", '%' . $wpdb->esc_like( $search_log ) . '%', '%' . $wpdb->esc_like( $search_log ) . '%' );
 }
 
-$download_logs = $wpdb->get_results( "
+$total_logs = (int) $wpdb->get_var( "
+	SELECT COUNT(*)
+	FROM {$wpdb->prefix}rp_analytics_downloads d
+	LEFT JOIN {$wpdb->posts} p ON d.post_id = p.ID
+	$log_where
+" );
+$total_log_pages = max( 1, (int) ceil( $total_logs / $logs_per_page ) );
+$log_page        = min( $log_page, $total_log_pages );
+$log_offset      = ( $log_page - 1 ) * $logs_per_page;
+
+$download_logs = $wpdb->get_results( $wpdb->prepare( "
 	SELECT d.id, d.post_id, d.user_id, d.ip_address, d.user_agent, d.created_at, p.post_title, p.post_type
 	FROM {$wpdb->prefix}rp_analytics_downloads d
 	LEFT JOIN {$wpdb->posts} p ON d.post_id = p.ID
 	$log_where
 	ORDER BY d.created_at DESC
-	LIMIT 100
-" );
+	LIMIT %d OFFSET %d
+", $logs_per_page, $log_offset ) );
+
+$csv_url = wp_nonce_url( add_query_arg( array(
+	'action'        => 'rp_export_analytics_csv',
+	'rp_days'       => $days,
+	'rp_traffic'    => $traffic_type,
+	'rp_search_log' => $search_log,
+), admin_url( 'admin-post.php' ) ), 'rp_export_analytics_csv' );
 
 get_header();
 ?>
@@ -311,6 +336,31 @@ get_header();
 	border-color: #2563eb;
 	box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
+.rp-analytics-pagination {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+	padding-top: 18px;
+	font-size: 13px;
+	color: #6b7280;
+}
+.rp-analytics-pagination .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 34px;
+	height: 34px;
+	padding: 0 9px;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	text-decoration: none;
+}
+.rp-analytics-pagination .page-numbers.current {
+	background: #0f766e;
+	border-color: #0f766e;
+	color: #fff;
+}
 
 .rp-log-badge {
 	font-size: 10px;
@@ -363,6 +413,7 @@ get_header();
 			<div class="rp-analytics-controls-bar" data-html2canvas-ignore="true">
 				<form method="get" class="rp-analytics-search-form">
 					<input type="hidden" name="rp_days" value="<?php echo esc_attr( $days ); ?>">
+					<input type="hidden" name="rp_traffic" value="<?php echo esc_attr( $traffic_type ); ?>">
 					<input type="search" name="rp_search_log" value="<?php echo esc_attr( $search_log ); ?>" placeholder="<?php esc_attr_e( 'Search download logs by resource title, user name, email, or IP...', 'resilient-hub' ); ?>">
 					<button class="rp-button" type="submit"><?php esc_html_e( 'Search', 'resilient-hub' ); ?></button>
 				</form>
@@ -372,6 +423,12 @@ get_header();
 						<?php if ( $search_log ) : ?>
 							<input type="hidden" name="rp_search_log" value="<?php echo esc_attr( $search_log ); ?>">
 						<?php endif; ?>
+						<label for="rp_traffic" style="font-size: 14px; font-weight: 600; color: #4b5563;"><?php esc_html_e( 'Traffic:', 'resilient-hub' ); ?></label>
+						<select id="rp_traffic" name="rp_traffic" onchange="this.form.submit()" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 12px; font-size: 14px; background: #fff; min-width: 160px;">
+							<option value="all" <?php selected( $traffic_type, 'all' ); ?>><?php esc_html_e( 'All Traffic', 'resilient-hub' ); ?></option>
+							<option value="organic" <?php selected( $traffic_type, 'organic' ); ?>><?php esc_html_e( 'Organic / Human', 'resilient-hub' ); ?></option>
+							<option value="bot" <?php selected( $traffic_type, 'bot' ); ?>><?php esc_html_e( 'Inorganic / Bot', 'resilient-hub' ); ?></option>
+						</select>
 						<label for="rp_days" style="font-size: 14px; font-weight: 600; color: #4b5563;"><?php esc_html_e( 'Range:', 'resilient-hub' ); ?></label>
 						<select id="rp_days" name="rp_days" onchange="this.form.submit()" style="border: 1px solid #d1d5db; border-radius: 6px; padding: 8px 12px; font-size: 14px; background: #fff; min-width: 180px;">
 							<option value="7" <?php selected( $days, 7 ); ?>><?php esc_html_e( 'Last 7 Days', 'resilient-hub' ); ?></option>
@@ -382,6 +439,9 @@ get_header();
 					</form>
 
 					<div style="display: flex; gap: 8px;">
+						<a href="<?php echo esc_url( $csv_url ); ?>" class="rp-button" style="background: #0f766e; color: #fff; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 16px; border-radius: 6px; text-decoration: none;">
+							<span class="dashicons dashicons-media-spreadsheet" style="font-size: 18px; width: 18px; height: 18px;"></span> <?php esc_html_e( 'Export CSV', 'resilient-hub' ); ?>
+						</a>
 						<button id="rp-export-pdf" class="rp-button" style="background: #ef4444; color: #fff; display: inline-flex; align-items: center; gap: 6px; font-weight: 600; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">
 							<span class="dashicons dashicons-pdf" style="font-size: 18px; width: 18px; height: 18px; line-height: 1; margin-top: 3px;"></span> <?php esc_html_e( 'Export PDF', 'resilient-hub' ); ?>
 						</button>
@@ -564,9 +624,9 @@ get_header();
 				<h3 class="rp-analytics-table-title">
 					<?php 
 					if ( $search_log ) {
-						printf( esc_html__( 'Search Results: Download Audit Trail (Last 100 Events Matching "%s")', 'resilient-hub' ), esc_html( $search_log ) );
+						printf( esc_html__( 'Download Audit Trail: %1$s results matching "%2$s"', 'resilient-hub' ), number_format_i18n( $total_logs ), esc_html( $search_log ) );
 					} else {
-						esc_html_e( 'Download Audit Trail (Last 100 Events)', 'resilient-hub' );
+						printf( esc_html__( 'Download Audit Trail (%s events)', 'resilient-hub' ), number_format_i18n( $total_logs ) );
 					}
 					?>
 				</h3>
@@ -632,6 +692,21 @@ get_header();
 						</tbody>
 					</table>
 				</div>
+				<?php if ( $total_logs > $logs_per_page ) : ?>
+					<div class="rp-analytics-pagination">
+						<span><?php printf( esc_html__( 'Showing %1$s–%2$s of %3$s', 'resilient-hub' ), number_format_i18n( $log_offset + 1 ), number_format_i18n( min( $log_offset + $logs_per_page, $total_logs ) ), number_format_i18n( $total_logs ) ); ?></span>
+						<div><?php
+							echo wp_kses_post( paginate_links( array(
+								'base'      => add_query_arg( 'rp_log_page', '%#%' ),
+								'format'    => '',
+								'current'   => $log_page,
+								'total'     => $total_log_pages,
+								'prev_text' => __( 'Previous', 'resilient-hub' ),
+								'next_text' => __( 'Next', 'resilient-hub' ),
+							) ) );
+						?></div>
+					</div>
+				<?php endif; ?>
 			</div>
 
 		</div>

@@ -779,6 +779,91 @@ function rp_child_create_analytics_page() {
 add_action( 'init', 'rp_child_create_analytics_page' );
 
 /**
+ * Return a SQL condition for human or automated analytics traffic.
+ *
+ * Classification is based on common crawler and automation user-agent markers.
+ */
+function rp_child_analytics_traffic_sql( $alias, $traffic_type ) {
+	if ( ! in_array( $traffic_type, array( 'organic', 'bot' ), true ) ) {
+		return '';
+	}
+
+	$alias     = preg_replace( '/[^a-zA-Z0-9_]/', '', $alias );
+	$bot_regex = 'bot|crawl|spider|slurp|bingpreview|headless|phantom|selenium|puppeteer|playwright|lighthouse|monitor|uptime|facebookexternalhit|whatsapp|telegrambot|discordbot';
+	$bot_test  = "(COALESCE({$alias}.user_agent, '') = '' OR {$alias}.user_agent REGEXP '{$bot_regex}')";
+
+	return 'organic' === $traffic_type ? " AND NOT {$bot_test}" : " AND {$bot_test}";
+}
+
+function rp_child_is_bot_user_agent( $user_agent ) {
+	return empty( $user_agent ) || (bool) preg_match( '/bot|crawl|spider|slurp|bingpreview|headless|phantom|selenium|puppeteer|playwright|lighthouse|monitor|uptime|facebookexternalhit|whatsapp|telegrambot|discordbot/i', $user_agent );
+}
+
+/**
+ * Export the filtered download audit trail as CSV.
+ */
+function rp_child_export_analytics_csv() {
+	if ( ! current_user_can( 'manage_options' ) && ! current_user_can( 'publish_posts' ) ) {
+		wp_die( esc_html__( 'You do not have permission to export analytics.', 'resilient-hub' ), '', array( 'response' => 403 ) );
+	}
+
+	check_admin_referer( 'rp_export_analytics_csv' );
+
+	global $wpdb;
+	$days         = isset( $_GET['rp_days'] ) ? absint( $_GET['rp_days'] ) : 30;
+	$traffic_type = isset( $_GET['rp_traffic'] ) ? sanitize_key( $_GET['rp_traffic'] ) : 'all';
+	$search_log   = isset( $_GET['rp_search_log'] ) ? sanitize_text_field( wp_unslash( $_GET['rp_search_log'] ) ) : '';
+	$where        = 'WHERE 1=1';
+
+	if ( $days > 0 ) {
+		$where .= $wpdb->prepare( ' AND d.created_at >= DATE_SUB(NOW(), INTERVAL %d DAY)', $days );
+	}
+	$where .= rp_child_analytics_traffic_sql( 'd', $traffic_type );
+
+	if ( $search_log ) {
+		$search_users = get_users( array(
+			'search'         => '*' . $search_log . '*',
+			'search_columns' => array( 'user_login', 'user_email', 'display_name' ),
+			'fields'         => 'ID',
+		) );
+		$user_ids    = ! empty( $search_users ) ? implode( ',', array_map( 'absint', $search_users ) ) : '0';
+		$like        = '%' . $wpdb->esc_like( $search_log ) . '%';
+		$where      .= $wpdb->prepare( " AND (d.ip_address LIKE %s OR p.post_title LIKE %s OR d.user_id IN ($user_ids))", $like, $like );
+	}
+
+	$logs = $wpdb->get_results( "
+		SELECT d.user_id, d.ip_address, d.user_agent, d.created_at, d.post_id, p.post_title, p.post_type
+		FROM {$wpdb->prefix}rp_analytics_downloads d
+		LEFT JOIN {$wpdb->posts} p ON d.post_id = p.ID
+		{$where}
+		ORDER BY d.created_at DESC
+	" );
+
+	nocache_headers();
+	header( 'Content-Type: text/csv; charset=utf-8' );
+	header( 'Content-Disposition: attachment; filename="download-audit-' . gmdate( 'Y-m-d' ) . '.csv"' );
+	$output = fopen( 'php://output', 'w' );
+	fputcsv( $output, array( 'User', 'Email', 'Resource', 'Resource ID', 'Type', 'IP Address', 'Traffic', 'Timestamp', 'User Agent' ) );
+	foreach ( $logs as $log ) {
+		$user = $log->user_id ? get_userdata( $log->user_id ) : false;
+		fputcsv( $output, array(
+			$user ? $user->display_name : 'Guest User',
+			$user ? $user->user_email : '',
+			$log->post_title ? $log->post_title : 'Deleted Resource',
+			$log->post_id,
+			$log->post_type,
+			$log->ip_address,
+			rp_child_is_bot_user_agent( (string) $log->user_agent ) ? 'Bot / Inorganic' : 'Organic',
+			$log->created_at,
+			$log->user_agent,
+		) );
+	}
+	fclose( $output );
+	exit;
+}
+add_action( 'admin_post_rp_export_analytics_csv', 'rp_child_export_analytics_csv' );
+
+/**
  * Auto-create the compliance policies pages if they don't exist.
  */
 function rp_child_create_compliance_pages() {
