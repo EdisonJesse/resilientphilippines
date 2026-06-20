@@ -1592,12 +1592,25 @@ add_filter( 'excerpt_more', 'rp_child_resource_excerpt_more', 100 );
 
 // 1. Dynamically append an invisible honeypot field inside the CF7 forms.
 function rp_child_append_cf7_honeypot( $content ) {
+	$first_number  = wp_rand( 2, 9 );
+	$second_number = wp_rand( 2, 9 );
+	$challenge     = $first_number . ':' . $second_number;
+	$signature     = hash_hmac( 'sha256', $challenge, wp_salt( 'nonce' ) );
+	$token         = base64_encode( $challenge . ':' . $signature );
+
+	$human_check_html = sprintf(
+		'<p class="cf7-human-check"><label for="cf7_human_answer">Human check: What is %1$d + %2$d? <span aria-hidden="true">*</span></label><br><input type="number" id="cf7_human_answer" name="cf7_human_answer" min="4" max="18" inputmode="numeric" autocomplete="off" required aria-required="true"><input type="hidden" name="cf7_human_token" value="%3$s"></p>',
+		$first_number,
+		$second_number,
+		esc_attr( $token )
+	);
+
 	$honeypot_html = '
 	<div class="cf7-hp-wrapper" style="display:none !important; visibility:hidden !important; position:absolute !important; left:-9999px !important; width:1px !important; height:1px !important; overflow:hidden !important;">
 		<label for="cf7_hp_field">Please leave this field empty:</label>
 		<input type="text" id="cf7_hp_field" name="cf7_hp_field" tabindex="-1" autocomplete="new-password" value="" />
 	</div>';
-	return $content . $honeypot_html;
+	return $human_check_html . $content . $honeypot_html;
 }
 add_filter( 'wpcf7_form_elements', 'rp_child_append_cf7_honeypot' );
 
@@ -1613,6 +1626,24 @@ function rp_child_cf7_spam_verification( $spam, $submission ) {
 		return true; // Mark as spam.
 	}
 
+	// Case 2: Require a valid answer to the signed arithmetic challenge.
+	$human_answer = isset( $_POST['cf7_human_answer'] ) ? sanitize_text_field( wp_unslash( $_POST['cf7_human_answer'] ) ) : '';
+	$human_token  = isset( $_POST['cf7_human_token'] ) ? sanitize_text_field( wp_unslash( $_POST['cf7_human_token'] ) ) : '';
+	$decoded      = base64_decode( $human_token, true );
+	$token_parts  = $decoded ? explode( ':', $decoded, 3 ) : array();
+
+	if ( 3 !== count( $token_parts ) || ! ctype_digit( $token_parts[0] ) || ! ctype_digit( $token_parts[1] ) ) {
+		return true;
+	}
+
+	$challenge          = $token_parts[0] . ':' . $token_parts[1];
+	$expected_signature = hash_hmac( 'sha256', $challenge, wp_salt( 'nonce' ) );
+	$expected_answer    = (int) $token_parts[0] + (int) $token_parts[1];
+
+	if ( ! hash_equals( $expected_signature, $token_parts[2] ) || (string) $expected_answer !== $human_answer ) {
+		return true;
+	}
+
 	// Get form submission data.
 	$posted_data = $submission->get_posted_data();
 
@@ -1626,13 +1657,18 @@ function rp_child_cf7_spam_verification( $spam, $submission ) {
 		}
 	}
 
-	// Case 2: Block if there are excessive links (more than 2 links is highly suspicious for a contact message).
-	$link_count = preg_match_all( '/https?:\/\/[^\s]+/i', $text_content );
-	if ( $link_count > 2 ) {
+	// Case 3: Block multiple links and URL shorteners commonly used to conceal spam destinations.
+	$link_count = preg_match_all( '/(?:https?:\/\/|www\.)[^\s]+/i', $text_content );
+	if ( $link_count > 1 ) {
 		return true; // Mark as spam.
 	}
 
-	// Case 3: Block common SEO spam keywords.
+	$shortener_pattern = '/\b(?:bit\.ly|tinyurl\.com|t\.co|goo\.gl|ow\.ly|buff\.ly|is\.gd|cutt\.ly|rebrand\.ly|shorturl\.at|bpl\.kr)(?:\/|\b)/i';
+	if ( preg_match( $shortener_pattern, $text_content ) ) {
+		return true;
+	}
+
+	// Case 4: Block common SEO spam keywords.
 	$spam_keywords = array(
 		'dr30',
 		'dr40',
@@ -1648,6 +1684,12 @@ function rp_child_cf7_spam_verification( $spam, $submission ) {
 		'increase traffic',
 		'link building',
 		'ranking on google',
+		'jackpot',
+		'lottery winner',
+		'cash prize',
+		'claim your prize',
+		'guaranteed payout',
+		'crypto investment',
 	);
 
 	$lower_text_content = strtolower( $text_content );
@@ -1660,4 +1702,3 @@ function rp_child_cf7_spam_verification( $spam, $submission ) {
 	return $spam;
 }
 add_filter( 'wpcf7_spam', 'rp_child_cf7_spam_verification', 10, 2 );
-
