@@ -19,7 +19,6 @@
 					<li><a href="<?php echo esc_url( home_url( '/opportunities/' ) ); ?>"><?php esc_html_e( 'Opportunities', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/job-ads/' ) ); ?>"><?php esc_html_e( 'Job Ads', 'resilient-hub' ); ?></a></li>
 					<li><a href="<?php echo esc_url( home_url( '/invitations-to-bid/' ) ); ?>"><?php esc_html_e( 'Invitations to Bid', 'resilient-hub' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/tinig/' ) ); ?>"><?php esc_html_e( 'Tinig Feedback', 'resilient-hub' ); ?></a></li>
 				</ul>
 			</div>
 			<div>
