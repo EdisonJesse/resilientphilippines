@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Resource Hub
  * Description: Custom post types, taxonomies, roles, upload workflow, and catalog shortcodes for the humanitarian resource hub.
- * Version: 1.12.0
+ * Version: 1.13.0
  * Author: ACCORD
  * Text Domain: rp-resource-hub
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_RESOURCE_HUB_VERSION', '1.12.0' );
+define( 'RP_RESOURCE_HUB_VERSION', '1.13.0' );
 define( 'RP_RESOURCE_HUB_FILE', __FILE__ );
 define( 'RP_RESOURCE_HUB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_URL', plugin_dir_url( __FILE__ ) );
@@ -974,6 +974,17 @@ function rp_resource_hub_enqueue_assets() {
 		array(),
 		RP_RESOURCE_HUB_VERSION
 	);
+
+	if ( is_page( 'submit-post' ) ) {
+		wp_enqueue_media();
+		wp_enqueue_script(
+			'rp-submit-post',
+			RP_RESOURCE_HUB_URL . 'assets/submit-post.js',
+			array( 'jquery' ),
+			RP_RESOURCE_HUB_VERSION,
+			true
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'rp_resource_hub_enqueue_assets' );
 
@@ -4568,13 +4579,45 @@ function rp_resource_hub_submit_post_shortcode() {
 		echo '<div class="rp-notice ' . esc_attr( $notice_class ) . '">' . esc_html( $notice['message'] ) . '</div>';
 	}
 	?>
-	<form class="rp-upload-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" enctype="multipart/form-data">
+	<div class="rp-submit-layout">
+	<form class="rp-upload-form rp-submit-post-form" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" enctype="multipart/form-data" data-autosave-key="rp-submit-post-draft">
 		<input type="hidden" name="action" value="rp_post_upload">
 		<?php wp_nonce_field( 'rp_post_upload', 'rp_post_upload_nonce' ); ?>
-		
+
+		<div class="rp-form-intro">
+			<div>
+				<h2><?php esc_html_e( 'Share your story', 'rp-resource-hub' ); ?></h2>
+				<p><?php esc_html_e( 'Draft your contribution below. All submissions are reviewed before publication.', 'rp-resource-hub' ); ?></p>
+			</div>
+			<span class="rp-review-badge"><?php esc_html_e( 'Review required', 'rp-resource-hub' ); ?></span>
+		</div>
+
+		<details class="rp-submit-guidance">
+			<summary><?php esc_html_e( 'Before you submit', 'rp-resource-hub' ); ?></summary>
+			<ul>
+				<li><?php esc_html_e( 'Lead with the most important information.', 'rp-resource-hub' ); ?></li>
+				<li><?php esc_html_e( 'Use headings for long sections.', 'rp-resource-hub' ); ?></li>
+				<li><?php esc_html_e( 'Confirm names, dates, and locations.', 'rp-resource-hub' ); ?></li>
+				<li><?php esc_html_e( 'Only upload media you have permission to share.', 'rp-resource-hub' ); ?></li>
+			</ul>
+		</details>
+
 		<div class="rp-field">
 			<label for="rp_title"><?php esc_html_e( 'Post Title', 'rp-resource-hub' ); ?></label>
-			<input id="rp_title" name="rp_title" type="text" required maxlength="160">
+			<input id="rp_title" name="rp_title" type="text" required maxlength="160" aria-describedby="rp-title-help rp-title-count">
+			<div class="rp-field-meta">
+				<p id="rp-title-help" class="rp-field-help"><?php esc_html_e( 'Use a clear, specific title that tells readers what happened.', 'rp-resource-hub' ); ?></p>
+				<span id="rp-title-count" class="rp-character-count" aria-live="polite">0/160</span>
+			</div>
+		</div>
+
+		<div class="rp-field">
+			<label for="rp_excerpt"><?php esc_html_e( 'Short Summary', 'rp-resource-hub' ); ?></label>
+			<textarea id="rp_excerpt" name="rp_excerpt" rows="3" maxlength="320" aria-describedby="rp-excerpt-help rp-excerpt-count"></textarea>
+			<div class="rp-field-meta">
+				<p id="rp-excerpt-help" class="rp-field-help"><?php esc_html_e( 'Optional. Summarize the main point in one or two sentences.', 'rp-resource-hub' ); ?></p>
+				<span id="rp-excerpt-count" class="rp-character-count" aria-live="polite">0/320</span>
+			</div>
 		</div>
 
 		<div class="rp-field">
@@ -4592,8 +4635,9 @@ function rp_resource_hub_submit_post_shortcode() {
 			</select>
 		</div>
 
-		<div class="rp-field">
+		<div class="rp-field rp-editor-field">
 			<label for="rp_content"><?php esc_html_e( 'Content Body', 'rp-resource-hub' ); ?></label>
+			<p id="rp-content-help" class="rp-field-help"><?php esc_html_e( 'Use headings to organize longer stories. Add images only when they help explain the story.', 'rp-resource-hub' ); ?></p>
 			<?php
 			wp_editor(
 				'',
@@ -4601,29 +4645,72 @@ function rp_resource_hub_submit_post_shortcode() {
 				array(
 					'textarea_name' => 'rp_content',
 					'textarea_rows' => 12,
-					'media_buttons' => false,
-					'teeny'         => true,
-					'quicktags'     => true,
+					'media_buttons'   => current_user_can( 'upload_files' ),
+					'teeny'           => false,
+					'quicktags'       => current_user_can( 'manage_options' ),
+					'drag_drop_upload' => current_user_can( 'upload_files' ),
+					'tinymce'         => array(
+						'block_formats' => 'Paragraph=p;Heading 2=h2;Heading 3=h3;Heading 4=h4',
+						'toolbar1'      => 'formatselect,bold,italic,underline,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,unlink,wp_more,undo,redo,removeformat,fullscreen',
+						'toolbar2'      => '',
+						'statusbar'     => true,
+						'resize'        => true,
+					),
 				)
 			);
 			?>
+			<div class="rp-editor-status" aria-live="polite">
+				<span><strong id="rp-word-count">0</strong> <?php esc_html_e( 'words', 'rp-resource-hub' ); ?></span>
+				<span id="rp-reading-time"><?php esc_html_e( 'Less than 1 min read', 'rp-resource-hub' ); ?></span>
+				<span id="rp-autosave-status"><?php esc_html_e( 'Draft autosave ready', 'rp-resource-hub' ); ?></span>
+			</div>
+			<p id="rp-content-error" class="rp-field-error" role="alert" hidden><?php esc_html_e( 'Add some content before submitting.', 'rp-resource-hub' ); ?></p>
+		</div>
+
+		<div class="rp-field rp-image-field">
+			<label for="rp_featured_image"><?php esc_html_e( 'Featured Image', 'rp-resource-hub' ); ?></label>
+			<div class="rp-image-dropzone">
+				<img id="rp-image-preview" alt="" hidden>
+				<div class="rp-image-prompt">
+					<strong><?php esc_html_e( 'Drop an image here or choose a file', 'rp-resource-hub' ); ?></strong>
+					<span><?php esc_html_e( 'JPEG, PNG or WebP, up to 5MB', 'rp-resource-hub' ); ?></span>
+				</div>
+				<input id="rp_featured_image" name="rp_featured_image" type="file" accept="image/jpeg,image/png,image/webp" required aria-describedby="rp-image-error">
+			</div>
+			<p id="rp-image-error" class="rp-field-error" role="alert" hidden></p>
 		</div>
 
 		<div class="rp-field">
-			<label for="rp_featured_image"><?php esc_html_e( 'Featured Image', 'rp-resource-hub' ); ?></label>
-			<input id="rp_featured_image" name="rp_featured_image" type="file" accept="image/*" required>
-			<p class="rp-field-help"><?php esc_html_e( 'Upload a featured image for your post (JPEG, PNG, WebP). Max size: 5MB.', 'rp-resource-hub' ); ?></p>
+			<label for="rp_featured_image_alt"><?php esc_html_e( 'Image Description', 'rp-resource-hub' ); ?></label>
+			<input id="rp_featured_image_alt" name="rp_featured_image_alt" type="text" required maxlength="200" aria-describedby="rp-image-alt-help">
+			<p id="rp-image-alt-help" class="rp-field-help"><?php esc_html_e( 'Briefly describe the image for people using screen readers.', 'rp-resource-hub' ); ?></p>
 		</div>
-		
+
 		<div class="rp-field rp-field-consent">
-			<label style="display: flex; align-items: flex-start; gap: 8px; font-weight: normal; cursor: pointer;">
-				<input id="rp_authorized_consent" name="rp_authorized_consent" type="checkbox" value="1" required style="margin-top: 4px; width: auto; height: auto;">
+			<label class="rp-consent-label">
+				<input id="rp_authorized_consent" name="rp_authorized_consent" type="checkbox" value="1" required>
 				<span><?php esc_html_e( 'I confirm that I am authorized to share this content publicly.', 'rp-resource-hub' ); ?></span>
 			</label>
 		</div>
 
-		<button type="submit" class="rp-button" style="margin-top: 20px;"><?php esc_html_e( 'Submit Post', 'rp-resource-hub' ); ?></button>
+		<div class="rp-form-actions">
+			<button type="button" class="rp-button rp-button-secondary" id="rp-preview-post"><?php esc_html_e( 'Preview', 'rp-resource-hub' ); ?></button>
+			<button type="submit" class="rp-button" data-default-label="<?php esc_attr_e( 'Submit for Review', 'rp-resource-hub' ); ?>" data-busy-label="<?php esc_attr_e( 'Submitting…', 'rp-resource-hub' ); ?>"><?php esc_html_e( 'Submit for Review', 'rp-resource-hub' ); ?></button>
+		</div>
 	</form>
+	</div>
+	<dialog class="rp-post-preview" id="rp-post-preview" aria-labelledby="rp-preview-title">
+		<div class="rp-preview-header">
+			<strong><?php esc_html_e( 'Post preview', 'rp-resource-hub' ); ?></strong>
+			<button type="button" id="rp-close-preview" aria-label="<?php esc_attr_e( 'Close preview', 'rp-resource-hub' ); ?>">&times;</button>
+		</div>
+		<div class="rp-preview-content">
+			<img id="rp-preview-image" alt="" hidden>
+			<h2 id="rp-preview-title"></h2>
+			<p id="rp-preview-excerpt"></p>
+			<div id="rp-preview-body"></div>
+		</div>
+	</dialog>
 	<?php
 	return ob_get_clean();
 }
@@ -4650,12 +4737,14 @@ function rp_resource_hub_handle_post_upload() {
 		exit;
 	}
 
-	$title    = isset( $_POST['rp_title'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_title'] ) ) : '';
-	$content  = isset( $_POST['rp_content'] ) ? wp_kses_post( wp_unslash( $_POST['rp_content'] ) ) : '';
-	$category = isset( $_POST['rp_category'] ) ? absint( $_POST['rp_category'] ) : 0;
+	$title     = isset( $_POST['rp_title'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_title'] ) ) : '';
+	$excerpt   = isset( $_POST['rp_excerpt'] ) ? sanitize_textarea_field( wp_unslash( $_POST['rp_excerpt'] ) ) : '';
+	$content   = isset( $_POST['rp_content'] ) ? wp_kses_post( wp_unslash( $_POST['rp_content'] ) ) : '';
+	$category  = isset( $_POST['rp_category'] ) ? absint( $_POST['rp_category'] ) : 0;
+	$image_alt = isset( $_POST['rp_featured_image_alt'] ) ? sanitize_text_field( wp_unslash( $_POST['rp_featured_image_alt'] ) ) : '';
 
-	if ( empty( $title ) || empty( $content ) || empty( $category ) ) {
-		$notice_key = rp_resource_hub_store_upload_notice( 'error', __( 'Title, content, and category are required.', 'rp-resource-hub' ) );
+	if ( empty( $title ) || empty( $content ) || empty( $category ) || empty( $image_alt ) ) {
+		$notice_key = rp_resource_hub_store_upload_notice( 'error', __( 'Title, content, category, and image description are required.', 'rp-resource-hub' ) );
 		wp_safe_redirect( add_query_arg( 'rp_upload_notice', $notice_key, home_url( '/submit-post/' ) ) );
 		exit;
 	}
@@ -4674,9 +4763,9 @@ function rp_resource_hub_handle_post_upload() {
 	}
 
 	$file_type = wp_check_filetype( $file['name'] );
-	$allowed_mimes = array( 'jpg', 'jpeg', 'png', 'gif', 'webp' );
+	$allowed_mimes = array( 'jpg', 'jpeg', 'png', 'webp' );
 	if ( ! in_array( strtolower( $file_type['ext'] ), $allowed_mimes, true ) ) {
-		$notice_key = rp_resource_hub_store_upload_notice( 'error', __( 'Only JPG, JPEG, PNG, GIF, and WebP images are allowed.', 'rp-resource-hub' ) );
+		$notice_key = rp_resource_hub_store_upload_notice( 'error', __( 'Only JPG, JPEG, PNG, and WebP images are allowed.', 'rp-resource-hub' ) );
 		wp_safe_redirect( add_query_arg( 'rp_upload_notice', $notice_key, home_url( '/submit-post/' ) ) );
 		exit;
 	}
@@ -4684,6 +4773,7 @@ function rp_resource_hub_handle_post_upload() {
 	$post_id = wp_insert_post( array(
 		'post_type'    => 'post',
 		'post_title'   => $title,
+		'post_excerpt' => $excerpt,
 		'post_content' => $content,
 		'post_status'  => 'pending',
 		'post_author'  => get_current_user_id(),
@@ -4712,6 +4802,7 @@ function rp_resource_hub_handle_post_upload() {
 	}
 
 	set_post_thumbnail( $post_id, $attachment_id );
+	update_post_meta( $attachment_id, '_wp_attachment_image_alt', $image_alt );
 
 	wp_safe_redirect( home_url( '/resource-submitted/' ) );
 	exit;
