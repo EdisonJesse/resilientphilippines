@@ -231,6 +231,10 @@
   overflow: hidden;
 }
 
+.rp-submit-post-form .mce-container.mce-fullscreen {
+  z-index: 100000 !important;
+}
+
 .rp-submit-post-form .wp-media-buttons .insert-media {
   background: #ffffff;
   border: 1px solid var(--rp-color-green, #176b52);
