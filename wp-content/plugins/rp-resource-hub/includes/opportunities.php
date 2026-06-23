@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_OPPORTUNITIES_VERSION', '1.0.10' );
+define( 'RP_OPPORTUNITIES_VERSION', '1.0.11' );
 define( 'RP_JOB_MAX_ATTACHMENT_BYTES', 10 * 1024 * 1024 );
 define( 'RP_JOB_MAX_ATTACHMENTS', 5 );
 define( 'RP_BID_MAX_ATTACHMENT_BYTES', 25 * 1024 * 1024 );
@@ -142,10 +142,17 @@ function rp_opportunities_apply_roles_and_caps() {
 			'rp_hr_department',
 			__( 'ACCORD HR', 'rp-resource-hub' ),
 			array(
-				'read'                     => true,
-				'upload_files'             => true,
-				'manage_job_applications'  => true,
-				'submit_job_opportunities' => true,
+				'read'                         => true,
+				'upload_files'                 => true,
+				'manage_job_applications'      => true,
+				'submit_job_opportunities'     => true,
+				'edit_rp_sitrep'               => true,
+				'read_rp_sitrep'               => true,
+				'delete_rp_sitrep'             => true,
+				'edit_rp_sitreps'              => true,
+				'edit_published_rp_sitreps'    => true,
+				'delete_rp_sitreps'            => true,
+				'delete_published_rp_sitreps'  => true,
 			)
 		);
 	} else {
@@ -153,6 +160,13 @@ function rp_opportunities_apply_roles_and_caps() {
 		$hr_department->add_cap( 'upload_files' );
 		$hr_department->add_cap( 'manage_job_applications' );
 		$hr_department->add_cap( 'submit_job_opportunities' );
+		$hr_department->add_cap( 'edit_rp_sitrep' );
+		$hr_department->add_cap( 'read_rp_sitrep' );
+		$hr_department->add_cap( 'delete_rp_sitrep' );
+		$hr_department->add_cap( 'edit_rp_sitreps' );
+		$hr_department->add_cap( 'edit_published_rp_sitreps' );
+		$hr_department->add_cap( 'delete_rp_sitreps' );
+		$hr_department->add_cap( 'delete_published_rp_sitreps' );
 	}
 
 	$procurement_department = get_role( 'rp_procurement_department' );
@@ -161,10 +175,17 @@ function rp_opportunities_apply_roles_and_caps() {
 			'rp_procurement_department',
 			__( 'ACCORD Procurement', 'rp-resource-hub' ),
 			array(
-				'read'                     => true,
-				'upload_files'             => true,
-				'manage_bid_submissions'   => true,
-				'submit_itb_opportunities' => true,
+				'read'                         => true,
+				'upload_files'                 => true,
+				'manage_bid_submissions'       => true,
+				'submit_itb_opportunities'     => true,
+				'edit_rp_sitrep'               => true,
+				'read_rp_sitrep'               => true,
+				'delete_rp_sitrep'             => true,
+				'edit_rp_sitreps'              => true,
+				'edit_published_rp_sitreps'    => true,
+				'delete_rp_sitreps'            => true,
+				'delete_published_rp_sitreps'  => true,
 			)
 		);
 	} else {
@@ -172,6 +193,13 @@ function rp_opportunities_apply_roles_and_caps() {
 		$procurement_department->add_cap( 'upload_files' );
 		$procurement_department->add_cap( 'manage_bid_submissions' );
 		$procurement_department->add_cap( 'submit_itb_opportunities' );
+		$procurement_department->add_cap( 'edit_rp_sitrep' );
+		$procurement_department->add_cap( 'read_rp_sitrep' );
+		$procurement_department->add_cap( 'delete_rp_sitrep' );
+		$procurement_department->add_cap( 'edit_rp_sitreps' );
+		$procurement_department->add_cap( 'edit_published_rp_sitreps' );
+		$procurement_department->add_cap( 'delete_rp_sitreps' );
+		$procurement_department->add_cap( 'delete_published_rp_sitreps' );
 	}
 
 	rp_opportunities_migrate_department_role( 'rp_hr_reviewer', 'rp_hr_department' );

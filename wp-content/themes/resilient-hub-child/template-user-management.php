@@ -25,6 +25,7 @@ $editable_roles = array(
 	'editor'                     => __( 'Editor', 'resilient-hub' ),
 	'rp_hr_department'           => __( 'ACCORD HR', 'resilient-hub' ),
 	'rp_procurement_department'  => __( 'ACCORD Procurement', 'resilient-hub' ),
+	'rp_accord_staff'            => __( 'ACCORD Staff', 'resilient-hub' ),
 	'partner_contributor'        => __( 'Partner Contributor', 'resilient-hub' ),
 	'hub_subscriber'             => __( 'Hub Subscriber', 'resilient-hub' ),
 	'subscriber'                 => __( 'Subscriber', 'resilient-hub' ),

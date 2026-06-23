@@ -3356,6 +3356,11 @@ input[type="submit"].give-submit:focus {
   color: #047857;
 }
 
+.rp-role-badge-rp_accord_staff {
+  background: #f3e8ff;
+  color: #6b21a8;
+}
+
 .rp-role-badge-partner_contributor {
   background: #d1fae5;
   color: #065f46;

@@ -700,7 +700,7 @@ function rp_ajax_update_user_role_handler() {
 		wp_send_json_error( array( 'message' => __( 'You cannot change your own role.', 'resilient-hub' ) ) );
 	}
 
-	$allowed_roles = array( 'administrator', 'editor', 'rp_hr_department', 'rp_procurement_department', 'partner_contributor', 'hub_subscriber', 'subscriber' );
+	$allowed_roles = array( 'administrator', 'editor', 'rp_hr_department', 'rp_procurement_department', 'rp_accord_staff', 'partner_contributor', 'hub_subscriber', 'subscriber' );
 	if ( ! in_array( $new_role, $allowed_roles, true ) ) {
 		wp_send_json_error( array( 'message' => __( 'Invalid role selected.', 'resilient-hub' ) ) );
 	}
@@ -717,6 +717,7 @@ function rp_ajax_update_user_role_handler() {
 		'editor'                    => __( 'Editor', 'resilient-hub' ),
 		'rp_hr_department'          => __( 'ACCORD HR', 'resilient-hub' ),
 		'rp_procurement_department' => __( 'ACCORD Procurement', 'resilient-hub' ),
+		'rp_accord_staff'           => __( 'ACCORD Staff', 'resilient-hub' ),
 		'partner_contributor'       => __( 'Partner Contributor', 'resilient-hub' ),
 		'hub_subscriber'            => __( 'Hub Subscriber', 'resilient-hub' ),
 		'subscriber'                => __( 'Subscriber', 'resilient-hub' ),
@@ -2382,3 +2383,31 @@ function rp_child_force_page_templates( $template ) {
 	return $template;
 }
 add_filter( 'page_template', 'rp_child_force_page_templates', 999 );
+
+/**
+ * Dynamically grant read_member_resources capability to all logged-in users.
+ */
+function rp_child_grant_read_member_resources_to_logged_in_users( $allcaps, $caps, $args, $user ) {
+	if ( is_user_logged_in() ) {
+		$allcaps['read_member_resources'] = true;
+	}
+	return $allcaps;
+}
+add_filter( 'user_has_cap', 'rp_child_grant_read_member_resources_to_logged_in_users', 10, 4 );
+
+/**
+ * Automatically assign ACCORD Staff role to new users registering with an @accord.org.ph email.
+ */
+function rp_child_auto_assign_accord_staff_role( $user_id ) {
+	$user = get_userdata( $user_id );
+	if ( ! $user ) {
+		return;
+	}
+	$email = $user->user_email;
+	if ( strpos( strtolower( $email ), '@accord.org.ph' ) !== false ) {
+		$user->set_role( 'rp_accord_staff' );
+	}
+}
+add_action( 'user_register', 'rp_child_auto_assign_accord_staff_role' );
+
+

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Resource Hub
  * Description: Custom post types, taxonomies, roles, upload workflow, and catalog shortcodes for the humanitarian resource hub.
- * Version: 1.13.0
+ * Version: 1.13.1
  * Author: ACCORD
  * Text Domain: rp-resource-hub
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_RESOURCE_HUB_VERSION', '1.13.0' );
+define( 'RP_RESOURCE_HUB_VERSION', '1.13.1' );
 define( 'RP_RESOURCE_HUB_FILE', __FILE__ );
 define( 'RP_RESOURCE_HUB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_URL', plugin_dir_url( __FILE__ ) );
@@ -310,6 +310,37 @@ function rp_resource_hub_apply_roles_and_caps() {
 		foreach ( rp_resource_hub_admin_caps() as $cap ) {
 			$role->add_cap( $cap );
 		}
+	}
+
+	$staff = get_role( 'rp_accord_staff' );
+	if ( ! $staff ) {
+		add_role(
+			'rp_accord_staff',
+			__( 'ACCORD Staff', 'rp-resource-hub' ),
+			array(
+				'read'                         => true,
+				'upload_files'                 => true,
+				'read_member_resources'        => true,
+				'edit_rp_sitrep'               => true,
+				'read_rp_sitrep'               => true,
+				'delete_rp_sitrep'             => true,
+				'edit_rp_sitreps'              => true,
+				'edit_published_rp_sitreps'    => true,
+				'delete_rp_sitreps'            => true,
+				'delete_published_rp_sitreps'  => true,
+			)
+		);
+	} else {
+		$staff->add_cap( 'read' );
+		$staff->add_cap( 'upload_files' );
+		$staff->add_cap( 'read_member_resources' );
+		$staff->add_cap( 'edit_rp_sitrep' );
+		$staff->add_cap( 'read_rp_sitrep' );
+		$staff->add_cap( 'delete_rp_sitrep' );
+		$staff->add_cap( 'edit_rp_sitreps' );
+		$staff->add_cap( 'edit_published_rp_sitreps' );
+		$staff->add_cap( 'delete_rp_sitreps' );
+		$staff->add_cap( 'delete_published_rp_sitreps' );
 	}
 }
 
