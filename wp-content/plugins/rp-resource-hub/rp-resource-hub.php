@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Resilient Philippines Resource Hub
  * Description: Custom post types, taxonomies, roles, upload workflow, and catalog shortcodes for the humanitarian resource hub.
- * Version: 1.13.1
+ * Version: 1.13.2
  * Author: ACCORD
  * Text Domain: rp-resource-hub
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RP_RESOURCE_HUB_VERSION', '1.13.1' );
+define( 'RP_RESOURCE_HUB_VERSION', '1.13.2' );
 define( 'RP_RESOURCE_HUB_FILE', __FILE__ );
 define( 'RP_RESOURCE_HUB_PATH', plugin_dir_path( __FILE__ ) );
 define( 'RP_RESOURCE_HUB_URL', plugin_dir_url( __FILE__ ) );
@@ -328,6 +328,13 @@ function rp_resource_hub_apply_roles_and_caps() {
 				'edit_published_rp_sitreps'    => true,
 				'delete_rp_sitreps'            => true,
 				'delete_published_rp_sitreps'  => true,
+				'edit_partner_resource'            => true,
+				'read_partner_resource'            => true,
+				'delete_partner_resource'          => true,
+				'edit_partner_resources'           => true,
+				'edit_published_partner_resources' => true,
+				'delete_partner_resources'         => true,
+				'delete_published_partner_resources' => true,
 			)
 		);
 	} else {
@@ -341,6 +348,13 @@ function rp_resource_hub_apply_roles_and_caps() {
 		$staff->add_cap( 'edit_published_rp_sitreps' );
 		$staff->add_cap( 'delete_rp_sitreps' );
 		$staff->add_cap( 'delete_published_rp_sitreps' );
+		$staff->add_cap( 'edit_partner_resource' );
+		$staff->add_cap( 'read_partner_resource' );
+		$staff->add_cap( 'delete_partner_resource' );
+		$staff->add_cap( 'edit_partner_resources' );
+		$staff->add_cap( 'edit_published_partner_resources' );
+		$staff->add_cap( 'delete_partner_resources' );
+		$staff->add_cap( 'delete_published_partner_resources' );
 	}
 }
 
